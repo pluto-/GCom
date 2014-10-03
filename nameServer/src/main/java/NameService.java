@@ -1,7 +1,6 @@
 import util.Host;
 import util.NameServerGroupManagement;
 
-import java.net.InetAddress;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -17,15 +16,10 @@ public class NameService implements NameServerGroupManagement {
     }
 
     public Host joinGroup(Host newMember, String groupName) {
-        Host leader;
-        if(groups.containsKey(groupName)) {
-            // Group exists, returns it's leader.
-            leader = groups.get(groupName);
-        } else {
-            // Create new group with caller as group leader.
+        if(!groups.containsKey(groupName)) {
             groups.put(groupName, newMember);
-            leader = groups.get(groupName);
         }
+        Host leader = groups.get(groupName);
 
         // USE LEADERS addMember method.
 
