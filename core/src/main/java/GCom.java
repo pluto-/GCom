@@ -1,7 +1,7 @@
-import communication.Communicator;
-import groupmanagement.GroupManager;
+import communicator.Communicator;
+import groupmanager.GroupManager;
 import rmi.RmiServer;
-import sorting.MessageSorter;
+import messagesorter.MessageSorter;
 import transfer.Host;
 import transfer.PeerCommunication;
 
@@ -30,7 +30,7 @@ public class GCom implements PeerCommunication {
         this.gcomClient = gcomClient;
     }
 
-    public void multicast() {
+    public void multicast(String message, String group) {
 
     }
     
