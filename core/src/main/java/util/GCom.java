@@ -1,4 +1,4 @@
-package src.main.java.util;
+package util;
 
 import rmi.RmiServer;
 import transfer.Host;
@@ -12,14 +12,25 @@ import java.util.Map;
 /**
  * Created by Jonas on 2014-10-03.
  */
-public class ClientRMIServer implements PeerCommunication {
+public class GCom implements PeerCommunication {
     
     private boolean reliableMulticast;
     private RmiServer rmiServer;
 
-    public ClientRMIServer(boolean reliableMulticast, int rmiPort) throws RemoteException, UnknownHostException, AlreadyBoundException {
+    private GroupManager groupManager;
+    private Communicator communicator;
+    private MessageSorter messageSorter;
+
+    GComClient gcomClient;
+
+    public GCom(boolean reliableMulticast, int rmiPort, GComClient gcomClient) throws RemoteException, UnknownHostException, AlreadyBoundException {
         this.reliableMulticast = reliableMulticast;
         rmiServer = new RmiServer(rmiPort);
+        this.gcomClient = gcomClient;
+    }
+
+    public void multicast() {
+
     }
     
     @Override

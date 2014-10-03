@@ -15,7 +15,7 @@ public class RmiServerTest {
         MyRemoteStuffs obj = new MyRemoteStuffs();
         RemoteStuffs stub = (RemoteStuffs) UnicastRemoteObject.exportObject(obj, 0);
         server.bind("test", stub);
-        System.out.println(LocateRegistry.getRegistry().list());
+        System.out.println(LocateRegistry.getRegistry(1337).list());
     }
 
     public static void main(String args[]) {
