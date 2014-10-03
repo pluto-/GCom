@@ -9,9 +9,6 @@
     <packaging>pom</packaging>
     <version>1.0-SNAPSHOT</version>
     <modules>
-        <module>communicator</module>
-        <module>groupManager</module>
-        <module>messageOrderer</module>
         <module>nameServer</module>
     </modules>
     <dependencies>
