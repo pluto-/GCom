@@ -1,7 +1,7 @@
 /**
  * Created by Patrik on 2014-10-03.
  */
-public interface gcomClient {
+public interface GComClient {
 
     public void deliverMessage(String message);
 
