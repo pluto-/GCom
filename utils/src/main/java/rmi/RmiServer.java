@@ -19,7 +19,7 @@ public class RmiServer {
     public RmiServer(int portNumber) throws RemoteException, UnknownHostException, AlreadyBoundException {
         if(System.getSecurityManager() == null) {
             System.setSecurityManager(new SecurityManager() {
-                public void checkConnect (String host, int port) {}
+                public void checkConnect (String host, int port) {System.out.println("connect");}
                 public void checkConnect (String host, int port, Object context) {}
                 public void checkPermission(Permission permission) {}
                 public void checkPermission(Permission permission, Object context) {}
@@ -29,10 +29,14 @@ public class RmiServer {
         System.out.println();
         System.setProperty("java.rmi.server.hostname", Inet4Address.getLocalHost().getHostAddress());
         registry = java.rmi.registry.LocateRegistry.createRegistry(portNumber);
+        System.out.println("constructor done");
     }
 
     public void bind(String name, Remote object) throws RemoteException, AlreadyBoundException {
         registry.rebind(name, object);
     }
 
+    public Registry getRegistry() {
+        return registry;
+    }
 }

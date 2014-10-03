@@ -3,6 +3,7 @@ import rmi.RmiServer;
 import transfer.Host;
 import transfer.MessageTransfer;
 
+import java.net.InterfaceAddress;
 import java.net.UnknownHostException;
 import java.rmi.AlreadyBoundException;
 import java.rmi.NotBoundException;
@@ -26,7 +27,7 @@ public class NameService implements NameServerGroupManagement {
         rmiServer = new RmiServer(rmiPort);
 
         NameServerGroupManagement stub = (NameServerGroupManagement) UnicastRemoteObject.exportObject(this, 0);
-        rmiServer.bind("NameServerGroupManagement", stub);
+        rmiServer.bind(NameServerGroupManagement.class.getName(), stub);
     }
 
     @Override
