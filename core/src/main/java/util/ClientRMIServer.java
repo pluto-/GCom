@@ -6,7 +6,7 @@ import java.util.Map;
 /**
  * Created by Jonas on 2014-10-03.
  */
-public class ClientRMIServer implements MessageTransfer {
+public class ClientRMIServer implements util.MessageTransfer {
     
     private boolean reliableMulticast;
 
@@ -15,7 +15,7 @@ public class ClientRMIServer implements MessageTransfer {
     }
     
     @Override
-    public void readMessage(Host sender, String Message, Map<Host, Integer> vectorClock) throws RemoteException {
+    public void readMessage(util.Host sender, String Message, Map<util.Host, Integer> vectorClock) throws RemoteException {
         
     }
 }

@@ -8,8 +8,10 @@ import java.net.InetAddress;
 public class Host {
 
     InetAddress address;
+    int port;
 
-    public Host(InetAddress address) {
+    public Host(InetAddress address, int port) {
         this.address = address;
+        this.port = port;
     }
 }
