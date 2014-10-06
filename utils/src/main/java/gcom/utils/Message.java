@@ -1,7 +1,5 @@
 package gcom.utils;
 
-import transfer.Host;
-
 import java.util.Map;
 
 /**
@@ -12,10 +10,10 @@ public class Message {
     private boolean isReliable;
     private String text;
     private Host sender;
-    private Map<Host, Integer> vectorClock;
+    private VectorClock vectorClock;
     private String groupName;
 
-    public Message(boolean isReliable, String text, Host sender, Map<Host, Integer> vectorClock, String groupName) {
+    public Message(boolean isReliable, String text, Host sender, VectorClock vectorClock, String groupName) {
         this.isReliable = isReliable;
         this.text = text;
         this.sender = sender;
@@ -27,7 +25,7 @@ public class Message {
         return groupName;
     }
 
-    public Map<Host, Integer> getVectorClock() {
+    public VectorClock getVectorClock() {
         return vectorClock;
     }
 
