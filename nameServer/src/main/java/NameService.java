@@ -54,7 +54,7 @@ public class NameService implements NameServiceGroupManagement {
     private void sendAddMember(Host leader, Host newMember) throws RemoteException, NotBoundException {
         Registry leaderRegistry = LocateRegistry.getRegistry(leader.getAddress().getHostAddress(), leader.getPort());
 
-        PeerCommunication stub = (PeerCommunication) leaderRegistry.lookup("MessageTransfer");
+        PeerCommunication stub = (PeerCommunication) leaderRegistry.lookup(PeerCommunication.class.getName());
         stub.addMember(newMember);
     }
 }

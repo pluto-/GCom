@@ -1,5 +1,7 @@
 package transfer;
 
+
+import java.rmi.NotBoundException;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.util.Map;
@@ -8,7 +10,7 @@ import java.util.Map;
  * Created by Jonas on 2014-10-03.
  */
 public interface PeerCommunication extends Remote {
-    public void readMessage(Host sender, String Message, Map<Host, Integer> vectorClock) throws RemoteException;
-    public void addMember(Host newMember) throws RemoteException;
-    public void viewChanged(Host newMember) throws RemoteException;
+    public void receiveMessage(Message message) throws RemoteException;
+    public void addMember(Host newMember, String groupName) throws RemoteException, NotBoundException;
+    public void viewChanged(Host newMember, String groupName) throws RemoteException;
 }
