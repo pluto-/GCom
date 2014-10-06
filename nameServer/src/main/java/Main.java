@@ -1,6 +1,7 @@
 import java.net.UnknownHostException;
 import java.rmi.AlreadyBoundException;
 import java.rmi.RemoteException;
+import gcom.nameserver.NameService;
 
 /**
  * Created by Jonas on 2014-10-03.

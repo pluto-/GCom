@@ -1,4 +1,4 @@
-package rmi;
+package gcom.utils;
 
 import java.net.Inet4Address;
 import java.net.UnknownHostException;

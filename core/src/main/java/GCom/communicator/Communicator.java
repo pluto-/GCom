@@ -1,4 +1,4 @@
-package GCom.communicator;
+package gcom.communicator;
 
 import GCom.GCom;
 import rmi.RmiServer;
