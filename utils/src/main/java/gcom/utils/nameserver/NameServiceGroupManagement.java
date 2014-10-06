@@ -1,6 +1,6 @@
 package gcom.utils.nameserver;
 
-import transfer.Host;
+import gcom.utils.transfer.Host;
 
 import java.rmi.NotBoundException;
 import java.rmi.Remote;
