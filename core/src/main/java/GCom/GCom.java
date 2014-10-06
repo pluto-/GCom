@@ -1,7 +1,9 @@
-import communicator.Communicator;
-import groupmanager.GroupManager;
+package GCom;
+
+import GCom.GCom.communicator.Communicator;
+import GCom.GCom.groupmanager.GroupManager;
 import rmi.RmiServer;
-import messagesorter.MessageSorter;
+import GCom.messagesorter.MessageSorter;
 import transfer.Host;
 import transfer.PeerCommunication;
 
