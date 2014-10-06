@@ -9,8 +9,8 @@ import java.util.Map;
 public class VectorClock {
     Map<Host, Integer> clock;
 
-    public void VectorClock() {
-        clock = new HashMap<Host, Integer>();
+    public VectorClock() {
+        clock = new HashMap<>();
     }
 
     public boolean hasReceived(Host host, Integer value) {

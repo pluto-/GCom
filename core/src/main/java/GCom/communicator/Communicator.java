@@ -20,8 +20,8 @@ import java.util.ArrayList;
  */
 public class Communicator implements PeerCommunication {
 
-    GCom gCom;
-    RmiServer rmiServer;
+    private GCom gCom;
+    private RmiServer rmiServer;
 
     public Communicator(GCom gCom, int rmiPort) throws RemoteException, UnknownHostException, AlreadyBoundException {
         this.gCom = gCom;

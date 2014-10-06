@@ -32,7 +32,7 @@ public class GroupManager {
     }
 
     public void joinGroup(String groupName) throws RemoteException {
-        Host leader = nameService.joinGroup(self, groupName);
+        Host leader = nameService.joinGroup(groupName, self);
         groups.put(groupName, new Group(groupName, leader));
     }
 
