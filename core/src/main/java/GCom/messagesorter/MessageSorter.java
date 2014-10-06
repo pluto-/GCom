@@ -1,4 +1,4 @@
-package GCom.messagesorter;
+package gcom.messagesorter;
 
 /**
  * Created by Jonas on 2014-10-03.
