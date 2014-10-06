@@ -1,4 +1,4 @@
-package nameserver;
+package gcom.utils.nameserver;
 
 import transfer.Host;
 

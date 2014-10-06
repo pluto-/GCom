@@ -1,4 +1,4 @@
-package transfer;
+package gcom.utils.transfer;
 
 import java.rmi.Remote;
 import java.rmi.RemoteException;

@@ -1,11 +1,12 @@
-package GCom;
+package gcom;
 
-import GCom.GCom.communicator.Communicator;
-import GCom.GCom.groupmanager.GroupManager;
-import rmi.RmiServer;
-import GCom.messagesorter.MessageSorter;
-import transfer.Host;
-import transfer.PeerCommunication;
+import gcom.communicator.Communicator;
+import gcom.groupmanager.GroupManager;
+import gcom.utils.GComClient;
+import gcom.utils.rmi.RmiServer;
+import gcom.messagesorter.MessageSorter;
+import gcom.utils.transfer.Host;
+import gcom.utils.transfer.PeerCommunication;
 
 import java.net.UnknownHostException;
 import java.rmi.AlreadyBoundException;
@@ -22,7 +23,7 @@ public class GCom implements PeerCommunication {
 
     private GroupManager groupManager;
     private Communicator communicator;
-    private MessageSorter messageSorter;
+    private gcom.messagesorter.MessageSorter messageSorter;
 
     GComClient gcomClient;
 

@@ -1,4 +1,4 @@
-package GCom.groupmanager;
+package gcom.groupmanager;
 
 import nameserver.NameServiceGroupManagement;
 import transfer.Host;
