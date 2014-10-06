@@ -2,10 +2,10 @@ package gcom.nameserver;
 
 import gcom.utils.nameserver.NameServiceGroupManagement;
 
-import nameserver.NameServiceGroupManagement;
-import rmi.RmiServer;
-import transfer.Host;
-import transfer.PeerCommunication;
+import gcom.utils.nameserver.NameServiceGroupManagement;
+import gcom.utils.rmi.RmiServer;
+import gcom.utils.transfer.Host;
+import gcom.utils.transfer.PeerCommunication;
 
 import java.net.UnknownHostException;
 import java.rmi.AlreadyBoundException;

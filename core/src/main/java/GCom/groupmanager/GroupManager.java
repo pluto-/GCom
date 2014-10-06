@@ -1,7 +1,7 @@
 package gcom.groupmanager;
 
-import nameserver.NameServiceGroupManagement;
-import transfer.Host;
+import gcom.utils.nameserver.NameServiceGroupManagement;
+import gcom.utils.transfer.Host;
 
 import java.net.MalformedURLException;
 import java.rmi.Naming;

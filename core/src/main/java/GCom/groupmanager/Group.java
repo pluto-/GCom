@@ -1,6 +1,6 @@
 package gcom.groupmanager;
 
-import transfer.Host;
+import gcom.utils.transfer.Host;
 
 import java.util.ArrayList;
 
