@@ -1,16 +1,17 @@
-package GCom;
+package gcom;
 
 import gcom.communicator.Communicator;
 import gcom.groupmanager.GroupManager;
-import gcom.utils.GComClient;
-import gcom.utils.RmiServer;
+import gcom.utils.*;
 import gcom.messagesorter.MessageSorter;
-import gcom.utils.Host;
-import gcom.utils.PeerCommunication;
 
+import java.net.Inet4Address;
+import java.net.MalformedURLException;
 import java.net.UnknownHostException;
 import java.rmi.AlreadyBoundException;
+import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
+import java.util.ArrayList;
 import java.util.Map;
 
 /**
@@ -25,12 +26,14 @@ public class GCom implements PeerCommunication {
     private Communicator communicator;
     private MessageSorter messageSorter;
 
-    GComClient gcomClient;
+    private GComClient gcomClient;
 
-    public GCom(boolean reliableMulticast, int rmiPort, GComClient gcomClient) throws RemoteException, UnknownHostException, AlreadyBoundException {
+    public GCom(boolean reliableMulticast, int rmiPort, GComClient gcomClient, Host nameService)
+            throws RemoteException, UnknownHostException, AlreadyBoundException, MalformedURLException, NotBoundException {
         this.reliableMulticast = reliableMulticast;
         rmiServer = new RmiServer(rmiPort);
         this.gcomClient = gcomClient;
+        this.groupManager = new GroupManager(nameService, rmiServer.getHost(), this);
     }
 
     public void multicast(String message, String group) {
@@ -38,17 +41,24 @@ public class GCom implements PeerCommunication {
     }
     
     @Override
-    public void readMessage(Host sender, String Message, Map<Host, Integer> vectorClock) throws RemoteException {
-        
+    public void receiveMessage(Message message) throws RemoteException {
+
     }
 
     @Override
-    public void addMember(Host newMember) throws RemoteException {
-        
+    public void addMember(String groupName, Host newMember) throws RemoteException, NotBoundException {
+        groupManager.addMember(groupName, newMember);
     }
 
     @Override
-    public void viewChanged(Host newMember) throws RemoteException {
+    public void viewChanged(String groupName, ArrayList<Host> members) throws RemoteException {
+        groupManager.processViewChange(groupName, members);
+    }
+
+    public void sendViewChange(Group group) {
+    }
+
+    public void sendLeaderElection(Group group) {
 
     }
 }

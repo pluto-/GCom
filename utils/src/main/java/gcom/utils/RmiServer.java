@@ -14,9 +14,11 @@ import java.security.Permission;
  */
 public class RmiServer {
 
-    Registry registry;
+    private Registry registry;
+    private int port;
 
     public RmiServer(int portNumber) throws RemoteException, UnknownHostException, AlreadyBoundException {
+        this.port = portNumber;
         if(System.getSecurityManager() == null) {
             System.setSecurityManager(new SecurityManager() {
                 public void checkConnect (String host, int port) {System.out.println("connect");}
@@ -34,6 +36,10 @@ public class RmiServer {
 
     public void bind(String name, Remote object) throws RemoteException, AlreadyBoundException {
         registry.rebind(name, object);
+    }
+
+    public Host getHost() throws UnknownHostException {
+        return new Host(Inet4Address.getLocalHost(), port);
     }
 
     public Registry getRegistry() {

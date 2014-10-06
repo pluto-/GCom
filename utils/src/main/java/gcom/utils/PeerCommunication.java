@@ -4,6 +4,7 @@ package gcom.utils;
 import java.rmi.NotBoundException;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
+import java.util.ArrayList;
 import java.util.Map;
 
 /**
@@ -11,6 +12,6 @@ import java.util.Map;
  */
 public interface PeerCommunication extends Remote {
     public void receiveMessage(Message message) throws RemoteException;
-    public void addMember(Host newMember, String groupName) throws RemoteException, NotBoundException;
-    public void viewChanged(Host newMember, String groupName) throws RemoteException;
+    public void addMember(String groupName, Host newMember) throws RemoteException, NotBoundException;
+    public void viewChanged(String groupName, ArrayList<Host> members) throws RemoteException;
 }

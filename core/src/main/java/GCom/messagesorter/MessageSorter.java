@@ -1,8 +1,8 @@
 package gcom.messagesorter;
 
-import GCom.GCom;
+import gcom.GCom;
 import sun.plugin2.message.Message;
-import transfer.Host;
+import gcom.utils.Host;
 
 /**
  * Created by Jonas on 2014-10-03.

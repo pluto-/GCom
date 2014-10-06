@@ -1,10 +1,10 @@
 package gcom.communicator;
 
-import GCom.GCom;
-import rmi.RmiServer;
-import transfer.Host;
-import transfer.Message;
-import transfer.PeerCommunication;
+import gcom.GCom;
+import gcom.utils.RmiServer;
+import gcom.utils.Host;
+import gcom.utils.Message;
+import gcom.utils.PeerCommunication;
 
 import java.net.UnknownHostException;
 import java.rmi.AlreadyBoundException;

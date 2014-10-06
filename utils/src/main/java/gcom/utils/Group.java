@@ -1,4 +1,4 @@
-package gcom.groupmanager;
+package gcom.utils;
 
 import gcom.utils.Host;
 

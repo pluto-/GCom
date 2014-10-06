@@ -1,5 +1,7 @@
 package gcom.groupmanager;
 
+import gcom.GCom;
+import gcom.utils.Group;
 import gcom.utils.NameServiceGroupManagement;
 import gcom.utils.Host;
 import gcom.utils.PeerCommunication;
@@ -17,18 +19,19 @@ import java.util.Map;
  */
 public class GroupManager {
 
-    Map<String, Group> groups;
-    Host nameServiceHost;
-    Host self;
+    private Map<String, Group> groups;
+    private NameServiceGroupManagement nameService;
+    private Host self;
+    private GCom gCom;
 
-    public GroupManager (Host nameServiceHost, Host self) {
-        nameServiceHost = nameServiceHost;
+    public GroupManager (Host nameServiceHost, Host self, GCom gCom) throws RemoteException, NotBoundException, MalformedURLException {
+        nameService = (NameServiceGroupManagement) Naming.lookup(nameServiceHost + "/" + NameServiceGroupManagement.class.getName());
         groups = new HashMap<>();
         this.self = self;
+        this.gCom = gCom;
     }
 
-    public void joinGroup(String groupName) throws RemoteException, MalformedURLException, NotBoundException {
-        NameServiceGroupManagement nameService = (NameServiceGroupManagement) Naming.lookup(nameServiceHost + "/" + NameServiceGroupManagement.class.getName());
+    public void joinGroup(String groupName) throws RemoteException {
         Host leader = nameService.joinGroup(self, groupName);
         groups.put(groupName, new Group(groupName, leader));
     }
@@ -42,9 +45,13 @@ public class GroupManager {
 
     public void addMember(String groupName, Host member) {
         groups.get(groupName).addMember(member);
+        gCom.sendViewChange(groups.get(groupName));
     }
 
     public void processViewChange(String groupName, ArrayList<Host> members) {
+        if (!members.contains(groups.get(groupName).getLeader())) {
+            gCom.sendLeaderElection(groups.get(groupName));
+        }
         groups.get(groupName).setMembers(members);
     }
 }
