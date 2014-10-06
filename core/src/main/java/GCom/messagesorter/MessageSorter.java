@@ -1,4 +1,4 @@
-package GCom.messagesorter;
+package gcom.messagesorter;
 
 import GCom.GCom;
 import sun.plugin2.message.Message;
