@@ -31,9 +31,7 @@ public class Communicator implements PeerCommunication {
         rmiServer.bind(PeerCommunication.class.getName(), stub);
     }
 
-    public void multicast(Message message) throws RemoteException, NotBoundException {
-        ArrayList<Host> groupMembers = gCom.getGroupMembers(message.getGroupName());
-
+    public void multicast(Message message, ArrayList<Host> groupMembers) throws RemoteException, NotBoundException {
         for(Host member : groupMembers) {
             Registry memberRegistry = LocateRegistry.getRegistry(member.getAddress().getHostAddress(), member.getPort());
 
@@ -49,24 +47,31 @@ public class Communicator implements PeerCommunication {
         }
 
         //TODO: Send to message ordering.
+
+        gCom.deliverMessage(message.getText());
     }
 
     @Override
-    public void addMember(Host newMember, String groupName) throws RemoteException, NotBoundException {
-        ArrayList<Host> groupMembers = gCom.getGroupMembers(groupName);
+    public void addMember(String groupName, Host newMember) throws RemoteException, NotBoundException {
+        gCom.addMember(groupName, newMember);
+    }
 
-        for(Host member : groupMembers) {
+    @Override
+    public void viewChanged(String groupName, ArrayList<Host> members) throws RemoteException {
+        gCom.viewChanged(groupName, members);
+    }
+
+    @Override
+    public void electLeader(String groupName) {
+        //TODO fix
+    }
+
+    public void sendViewChange(ArrayList<Host> members, String groupName) throws RemoteException, NotBoundException {
+        for(Host member : members) {
             Registry memberRegistry = LocateRegistry.getRegistry(member.getAddress().getHostAddress(), member.getPort());
 
             PeerCommunication stub = (PeerCommunication) memberRegistry.lookup(PeerCommunication.class.getName());
-            stub.viewChanged(newMember, groupName);
+            stub.viewChanged(groupName, members);
         }
-
-        gCom.addMemberInGroup(newMember, groupName);
-    }
-
-    @Override
-    public void viewChanged(Host newMember, String groupName) throws RemoteException {
-        gCom.addMemberInGroup(newMember, groupName);
     }
 }

@@ -43,7 +43,7 @@ public class GroupManager {
         }
     }
 
-    public void addMember(String groupName, Host member) {
+    public void addMember(String groupName, Host member) throws RemoteException, NotBoundException {
         groups.get(groupName).addMember(member);
         gCom.sendViewChange(groups.get(groupName));
     }
@@ -53,5 +53,9 @@ public class GroupManager {
             gCom.sendLeaderElection(groups.get(groupName));
         }
         groups.get(groupName).setMembers(members);
+    }
+
+    public ArrayList<Host> getMembers(String groupName) {
+        return groups.get(groupName).getMembers();
     }
 }

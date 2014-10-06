@@ -25,7 +25,7 @@ public class NameService implements NameServiceGroupManagement {
     private RmiServer rmiServer;
 
     public NameService(int rmiPort) throws RemoteException, UnknownHostException, AlreadyBoundException {
-        groups = new HashMap<String, Host>();
+        groups = new HashMap<>();
         rmiServer = new RmiServer(rmiPort);
 
         NameServiceGroupManagement stub = (NameServiceGroupManagement) UnicastRemoteObject.exportObject(this, 0);
@@ -33,15 +33,15 @@ public class NameService implements NameServiceGroupManagement {
     }
 
     @Override
-    public Host joinGroup(Host newMember, String groupName) throws RemoteException {
+    public Host joinGroup(String groupName, Host newMember) throws RemoteException {
         if(!groups.containsKey(groupName)) {
-            groups.put(groupName, newMember);
+            setLeader(groupName, newMember);
         }
         Host leader = groups.get(groupName);
 
         // Use leaders addMember method.
         try {
-            sendAddMember(leader, newMember);
+            sendAddMember(groupName, leader, newMember);
         } catch (NotBoundException e) {
             e.printStackTrace();
         }
@@ -54,10 +54,15 @@ public class NameService implements NameServiceGroupManagement {
         groups.remove(groupName);
     }
 
-    private void sendAddMember(Host leader, Host newMember) throws RemoteException, NotBoundException {
+    @Override
+    public void setLeader(String groupName, Host leader) throws RemoteException {
+        groups.put(groupName, leader);
+    }
+
+    private void sendAddMember(String groupName, Host leader, Host newMember) throws RemoteException, NotBoundException {
         Registry leaderRegistry = LocateRegistry.getRegistry(leader.getAddress().getHostAddress(), leader.getPort());
 
         PeerCommunication stub = (PeerCommunication) leaderRegistry.lookup(PeerCommunication.class.getName());
-        stub.addMember(newMember);
+        stub.addMember(groupName, newMember);
     }
 }
