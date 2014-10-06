@@ -1,4 +1,4 @@
-package gcom.utils.transfer;
+package gcom.utils;
 
 import java.net.InetAddress;
 

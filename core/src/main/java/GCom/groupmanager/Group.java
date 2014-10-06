@@ -1,6 +1,6 @@
 package gcom.groupmanager;
 
-import gcom.utils.transfer.Host;
+import gcom.utils.Host;
 
 import java.util.ArrayList;
 
@@ -13,12 +13,12 @@ public class Group {
     private Host leader;
     private ArrayList<Host> members;
 
-    public Group(Host leader, String name) {
+    public Group(String name, Host leader) {
         this.leader = leader;
         this.name = name;
     }
 
-    public Group(Host leader, String name, ArrayList<Host> members) {
+    public Group(String name, Host leader, ArrayList<Host> members) {
         this.leader = leader;
         this.name = name;
         this.members = members;

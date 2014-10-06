@@ -3,10 +3,10 @@ package gcom;
 import gcom.communicator.Communicator;
 import gcom.groupmanager.GroupManager;
 import gcom.utils.GComClient;
-import gcom.utils.rmi.RmiServer;
+import gcom.utils.RmiServer;
 import gcom.messagesorter.MessageSorter;
-import gcom.utils.transfer.Host;
-import gcom.utils.transfer.PeerCommunication;
+import gcom.utils.Host;
+import gcom.utils.PeerCommunication;
 
 import java.net.UnknownHostException;
 import java.rmi.AlreadyBoundException;
