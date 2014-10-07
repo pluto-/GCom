@@ -95,7 +95,7 @@ public class ClientGUI extends JFrame implements ActionListener {
                 message.setText("");
             } else {
                 try {
-                    client.sendMessage("[" + username + "] " + message.getText());
+                    client.sendMessage(username + " > " + message.getText());
                 } catch (NotBoundException e1) {
                     e1.printStackTrace();
                 } catch (RemoteException e1) {
