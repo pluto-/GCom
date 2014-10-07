@@ -9,10 +9,7 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.MalformedURLException;
 import java.net.UnknownHostException;
-import java.rmi.AlreadyBoundException;
-import java.rmi.Naming;
-import java.rmi.NotBoundException;
-import java.rmi.RemoteException;
+import java.rmi.*;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
@@ -51,10 +48,10 @@ public class NameService implements NameServiceGroupManagement  {
 
         // Use leaders addMember method.
         logger.error("before addmember");
+        NameServiceClient nameServiceClient = null;
         try {
-            NameServiceClient nameServiceClient = (NameServiceClient)Naming.lookup("rmi://" + newMember + "/" + NameServiceClient.class.getSimpleName());
+            nameServiceClient = (NameServiceClient)Naming.lookup("rmi://" + newMember + "/" + NameServiceClient.class.getSimpleName());
             nameServiceClient.setLeader(groupName, leader);
-            sendAddMember(groupName, leader,  newMember);
         } catch (NotBoundException e) {
             e.printStackTrace();
         } catch (MalformedURLException e) {
@@ -62,7 +59,15 @@ public class NameService implements NameServiceGroupManagement  {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        logger.error("after addmember");
+
+        try {
+            sendAddMember(groupName, leader,  newMember);
+        } catch(ConnectException e) {
+            nameServiceClient.setLeader(groupName, newMember);
+            logger.error("Leader not reachable, new leader - " + newMember);
+        }
+
+        logger.error("after addMember");
 
         return leader;
     }
