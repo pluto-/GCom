@@ -53,6 +53,8 @@ public class Client implements GComClient {
             e.printStackTrace();
         } catch (NotBoundException e) {
             e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
         System.out.println(" Done!");
         System.out.print("Trying to join group ...");

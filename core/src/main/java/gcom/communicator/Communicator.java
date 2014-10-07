@@ -6,6 +6,7 @@ import gcom.utils.Host;
 import gcom.utils.Message;
 import gcom.utils.PeerCommunication;
 
+import java.io.IOException;
 import java.net.UnknownHostException;
 import java.rmi.AlreadyBoundException;
 import java.rmi.NotBoundException;
@@ -23,12 +24,12 @@ public class Communicator implements PeerCommunication {
     private GCom gCom;
     private RmiServer rmiServer;
 
-    public Communicator(GCom gCom, int rmiPort) throws RemoteException, UnknownHostException, AlreadyBoundException {
+    public Communicator(GCom gCom, int rmiPort) throws IOException, AlreadyBoundException {
         this.gCom = gCom;
         rmiServer = new RmiServer(rmiPort);
 
-        PeerCommunication stub = (PeerCommunication) UnicastRemoteObject.exportObject(this, 0);
-        rmiServer.bind(PeerCommunication.class.getName(), stub);
+        PeerCommunication stub = (PeerCommunication) UnicastRemoteObject.exportObject(this, rmiPort);
+        rmiServer.bind(PeerCommunication.class.getSimpleName(), stub);
     }
 
     public void multicast(Message message, ArrayList<Host> groupMembers) throws RemoteException, NotBoundException {

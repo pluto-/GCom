@@ -29,7 +29,7 @@ public class GCom {
     private GComClient gcomClient;
 
     public GCom(boolean reliableMulticast, int rmiPort, GComClient gcomClient, Host nameService)
-            throws RemoteException, UnknownHostException, AlreadyBoundException, MalformedURLException, NotBoundException {
+            throws Exception {
         this.reliableMulticast = reliableMulticast;
         rmiServer = new RmiServer(rmiPort);
         this.gcomClient = gcomClient;

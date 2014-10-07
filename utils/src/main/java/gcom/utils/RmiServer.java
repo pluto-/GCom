@@ -1,14 +1,14 @@
 package gcom.utils;
 
+import java.io.IOException;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 
-import java.net.Inet4Address;
+import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.rmi.AlreadyBoundException;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
-import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.security.Permission;
 
@@ -18,10 +18,12 @@ import java.security.Permission;
 public class RmiServer {
 
     private Registry registry;
+    private InetAddress externalIp;
     private int port;
     private Logger logger2 = LogManager.getLogger(this.getClass());
     private Logger logger = LogManager.getLogger(SecurityManager.class);
-    public RmiServer(int portNumber) throws Exception {
+
+    public RmiServer(int portNumber) throws IOException {
         this.port = portNumber;
         logger2.error("before security manager");
         if(System.getSecurityManager() == null) {
@@ -37,6 +39,7 @@ public class RmiServer {
         //System.setProperty("java.rmi.server.hostname", Inet4Address.getLocalHost().getHostAddress());
         System.setProperty("java.rmi.server.hostname", IpChecker.getIp());
         registry = java.rmi.registry.LocateRegistry.createRegistry(portNumber);
+        externalIp = InetAddress.getByName(IpChecker.getIp());
         logger2.error("constructor done");
     }
 
@@ -45,7 +48,7 @@ public class RmiServer {
     }
 
     public Host getHost() throws UnknownHostException {
-        return new Host(Inet4Address.getLocalHost(), port);
+        return new Host(externalIp, port);
     }
 
     public Registry getRegistry() {
