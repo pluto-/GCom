@@ -46,11 +46,6 @@ public class GCom {
         communicator.multicast(message, groupManager.getMembers(group));
     }
     
-    public void addMember(String groupName, Host newMember) throws RemoteException, NotBoundException, MalformedURLException {
-        System.out.print("Adding member... ");
-        groupManager.addMember(groupName, newMember);
-        System.out.println("Done!");
-    }
 
     public void viewChanged(String groupName, ArrayList<Host> members) throws RemoteException {
         groupManager.processViewChange(groupName, members);

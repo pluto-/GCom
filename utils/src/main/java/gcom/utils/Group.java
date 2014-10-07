@@ -9,28 +9,18 @@ import java.util.ArrayList;
  */
 public class Group {
 
-    private String name;
+    private final String name;
     private Host leader;
     private ArrayList<Host> members;
 
     public Group(String name, Host leader) {
-        this.leader = leader;
-        this.name = name;
         members = new ArrayList<>();
-    }
-
-    public Group(String name, Host leader, ArrayList<Host> members) {
         this.leader = leader;
         this.name = name;
-        this.members = members;
     }
 
     public String getName() {
         return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
     }
 
     public Host getLeader() {
