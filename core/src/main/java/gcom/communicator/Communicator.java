@@ -35,7 +35,7 @@ public class Communicator implements PeerCommunication {
         for(Host member : groupMembers) {
             Registry memberRegistry = LocateRegistry.getRegistry(member.getAddress().getHostAddress(), member.getPort());
 
-            PeerCommunication stub = (PeerCommunication) memberRegistry.lookup(PeerCommunication.class.getName());
+            PeerCommunication stub = (PeerCommunication) memberRegistry.lookup(PeerCommunication.class.getSimpleName());
             stub.receiveMessage(message);
         }
     }

@@ -19,7 +19,7 @@ import java.util.Map;
  * Created by Jonas on 2014-10-03.
  */
 public class GCom {
-    
+
     private boolean reliableMulticast;
     private RmiServer rmiServer;
 
@@ -38,6 +38,8 @@ public class GCom {
         communicator = new Communicator(this);
         PeerCommunication stub = (PeerCommunication) UnicastRemoteObject.exportObject(communicator, rmiPort);
         rmiServer.bind(PeerCommunication.class.getSimpleName(), stub);
+        NameServiceClient nameServiceClient = (NameServiceClient) UnicastRemoteObject.exportObject(groupManager, rmiPort);
+        rmiServer.bind(NameServiceClient.class.getSimpleName(), nameServiceClient);
     }
 
     public void multicast(String text, String group) throws UnknownHostException, RemoteException, NotBoundException {
@@ -45,7 +47,10 @@ public class GCom {
         Message message = new Message(false, text, rmiServer.getHost(), new VectorClock(), group);
         communicator.multicast(message, groupManager.getMembers(group));
     }
-    
+
+    public void leaveGroup(String group) throws RemoteException, NotBoundException, MalformedURLException {
+        groupManager.leaveGroup(group);
+    }
 
     public void viewChanged(String groupName, ArrayList<Host> members) throws RemoteException {
         groupManager.processViewChange(groupName, members);
