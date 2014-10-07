@@ -22,14 +22,10 @@ import java.util.ArrayList;
 public class Communicator implements PeerCommunication {
 
     private GCom gCom;
-    private RmiServer rmiServer;
 
-    public Communicator(GCom gCom, int rmiPort) throws IOException, AlreadyBoundException {
+    public Communicator(GCom gCom) throws IOException, AlreadyBoundException {
         this.gCom = gCom;
-        rmiServer = new RmiServer(rmiPort);
 
-        PeerCommunication stub = (PeerCommunication) UnicastRemoteObject.exportObject(this, rmiPort);
-        rmiServer.bind(PeerCommunication.class.getSimpleName(), stub);
     }
 
     public void multicast(Message message, ArrayList<Host> groupMembers) throws RemoteException, NotBoundException {

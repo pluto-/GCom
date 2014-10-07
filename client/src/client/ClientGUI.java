@@ -16,6 +16,7 @@ public class ClientGUI extends JFrame implements ActionListener {
     JTextArea chat;
     JTextField message;
     JButton send;
+    JButton sendSlow;
     Client client;
 
     /**
@@ -40,6 +41,9 @@ public class ClientGUI extends JFrame implements ActionListener {
         send = new JButton("Send");
         send.addActionListener(this);
 
+        sendSlow = new JButton("Send Slow");
+        sendSlow.addActionListener(this);
+
         chat = new JTextArea();
         chat.setEditable(false);
         chat.setFont(new Font("Times New Roman", Font.PLAIN, 15));
@@ -62,6 +66,7 @@ public class ClientGUI extends JFrame implements ActionListener {
 
         southPanel.add(message, left);
         southPanel.add(send, right);
+        southPanel.add(sendSlow, right);
 
         mainPanel.add(BorderLayout.SOUTH, southPanel);
 
@@ -87,6 +92,27 @@ public class ClientGUI extends JFrame implements ActionListener {
                 chat.setText("Cleared all messages\n");
                 message.setText("");
             } else {
+                try {
+                    client.sendMessage(message.getText());
+                } catch (NotBoundException e1) {
+                    e1.printStackTrace();
+                } catch (RemoteException e1) {
+                    e1.printStackTrace();
+                } catch (UnknownHostException e1) {
+                    e1.printStackTrace();
+                }
+                message.setText("");
+            }
+            message.requestFocusInWindow();
+
+        } else if(e.getSource().equals(sendSlow)) {
+            if (message.getText().length() < 1) {
+                // do nothing
+            } else if (message.getText().equals(".clear")) {
+                chat.setText("Cleared all messages\n");
+                message.setText("");
+            } else {
+                int speed = Integer.valueOf(JOptionPane.showInputDialog("Speed: "));
                 try {
                     client.sendMessage(message.getText());
                 } catch (NotBoundException e1) {

@@ -28,11 +28,11 @@ public class RmiServer {
         logger2.error("before security manager");
         if(System.getSecurityManager() == null) {
             System.setSecurityManager(new SecurityManager() {
-                public void checkConnect (String host, int port) {logger.error("connect");}
-                public void checkConnect (String host, int port, Object context) {logger.error("connect");}
-                public void checkPermission(Permission permission) {logger.error("connect");}
-                public void checkPermission(Permission permission, Object context) {logger.error("connect");}
-                public void checkAccept(String host, int port) {logger.error("connect");}
+                public void checkConnect (String host, int port) {/*logger.error("connect");*/}
+                public void checkConnect (String host, int port, Object context) {/*logger.error("connect");*/}
+                public void checkPermission(Permission permission) {/*logger.error("connect");*/}
+                public void checkPermission(Permission permission, Object context) {/*logger.error("connect");*/}
+                public void checkAccept(String host, int port) {/*logger.error("connect");*/}
             });
         }
         logger2.error("after security manager");
