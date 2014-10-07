@@ -8,8 +8,16 @@ import gcom.nameserver.NameService;
  */
 public class Main {
     public static void main(String args[]) {
+        if(args.length < 1) {
+            System.out.println("Specify RMI port as parameter.");
+            System.exit(1);
+        }
+        /*System.out.print("Setting policy...");
+        System.setProperty("java.security.policy", "server.policy");
+        System.out.println("Done!");*/
+
         try {
-            new NameService(9999);
+            new NameService(Integer.valueOf(args[0]));
         } catch (RemoteException e) {
             e.printStackTrace();
         } catch (AlreadyBoundException e) {

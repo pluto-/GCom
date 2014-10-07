@@ -24,7 +24,7 @@ public class Host {
     }
 
     public String toString() {
-        return getAddress() + ":" + getPort();
+        return getAddress().getHostAddress().replaceAll("/", "") + ":" + getPort();
     }
 
     @Override

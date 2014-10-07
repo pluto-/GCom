@@ -6,6 +6,7 @@ import gcom.utils.RmiServer;
 import gcom.utils.Host;
 import gcom.utils.PeerCommunication;
 
+import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.rmi.AlreadyBoundException;
 import java.rmi.NotBoundException;
@@ -19,7 +20,7 @@ import java.util.Map;
 /**
  * Created by Jonas on 2014-10-03.
  */
-public class NameService implements NameServiceGroupManagement {
+public class NameService implements NameServiceGroupManagement  {
 
     private Map<String, Host> groups;
     private RmiServer rmiServer;
@@ -28,8 +29,9 @@ public class NameService implements NameServiceGroupManagement {
         groups = new HashMap<>();
         rmiServer = new RmiServer(rmiPort);
 
-        NameServiceGroupManagement stub = (NameServiceGroupManagement) UnicastRemoteObject.exportObject(this, 0);
-        rmiServer.bind(NameServiceGroupManagement.class.getName(), stub);
+        NameServiceGroupManagement stub = (NameServiceGroupManagement) UnicastRemoteObject.exportObject(this, rmiPort);
+        rmiServer.bind(NameServiceGroupManagement.class.getSimpleName(), stub);
+
     }
 
     @Override
