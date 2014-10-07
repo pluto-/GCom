@@ -27,7 +27,10 @@ public class Client implements GComClient {
         System.out.println("Name service address: " + nameServiceAddress);
         System.out.println("Name service port: " + nameServicePort);
 
+        System.out.print("Initializing GUI...");
         clientGUI = new ClientGUI(this);
+        System.out.println(" Done!");
+        System.out.print("Setting up GCom...");
         Host nameService = null;
         try {
             nameService = new Host(InetAddress.getByName(nameServiceAddress), nameServicePort);
@@ -51,6 +54,15 @@ public class Client implements GComClient {
         } catch (NotBoundException e) {
             e.printStackTrace();
         }
+        System.out.println(" Done!");
+        System.out.print("Trying to join group ...");
+        try {
+            gCom.joinGroup(group);
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+        System.out.println(" Done!");
+
     }
 
     @Override

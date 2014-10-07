@@ -1,11 +1,12 @@
 package gcom.utils;
 
+import java.io.Serializable;
 import java.net.InetAddress;
 
 /**
  * Created by Jonas on 2014-10-03.
  */
-public class Host {
+public class Host implements Serializable {
 
     private InetAddress address;
     private int port;
