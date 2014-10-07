@@ -1,12 +1,13 @@
 package gcom.utils;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
 /**
  * Created by Jonas on 2014-10-06.
  */
-public class VectorClock {
+public class VectorClock implements Serializable {
     Map<Host, Integer> clock;
 
     public VectorClock() {
