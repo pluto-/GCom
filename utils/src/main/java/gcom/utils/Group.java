@@ -16,6 +16,7 @@ public class Group {
     public Group(String name, Host leader) {
         this.leader = leader;
         this.name = name;
+        members = new ArrayList<>();
     }
 
     public Group(String name, Host leader, ArrayList<Host> members) {
