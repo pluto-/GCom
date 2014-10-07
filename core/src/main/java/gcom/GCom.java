@@ -37,7 +37,7 @@ public class GCom {
         groupManager = new GroupManager(nameService, rmiServer.getHost(), this);
         communicator = new Communicator(this);
         PeerCommunication stub = (PeerCommunication) UnicastRemoteObject.exportObject(communicator, rmiPort);
-        rmiServer.bind(communicator.getClass().getSimpleName(), stub);
+        rmiServer.bind(PeerCommunication.class.getSimpleName(), stub);
     }
 
     public void multicast(String text, String group) throws UnknownHostException, RemoteException, NotBoundException {
