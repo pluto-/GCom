@@ -50,6 +50,9 @@ public class GroupManager {
     }
 
     public void addMember(String groupName, Host member) throws RemoteException, NotBoundException {
+        if (groups.get(groupName) == null) {
+            groups.put(groupName, new Group(groupName, member));
+        }
         groups.get(groupName).addMember(member);
         gCom.sendViewChange(groups.get(groupName));
     }
