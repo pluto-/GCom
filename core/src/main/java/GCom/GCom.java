@@ -48,6 +48,10 @@ public class GCom {
         groupManager.processViewChange(groupName, members);
     }
 
+    public void joinGroup(String groupName) throws RemoteException {
+        groupManager.joinGroup(groupName);
+    }
+
     public void sendViewChange(Group group) throws RemoteException, NotBoundException {
         communicator.sendViewChange(group.getMembers(), group.getName());
     }
