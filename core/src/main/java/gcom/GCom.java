@@ -51,8 +51,8 @@ public class GCom {
         groupManager.processViewChange(groupName, members);
     }
 
-    public void joinGroup(String groupName) throws RemoteException {
-        groupManager.joinGroup(groupName);
+    public void joinGroup(String groupName) throws RemoteException, MalformedURLException, NotBoundException {
+        groupManager.sendJoinGroup(groupName);
     }
 
     public void sendViewChange(Group group) throws RemoteException, NotBoundException, MalformedURLException {
