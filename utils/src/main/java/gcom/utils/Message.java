@@ -1,11 +1,12 @@
 package gcom.utils;
 
+import java.io.Serializable;
 import java.util.Map;
 
 /**
  * Created by Jonas on 2014-10-06.
  */
-public class Message {
+public class Message implements Serializable {
 
     private boolean isReliable;
     private String text;
