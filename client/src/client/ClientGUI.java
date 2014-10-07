@@ -4,6 +4,9 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.net.UnknownHostException;
+import java.rmi.NotBoundException;
+import java.rmi.RemoteException;
 
 /**
  * Created by Jonas on 2014-10-06.
@@ -84,7 +87,15 @@ public class ClientGUI extends JFrame implements ActionListener {
                 chat.setText("Cleared all messages\n");
                 message.setText("");
             } else {
-                client.sendMessage(message.getText());
+                try {
+                    client.sendMessage(message.getText());
+                } catch (NotBoundException e1) {
+                    e1.printStackTrace();
+                } catch (RemoteException e1) {
+                    e1.printStackTrace();
+                } catch (UnknownHostException e1) {
+                    e1.printStackTrace();
+                }
                 message.setText("");
             }
             message.requestFocusInWindow();

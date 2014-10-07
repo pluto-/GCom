@@ -34,10 +34,13 @@ public class GCom {
         rmiServer = new RmiServer(rmiPort);
         this.gcomClient = gcomClient;
         this.groupManager = new GroupManager(nameService, rmiServer.getHost(), this);
+        this.communicator = new Communicator(this, rmiPort);
     }
 
-    public void multicast(String message, String group) {
-
+    public void multicast(String text, String group) throws UnknownHostException, RemoteException, NotBoundException {
+        // BTW: Vector Clock is not what it should be.
+        Message message = new Message(false, text, rmiServer.getHost(), new VectorClock(), group);
+        communicator.multicast(message, groupManager.getMembers(group));
     }
     
     public void addMember(String groupName, Host newMember) throws RemoteException, NotBoundException {
