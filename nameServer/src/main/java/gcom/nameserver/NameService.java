@@ -1,10 +1,7 @@
 package gcom.nameserver;
 
-import gcom.utils.NameServiceGroupManagement;
+import gcom.utils.*;
 
-import gcom.utils.RmiServer;
-import gcom.utils.Host;
-import gcom.utils.PeerCommunication;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 
@@ -41,21 +38,31 @@ public class NameService implements NameServiceGroupManagement  {
     }
 
     @Override
-    public Host joinGroup(String groupName, Host newMember) throws RemoteException {
+    public Host joinGroup(String groupName, Host newMember) throws RemoteException, MalformedURLException, NotBoundException {
         logger.error("joinGroup from " +  newMember + " " + groupName);
+        Host leader;
         if(!groups.containsKey(groupName)) {
             setLeader(groupName, newMember);
+            leader = newMember;
+        } else {
+            leader = groups.get(groupName);
         }
-        Host leader = groups.get(groupName);
+
 
         // Use leaders addMember method.
+        logger.error("before addmember");
         try {
-            sendAddMember(groupName, leader, newMember);
+            NameServiceClient nameServiceClient = (NameServiceClient)Naming.lookup("rmi://" + newMember + "/" + NameServiceClient.class.getSimpleName());
+            nameServiceClient.setLeader(groupName, leader);
+            sendAddMember(groupName, leader,  newMember);
         } catch (NotBoundException e) {
             e.printStackTrace();
         } catch (MalformedURLException e) {
             e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
+        logger.error("after addmember");
 
         return leader;
     }
@@ -72,7 +79,7 @@ public class NameService implements NameServiceGroupManagement  {
 
     private void sendAddMember(String groupName, Host leader, Host newMember) throws RemoteException, NotBoundException, MalformedURLException {
 
-        PeerCommunication stub = (PeerCommunication) Naming.lookup("rmi://" + leader + "/" + PeerCommunication.class.getSimpleName());
+        NameServiceClient stub = (NameServiceClient) Naming.lookup("rmi://" + leader + "/" + NameServiceClient.class.getSimpleName());
         stub.addMember(groupName, newMember);
     }
 }

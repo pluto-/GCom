@@ -52,11 +52,6 @@ public class Communicator implements PeerCommunication {
     }
 
     @Override
-    public void addMember(String groupName, Host newMember) throws RemoteException, NotBoundException, MalformedURLException {
-        gCom.addMember(groupName, newMember);
-    }
-
-    @Override
     public void viewChanged(String groupName, ArrayList<Host> members) throws RemoteException {
         gCom.viewChanged(groupName, members);
     }

@@ -13,7 +13,6 @@ import java.util.Map;
  */
 public interface PeerCommunication extends Remote {
     public void receiveMessage(Message message) throws RemoteException;
-    public void addMember(String groupName, Host newMember) throws RemoteException, NotBoundException, MalformedURLException;
     public void viewChanged(String groupName, ArrayList<Host> members) throws RemoteException;
     public void electLeader(String groupName) throws RemoteException;
 }
