@@ -22,8 +22,9 @@ import java.util.ArrayList;
 public class Communicator implements PeerCommunication {
 
     private GCom gCom;
+    private RmiServer rmiServer;
 
-    public Communicator(GCom gCom) throws IOException, AlreadyBoundException {
+    public Communicator(GCom gCom, int rmiPort) throws IOException, AlreadyBoundException {
         this.gCom = gCom;
 
     }
