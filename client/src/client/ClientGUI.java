@@ -18,6 +18,7 @@ public class ClientGUI extends JFrame implements ActionListener {
     JButton send;
     JButton sendSlow;
     Client client;
+    String username;
 
     /**
      * GUI look taken from: http://codereview.stackexchange.com/questions/25461/simple-chat-room-swing-gui
@@ -25,6 +26,8 @@ public class ClientGUI extends JFrame implements ActionListener {
     public ClientGUI(Client client) {
 
         this.client = client;
+
+        username = JOptionPane.showInputDialog("Username: ");
 
         client.setGroupName(JOptionPane.showInputDialog("Group name: "));
 
@@ -79,8 +82,7 @@ public class ClientGUI extends JFrame implements ActionListener {
     }
 
     public void incomingMessage(String message) {
-        chat.append("< Someone >:  " + message
-                + "\n");
+        chat.append(message + "\n");
     }
 
     @Override
@@ -93,7 +95,7 @@ public class ClientGUI extends JFrame implements ActionListener {
                 message.setText("");
             } else {
                 try {
-                    client.sendMessage(message.getText());
+                    client.sendMessage("[" + username + "] " + message.getText());
                 } catch (NotBoundException e1) {
                     e1.printStackTrace();
                 } catch (RemoteException e1) {
