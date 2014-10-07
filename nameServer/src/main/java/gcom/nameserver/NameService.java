@@ -5,6 +5,8 @@ import gcom.utils.NameServiceGroupManagement;
 import gcom.utils.RmiServer;
 import gcom.utils.Host;
 import gcom.utils.PeerCommunication;
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -24,8 +26,9 @@ public class NameService implements NameServiceGroupManagement  {
 
     private Map<String, Host> groups;
     private RmiServer rmiServer;
+    private Logger logger = LogManager.getLogger(this.getClass());
 
-    public NameService(int rmiPort) throws RemoteException, UnknownHostException, AlreadyBoundException {
+    public NameService(int rmiPort) throws Exception {
         groups = new HashMap<>();
         rmiServer = new RmiServer(rmiPort);
 
@@ -36,6 +39,7 @@ public class NameService implements NameServiceGroupManagement  {
 
     @Override
     public Host joinGroup(String groupName, Host newMember) throws RemoteException {
+        logger.error("joinGroup from " +  newMember + " " + groupName);
         if(!groups.containsKey(groupName)) {
             setLeader(groupName, newMember);
         }

@@ -1,5 +1,8 @@
 package gcom.utils;
 
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
+
 import java.net.Inet4Address;
 import java.net.UnknownHostException;
 import java.rmi.AlreadyBoundException;
@@ -16,22 +19,25 @@ public class RmiServer {
 
     private Registry registry;
     private int port;
-
-    public RmiServer(int portNumber) throws RemoteException, UnknownHostException, AlreadyBoundException {
+    private Logger logger2 = LogManager.getLogger(this.getClass());
+    private Logger logger = LogManager.getLogger(SecurityManager.class);
+    public RmiServer(int portNumber) throws Exception {
         this.port = portNumber;
+        logger2.error("before security manager");
         if(System.getSecurityManager() == null) {
             System.setSecurityManager(new SecurityManager() {
-                public void checkConnect (String host, int port) {System.out.println("connect");}
-                public void checkConnect (String host, int port, Object context) {}
-                public void checkPermission(Permission permission) {}
-                public void checkPermission(Permission permission, Object context) {}
-                public void checkAccept(String host, int port) {}
+                public void checkConnect (String host, int port) {logger.error("connect");}
+                public void checkConnect (String host, int port, Object context) {logger.error("connect");}
+                public void checkPermission(Permission permission) {logger.error("connect");}
+                public void checkPermission(Permission permission, Object context) {logger.error("connect");}
+                public void checkAccept(String host, int port) {logger.error("connect");}
             });
         }
-        System.out.println();
-        System.setProperty("java.rmi.server.hostname", Inet4Address.getLocalHost().getHostAddress());
+        logger2.error("after security manager");
+        //System.setProperty("java.rmi.server.hostname", Inet4Address.getLocalHost().getHostAddress());
+        System.setProperty("java.rmi.server.hostname", IpChecker.getIp());
         registry = java.rmi.registry.LocateRegistry.createRegistry(portNumber);
-        System.out.println("constructor done");
+        logger2.error("constructor done");
     }
 
     public void bind(String name, Remote object) throws RemoteException, AlreadyBoundException {

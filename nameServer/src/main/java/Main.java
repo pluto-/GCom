@@ -24,6 +24,8 @@ public class Main {
             e.printStackTrace();
         } catch (UnknownHostException e) {
             e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 }

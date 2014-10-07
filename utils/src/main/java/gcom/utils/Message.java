@@ -41,7 +41,4 @@ public class Message {
         return sender;
     }
 
-
-
-
 }
