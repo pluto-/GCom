@@ -27,11 +27,9 @@ public class GroupManager {
     private GCom gCom;
 
     public GroupManager (Host nameServiceHost, Host self, GCom gCom) throws RemoteException, NotBoundException, MalformedURLException {
-        System.out.println("HEJ");
         nameService = (NameServiceGroupManagement) Naming.lookup("rmi://" + nameServiceHost + "/" + NameServiceGroupManagement.class.getSimpleName());
         System.out.println("Name Service: " + nameService);
 
-        System.out.println("DÅ");
         groups = new HashMap<>();
         this.self = self;
         this.gCom = gCom;
@@ -54,6 +52,7 @@ public class GroupManager {
             groups.put(groupName, new Group(groupName, member));
         }
         groups.get(groupName).addMember(member);
+
         gCom.sendViewChange(groups.get(groupName));
     }
 
