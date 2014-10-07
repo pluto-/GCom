@@ -6,9 +6,12 @@ import gcom.utils.RmiServer;
 import gcom.utils.Host;
 import gcom.utils.PeerCommunication;
 
+import java.io.IOException;
 import java.net.InetAddress;
+import java.net.MalformedURLException;
 import java.net.UnknownHostException;
 import java.rmi.AlreadyBoundException;
+import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
@@ -25,7 +28,7 @@ public class NameService implements NameServiceGroupManagement  {
     private Map<String, Host> groups;
     private RmiServer rmiServer;
 
-    public NameService(int rmiPort) throws RemoteException, UnknownHostException, AlreadyBoundException {
+    public NameService(int rmiPort) throws IOException, AlreadyBoundException {
         groups = new HashMap<>();
         rmiServer = new RmiServer(rmiPort);
 
@@ -46,6 +49,8 @@ public class NameService implements NameServiceGroupManagement  {
             sendAddMember(groupName, leader, newMember);
         } catch (NotBoundException e) {
             e.printStackTrace();
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
         }
 
         return leader;
@@ -61,10 +66,9 @@ public class NameService implements NameServiceGroupManagement  {
         groups.put(groupName, leader);
     }
 
-    private void sendAddMember(String groupName, Host leader, Host newMember) throws RemoteException, NotBoundException {
-        Registry leaderRegistry = LocateRegistry.getRegistry(leader.getAddress().getHostAddress(), leader.getPort());
+    private void sendAddMember(String groupName, Host leader, Host newMember) throws RemoteException, NotBoundException, MalformedURLException {
 
-        PeerCommunication stub = (PeerCommunication) leaderRegistry.lookup(PeerCommunication.class.getName());
+        PeerCommunication stub = (PeerCommunication) Naming.lookup("rmi://" + leader + "/" + PeerCommunication.class.getSimpleName());
         stub.addMember(groupName, newMember);
     }
 }

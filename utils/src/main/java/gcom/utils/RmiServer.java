@@ -1,6 +1,8 @@
 package gcom.utils;
 
+import java.io.IOException;
 import java.net.Inet4Address;
+import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.rmi.AlreadyBoundException;
 import java.rmi.Remote;
@@ -15,9 +17,10 @@ import java.security.Permission;
 public class RmiServer {
 
     private Registry registry;
+    private InetAddress externalIp;
     private int port;
 
-    public RmiServer(int portNumber) throws RemoteException, UnknownHostException, AlreadyBoundException {
+    public RmiServer(int portNumber) throws IOException {
         this.port = portNumber;
         if(System.getSecurityManager() == null) {
             System.setSecurityManager(new SecurityManager() {
@@ -32,6 +35,7 @@ public class RmiServer {
         System.setProperty("java.rmi.server.hostname", Inet4Address.getLocalHost().getHostAddress());
         registry = java.rmi.registry.LocateRegistry.createRegistry(portNumber);
         System.out.println("constructor done");
+        externalIp = InetAddress.getByName(IpChecker.getIp());
     }
 
     public void bind(String name, Remote object) throws RemoteException, AlreadyBoundException {
@@ -39,7 +43,7 @@ public class RmiServer {
     }
 
     public Host getHost() throws UnknownHostException {
-        return new Host(Inet4Address.getLocalHost(), port);
+        return new Host(externalIp, port);
     }
 
     public Registry getRegistry() {
