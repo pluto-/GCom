@@ -42,7 +42,7 @@ public class Client implements GComClient {
             System.exit(1);
         }
         try {
-            gCom = new GCom(false, 9000, this, nameService);
+            gCom = new GCom(false, rmiPort, this, nameService);
         } catch (RemoteException e) {
             e.printStackTrace();
         } catch (UnknownHostException e) {
