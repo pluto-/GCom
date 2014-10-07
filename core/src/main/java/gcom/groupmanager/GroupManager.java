@@ -44,9 +44,11 @@ public class GroupManager implements NameServiceClient {
     }
 
     public void addMember(String groupName, Host member) throws RemoteException, NotBoundException, MalformedURLException {
-        groups.get(groupName).addMember(member);
-
+        if(!groups.get(groupName).getMembers().contains(member)) {
+            groups.get(groupName).addMember(member);
+        }
         gCom.sendViewChange(groups.get(groupName));
+
     }
 
     @Override
