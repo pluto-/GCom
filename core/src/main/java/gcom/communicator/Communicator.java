@@ -7,8 +7,10 @@ import gcom.utils.Message;
 import gcom.utils.PeerCommunication;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.UnknownHostException;
 import java.rmi.AlreadyBoundException;
+import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
@@ -50,7 +52,7 @@ public class Communicator implements PeerCommunication {
     }
 
     @Override
-    public void addMember(String groupName, Host newMember) throws RemoteException, NotBoundException {
+    public void addMember(String groupName, Host newMember) throws RemoteException, NotBoundException, MalformedURLException {
         gCom.addMember(groupName, newMember);
     }
 
@@ -64,11 +66,9 @@ public class Communicator implements PeerCommunication {
         //TODO fix
     }
 
-    public void sendViewChange(ArrayList<Host> members, String groupName) throws RemoteException, NotBoundException {
+    public void sendViewChange(ArrayList<Host> members, String groupName) throws RemoteException, NotBoundException, MalformedURLException {
         for(Host member : members) {
-            Registry memberRegistry = LocateRegistry.getRegistry(member.getAddress().getHostAddress(), member.getPort());
-
-            PeerCommunication stub = (PeerCommunication) memberRegistry.lookup(PeerCommunication.class.getName());
+            PeerCommunication stub = (PeerCommunication) Naming.lookup("rmi://" + member + "/" + PeerCommunication.class.getSimpleName());
             stub.viewChanged(groupName, members);
         }
     }

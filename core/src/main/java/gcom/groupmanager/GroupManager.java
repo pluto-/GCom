@@ -49,7 +49,7 @@ public class GroupManager {
         }
     }
 
-    public void addMember(String groupName, Host member) throws RemoteException, NotBoundException {
+    public void addMember(String groupName, Host member) throws RemoteException, NotBoundException, MalformedURLException {
         if (groups.get(groupName) == null) {
             groups.put(groupName, new Group(groupName, member));
         }
