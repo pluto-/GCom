@@ -17,38 +17,32 @@ public class MessageSorter implements Runnable {
 
     private BlockingQueue<Message> deliverQueue;
     private VectorClock localVectorClock;
-    private Map<Host,PriorityBlockingQueue<Message>> holdBackQueues;
+    private volatile Map<Host,PriorityBlockingQueue<Message>> holdBackQueues;
     private Thread thread;
-    private boolean running;
-    Host self;
+    private volatile boolean running;
+    private Host self;
 
-    public MessageSorter(BlockingQueue<Message> deliverQueue, VectorClock localVectorClock, Host self) {
-        this.self = self;
+    public MessageSorter(BlockingQueue<Message> deliverQueue, VectorClock localVectorClock) {
         this.deliverQueue = deliverQueue;
         this.localVectorClock = localVectorClock;
         holdBackQueues = new ConcurrentHashMap<>();
-        thread = new Thread(this);
     }
 
-    public void receive(Message message) {
+    public synchronized void receive(Message message) {
 
-        if((!message.deliverCausally()) || (message.getSender().equals(self))) {
-            deliverQueue.add(message);
-            return;
-        }
-
-        System.err.println("MessageSorter received message.");
         if(!holdBackQueues.containsKey(message.getSender())) {
             holdBackQueues.put(message.getSender(), new PriorityBlockingQueue<>(5, new MessageComparator()));
         }
         holdBackQueues.get(message.getSender()).add(message);
-
+        int size = 0;
+        for(Host key : holdBackQueues.keySet())
+            size += holdBackQueues.get(key).size();
         startThread();
     }
 
     private void startThread() {
         running = true;
-        if(!thread.isAlive()) {
+        if(thread == null || !thread.isAlive()) {
             thread = new Thread(this);
             thread.start();
         }
@@ -83,8 +77,15 @@ public class MessageSorter implements Runnable {
                         firstMessage.getVectorClock().isBeforeOrEqualOnAllValuesExcept(localVectorClock, key)){
 
                     // Deliver
+
+                    try {
+                        deliverQueue.put(firstMessage);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+
                     System.err.println("Delivering to deliverQueue");
-                    deliverQueue.add(firstMessage);
+                   
                     incrementLocalVectorClock(key);
                     holdBackQueue.remove();
                     running = true;
