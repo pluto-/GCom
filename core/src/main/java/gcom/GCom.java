@@ -51,12 +51,12 @@ public class GCom {
         communicator.multicast(message, groupManager.getMembers(group));
     }
 
-    public VectorClock getVectorClock() {
-        return vectorClock;
+    public VectorClock getVectorClock(String groupName) {
+        return groupManager.getVectorClock(groupName);
     }
 
-    public void incrementVectorClock(String group, Host host) {
-        vectorClock.increment(host);
+    public void incrementVectorClock(String groupName, Host host) {
+        groupManager.getVectorClock(groupName).increment(host);
     }
 
     public void leaveGroup(String group) throws RemoteException, NotBoundException, MalformedURLException {
@@ -68,8 +68,7 @@ public class GCom {
     }
 
     public boolean hasReceived(Message message) {
-        // TODO : asd
-        return true;
+        return (groupManager.getVectorClock(message.getGroupName()).hasReceived(message));
     }
 
     public void joinGroup(String groupName) throws RemoteException, MalformedURLException, NotBoundException {

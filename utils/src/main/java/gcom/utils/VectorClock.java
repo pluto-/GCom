@@ -24,6 +24,11 @@ public class VectorClock implements Serializable {
         }
     }
 
+    public boolean hasReceived(Message message) {
+        return !(message.getVectorClock().getValue(message.getSender()) < clock.get(message.getSender()));
+    }
+
+
     public Integer getValue(Host host) {
         return clock.get(host);
     }
