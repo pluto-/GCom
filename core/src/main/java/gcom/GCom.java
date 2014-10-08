@@ -29,6 +29,7 @@ public class GCom implements Runnable {
     private boolean running;
     private Thread thread;
     private BlockingQueue<Message> deliveryQueue;
+    private Host self;
 
     private GComClient gcomClient;
 
@@ -36,8 +37,9 @@ public class GCom implements Runnable {
             throws Exception {
         this.reliableMulticast = reliableMulticast;
         rmiServer = new RmiServer(rmiPort);
+        self = rmiServer.getHost();
         this.gcomClient = gcomClient;
-        groupManager = new GroupManager(nameService, rmiServer.getHost(), this);
+        groupManager = new GroupManager(nameService, self, this);
         communicator = new Communicator(this);
         PeerCommunication stub = (PeerCommunication) UnicastRemoteObject.exportObject(communicator, rmiPort);
         rmiServer.bind(PeerCommunication.class.getSimpleName(), stub);
@@ -53,8 +55,8 @@ public class GCom implements Runnable {
     }
 
     public void sendMessage(String text, String group, boolean sendReliably, boolean deliverCausally) throws UnknownHostException, RemoteException, NotBoundException {
-        groupManager.getVectorClock(group).increment(rmiServer.getHost());
-        Message message = new Message(sendReliably, deliverCausally, text, rmiServer.getHost(), groupManager.getVectorClock(group), group);
+        groupManager.getVectorClock(group).increment(self);
+        Message message = new Message(sendReliably, deliverCausally, text, self, groupManager.getVectorClock(group), group);
 
         communicator.multicast(message, groupManager.getMembers(group));
     }
@@ -82,7 +84,7 @@ public class GCom implements Runnable {
     public void joinGroup(String groupName) throws RemoteException, NotBoundException, MalformedURLException, UnknownHostException {
 
         groupManager.sendJoinGroup(groupName);
-        messageSorters.put(groupName, new MessageSorter(deliveryQueue, groupManager.getGroup(groupName).getVectorClock(), rmiServer.getHost()));
+        messageSorters.put(groupName, new MessageSorter(deliveryQueue, groupManager.getGroup(groupName).getVectorClock()));
 
     }
 
@@ -98,6 +100,13 @@ public class GCom implements Runnable {
         messageSorters.get(message.getGroupName()).receive(message);
     }
 
+    public void receive(Message message) {
+        if(message.getSender().equals(self)) {
+            deliveryQueue.add(message);
+        } else {
+            sendToMessageSorter(message);
+        }
+    }
     @Override
     public void run() {
         while (running) {

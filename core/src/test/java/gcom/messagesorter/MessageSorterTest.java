@@ -19,7 +19,7 @@ public class MessageSorterTest extends TestCase {
         VectorClock localVectorClock = new VectorClock();
 
         Host localHost = new Host(InetAddress.getByName("localhost"), 2000);
-        MessageSorter messageSorter = new MessageSorter(deliverQueue,  localVectorClock, localHost);
+        MessageSorter messageSorter = new MessageSorter(deliverQueue,  localVectorClock);
 
         Host someone = new Host(InetAddress.getByName("1.1.1.1"), 3000);
         VectorClock someoneVectorClock = new VectorClock();
@@ -53,7 +53,7 @@ public class MessageSorterTest extends TestCase {
         VectorClock localVectorClock = new VectorClock();
 
         Host localHost = new Host(InetAddress.getByName("localhost"), 2000);
-        MessageSorter messageSorter = new MessageSorter(deliverQueue,  localVectorClock, localHost);
+        MessageSorter messageSorter = new MessageSorter(deliverQueue,  localVectorClock);
 
         Host someone = new Host(InetAddress.getByName("1.1.1.1"), 3000);
         VectorClock someoneVectorClock = new VectorClock();
@@ -87,7 +87,7 @@ public class MessageSorterTest extends TestCase {
         VectorClock localVectorClock = new VectorClock();
 
         Host localHost = new Host(InetAddress.getByName("localhost"), 2000);
-        MessageSorter messageSorter = new MessageSorter(deliverQueue,  localVectorClock, localHost);
+        MessageSorter messageSorter = new MessageSorter(deliverQueue,  localVectorClock);
 
         Host someone = new Host(InetAddress.getByName("1.1.1.1"), 3000);
         VectorClock someoneVectorClock = new VectorClock();

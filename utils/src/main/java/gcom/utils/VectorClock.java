@@ -29,6 +29,11 @@ public class VectorClock implements Serializable {
 
 
     public boolean hasReceived(Message message) {
+        System.err.println(message.getVectorClock());
+        System.err.println(message.getVectorClock().getValue(message.getSender()));
+        if(!clock.containsKey(message.getSender())) {
+            return false;
+        }
         return !(message.getVectorClock().getValue(message.getSender()) < clock.get(message.getSender()));
     }
 
@@ -57,7 +62,7 @@ public class VectorClock implements Serializable {
         Host key;
         while(keys.hasNext()) {
             key = keys.next();
-            if(key != exception) {
+            if(!key.equals(exception)) {
                 if(clock.get(key) > other.getValue(key)) {
                     return false;
                 }

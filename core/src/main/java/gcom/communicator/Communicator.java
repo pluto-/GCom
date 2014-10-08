@@ -24,11 +24,9 @@ import java.util.ArrayList;
 public class Communicator implements PeerCommunication {
 
     private GCom gCom;
-    private RmiServer rmiServer;
 
     public Communicator(GCom gCom) throws IOException, AlreadyBoundException {
         this.gCom = gCom;
-
     }
 
     public void multicast(Message message, ArrayList<Host> groupMembers) throws RemoteException, NotBoundException {
@@ -42,16 +40,14 @@ public class Communicator implements PeerCommunication {
 
     @Override
     public void receiveMessage(Message message) throws RemoteException {
-        if(message.isReliable()) {
-            // TODO: Send to others if not received before.
-            if(gCom.hasReceived(message)) {
 
-            }
+        // TODO: Send to others if not received before.
+        if(gCom.hasReceived(message)) {
+
         }
 
         //TODO: Send to message ordering.
-
-        gCom.sendToMessageSorter(message);
+        gCom.receive(message);
     }
 
     @Override

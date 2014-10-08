@@ -20,7 +20,6 @@ public class MessageSorter implements Runnable {
     private volatile Map<Host,PriorityBlockingQueue<Message>> holdBackQueues;
     private Thread thread;
     private volatile boolean running;
-    private Host self;
 
     public MessageSorter(BlockingQueue<Message> deliverQueue, VectorClock localVectorClock) {
         this.deliverQueue = deliverQueue;
@@ -33,10 +32,8 @@ public class MessageSorter implements Runnable {
         if(!holdBackQueues.containsKey(message.getSender())) {
             holdBackQueues.put(message.getSender(), new PriorityBlockingQueue<>(5, new MessageComparator()));
         }
-        holdBackQueues.get(message.getSender()).add(message);
-        int size = 0;
-        for(Host key : holdBackQueues.keySet())
-            size += holdBackQueues.get(key).size();
+        holdBackQueues.get(message.getSender()).put(message);
+
         startThread();
     }
 
@@ -65,12 +62,9 @@ public class MessageSorter implements Runnable {
                 PriorityBlockingQueue<Message> holdBackQueue = holdBackQueues.get(key);
 
                 Message firstMessage = holdBackQueue.peek();
-                System.err.println("First Message : " + firstMessage.getText());
+                /*System.err.println("First Message : " + firstMessage.getText());
                 System.err.println("Sender Vector Clock[Sender] : " + firstMessage.getVectorClock().getValue(firstMessage.getSender()));
-                System.err.println("Local Vector Clock[Sender] : " + localVectorClock.getValue(firstMessage.getSender()));
-                System.err.println("Sender Vector Clock[Local] : " + firstMessage.getVectorClock().getValue(self));
-                System.err.println("Local Vector Clock[Local] : " + localVectorClock.getValue(self));
-
+                System.err.println("Local Vector Clock[Sender] : " + localVectorClock.getValue(firstMessage.getSender()));*/
 
                 if((firstMessage == null) || (firstMessage.getVectorClock().getValue(key) == null)) {}
                 else if((firstMessage.getVectorClock().getValue(key) == (localVectorClock.getValue(key) + 1)) &&
@@ -90,6 +84,14 @@ public class MessageSorter implements Runnable {
                     holdBackQueue.remove();
                     running = true;
                 } else {
+
+                    for(Host key1 : firstMessage.getVectorClock().getClock().keySet()) {
+                        System.err.println("First Message Vector Clock Key: " + key1 + " Value: " + firstMessage.getVectorClock().getValue(key1));
+                    }
+                    for(Host key1 : localVectorClock.getClock().keySet()) {
+                        System.err.println("Local Vector Clock Key: " + key1 + " Value: " + firstMessage.getVectorClock().getValue(key1));
+                    }
+
                     System.err.println("First bool: " + (firstMessage.getVectorClock().getValue(key) == (localVectorClock.getValue(key) + 1)));
                     System.err.println("Second bool: " + firstMessage.getVectorClock().isBeforeOrEqualOnAllValuesExcept(localVectorClock, key));
 
