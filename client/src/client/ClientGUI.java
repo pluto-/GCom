@@ -17,6 +17,7 @@ public class ClientGUI extends JFrame implements ActionListener {
     JTextField message;
     JButton send;
     JButton sendSlow;
+    JCheckBox sendReliably;
     Client client;
     String username;
 
@@ -47,6 +48,8 @@ public class ClientGUI extends JFrame implements ActionListener {
         sendSlow = new JButton("Send Slow");
         sendSlow.addActionListener(this);
 
+        sendReliably = new JCheckBox("Send Reliably");
+
         chat = new JTextArea();
         chat.setEditable(false);
         chat.setFont(new Font("Times New Roman", Font.PLAIN, 15));
@@ -70,12 +73,13 @@ public class ClientGUI extends JFrame implements ActionListener {
         southPanel.add(message, left);
         southPanel.add(send, right);
         southPanel.add(sendSlow, right);
+        southPanel.add(sendReliably, right);
 
         mainPanel.add(BorderLayout.SOUTH, southPanel);
 
         add(mainPanel);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(470, 300);
+        setSize(600, 300);
         setVisible(true);
 
 
@@ -95,7 +99,7 @@ public class ClientGUI extends JFrame implements ActionListener {
                 message.setText("");
             } else {
                 try {
-                    client.sendMessage(username + " > " + message.getText());
+                    client.sendMessage(username + " > " + message.getText(), sendReliably.isSelected());
                 } catch (NotBoundException e1) {
                     e1.printStackTrace();
                 } catch (RemoteException e1) {
@@ -115,7 +119,7 @@ public class ClientGUI extends JFrame implements ActionListener {
                 message.setText("");
             } else {
                 int speed = Integer.valueOf(JOptionPane.showInputDialog("Speed: "));
-                try {
+                /*try {
                     client.sendMessage(message.getText());
                 } catch (NotBoundException e1) {
                     e1.printStackTrace();
@@ -123,7 +127,7 @@ public class ClientGUI extends JFrame implements ActionListener {
                     e1.printStackTrace();
                 } catch (UnknownHostException e1) {
                     e1.printStackTrace();
-                }
+                }*/
                 message.setText("");
             }
             message.requestFocusInWindow();

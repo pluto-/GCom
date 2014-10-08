@@ -14,6 +14,7 @@ import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.Vector;
 
 /**
  * Created by Jonas on 2014-10-03.
@@ -22,7 +23,7 @@ public class GCom {
 
     private boolean reliableMulticast;
     private RmiServer rmiServer;
-
+    private VectorClock vectorClock;
     private GroupManager groupManager;
     private Communicator communicator;
     private MessageSorter messageSorter;
@@ -36,16 +37,26 @@ public class GCom {
         this.gcomClient = gcomClient;
         groupManager = new GroupManager(nameService, rmiServer.getHost(), this);
         communicator = new Communicator(this);
+        vectorClock = new VectorClock(rmiServer.getHost());
         PeerCommunication stub = (PeerCommunication) UnicastRemoteObject.exportObject(communicator, rmiPort);
         rmiServer.bind(PeerCommunication.class.getSimpleName(), stub);
         NameServiceClient nameServiceClient = (NameServiceClient) UnicastRemoteObject.exportObject(groupManager, rmiPort);
         rmiServer.bind(NameServiceClient.class.getSimpleName(), nameServiceClient);
     }
 
-    public void multicast(String text, String group) throws UnknownHostException, RemoteException, NotBoundException {
-        // BTW: Vector Clock is not what it should be.
-        Message message = new Message(false, text, rmiServer.getHost(), new VectorClock(), group);
+    public void sendMessage(String text, String group, boolean sendReliably, boolean deliverCausally) throws UnknownHostException, RemoteException, NotBoundException {
+        vectorClock.increment(rmiServer.getHost());
+        Message message = new Message(sendReliably, deliverCausally, text, rmiServer.getHost(), vectorClock, group);
+
         communicator.multicast(message, groupManager.getMembers(group));
+    }
+
+    public VectorClock getVectorClock() {
+        return vectorClock;
+    }
+
+    public void incrementVectorClock(String group, Host host) {
+        vectorClock.increment(host);
     }
 
     public void leaveGroup(String group) throws RemoteException, NotBoundException, MalformedURLException {
@@ -54,6 +65,11 @@ public class GCom {
 
     public void viewChanged(String groupName, ArrayList<Host> members) throws RemoteException, MalformedURLException, NotBoundException {
         groupManager.processViewChange(groupName, members);
+    }
+
+    public boolean hasReceived(Message message) {
+        // TODO : asd
+        return true;
     }
 
     public void joinGroup(String groupName) throws RemoteException, MalformedURLException, NotBoundException {

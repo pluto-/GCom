@@ -44,6 +44,9 @@ public class Communicator implements PeerCommunication {
     public void receiveMessage(Message message) throws RemoteException {
         if(message.isReliable()) {
             // TODO: Send to others if not received before.
+            if(gCom.hasReceived(message)) {
+
+            }
         }
 
         //TODO: Send to message ordering.

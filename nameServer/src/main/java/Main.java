@@ -1,6 +1,11 @@
 import java.net.UnknownHostException;
 import java.rmi.AlreadyBoundException;
 import java.rmi.RemoteException;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.ListIterator;
+import java.util.Map;
+
 import gcom.nameserver.NameService;
 
 /**
@@ -12,6 +17,7 @@ public class Main {
             System.out.println("Specify RMI port as parameter.");
             System.exit(1);
         }
+
         /*System.out.print("Setting policy...");
         System.setProperty("java.security.policy", "server.policy");
         System.out.println("Done!");*/

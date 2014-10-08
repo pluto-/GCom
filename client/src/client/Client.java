@@ -76,8 +76,8 @@ public class Client implements GComClient {
         clientGUI.incomingMessage(message);
     }
 
-    public void sendMessage(String message) throws NotBoundException, RemoteException, UnknownHostException {
-        gCom.multicast(message, group);
+    public void sendMessage(String message, boolean sendReliably) throws NotBoundException, RemoteException, UnknownHostException {
+        gCom.sendMessage(message, group, sendReliably);
     }
 
     public void setGroupName(String groupName) {
