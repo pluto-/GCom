@@ -17,9 +17,9 @@ public class MessageSorter implements Runnable {
 
     private BlockingQueue<Message> deliverQueue;
     private VectorClock localVectorClock;
-    private Map<Host,PriorityBlockingQueue<Message>> holdBackQueues;
-    private Thread thread = new Thread(this);
-    private boolean running;
+    private volatile Map<Host,PriorityBlockingQueue<Message>> holdBackQueues;
+    private Thread thread;
+    private volatile boolean running;
 
     public MessageSorter(BlockingQueue<Message> deliverQueue, VectorClock localVectorClock) {
         this.deliverQueue = deliverQueue;
@@ -27,19 +27,22 @@ public class MessageSorter implements Runnable {
         holdBackQueues = new ConcurrentHashMap<>();
     }
 
-    public void receive(Message message) {
+    public synchronized void receive(Message message) {
 
         if(!holdBackQueues.containsKey(message.getSender())) {
             holdBackQueues.put(message.getSender(), new PriorityBlockingQueue<>(5, new MessageComparator()));
         }
         holdBackQueues.get(message.getSender()).add(message);
-
+        int size = 0;
+        for(Host key : holdBackQueues.keySet())
+            size += holdBackQueues.get(key).size();
         startThread();
     }
 
     private void startThread() {
         running = true;
-        if(!thread.isAlive()) {
+        if(thread == null || !thread.isAlive()) {
+            thread = new Thread(this);
             thread.start();
         }
     }
@@ -66,9 +69,13 @@ public class MessageSorter implements Runnable {
                         firstMessage.getVectorClock().isBeforeOrEqualOnAllValuesExcept(localVectorClock, key)){
 
                     // Deliver
-                    deliverQueue.add(firstMessage);
+                    try {
+                        deliverQueue.put(firstMessage);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
                     incrementLocalVectorClock(key);
-                    holdBackQueue.remove();
+                    holdBackQueue.remove(firstMessage);
                     running = true;
                 }
 
