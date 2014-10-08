@@ -37,10 +37,9 @@ public class GroupManager implements NameServiceClient {
     }
 
     public void leaveGroup(String groupName) throws RemoteException, NotBoundException, MalformedURLException {
-        Host leader;
-        if ((leader = groups.get(groupName).getLeader()) != null) {
-            PeerCommunication leaderService = (PeerCommunication) Naming.lookup(leader + "/" + PeerCommunication.class.getName());
-        }
+        Group group = groups.get(groupName);
+        group.removeMember(self);
+        gCom.sendViewChange(group);
     }
 
     public void addMember(String groupName, Host member) throws RemoteException, NotBoundException, MalformedURLException {
@@ -75,5 +74,9 @@ public class GroupManager implements NameServiceClient {
 
     public ArrayList<Host> getMembers(String groupName) {
         return groups.get(groupName).getMembers();
+    }
+
+    public VectorClock getVectorClock(String groupName) {
+        return groups.get(groupName).getVectorClock();
     }
 }

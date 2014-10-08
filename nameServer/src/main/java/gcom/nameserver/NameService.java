@@ -40,10 +40,8 @@ public class NameService implements NameServiceGroupManagement  {
         Host leader;
         if(!groups.containsKey(groupName)) {
             setLeader(groupName, newMember);
-            leader = newMember;
-        } else {
-            leader = groups.get(groupName);
         }
+        leader = groups.get(groupName);
 
 
         // Use leaders addMember method.

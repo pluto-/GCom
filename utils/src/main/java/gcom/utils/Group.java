@@ -12,11 +12,13 @@ public class Group {
     private final String name;
     private Host leader;
     private ArrayList<Host> members;
+    private VectorClock vectorClock;
 
     public Group(String name, Host leader) {
         members = new ArrayList<>();
         this.leader = leader;
         this.name = name;
+        vectorClock = new VectorClock();
     }
 
     public String getName() {
@@ -47,5 +49,13 @@ public class Group {
 
     public void setMembers(ArrayList<Host> members) {
         this.members = members;
+    }
+
+    public VectorClock getVectorClock() {
+        return vectorClock;
+    }
+
+    public void setVectorClock(VectorClock vectorClock) {
+        this.vectorClock = vectorClock;
     }
 }

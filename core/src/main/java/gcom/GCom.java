@@ -52,7 +52,7 @@ public class GCom {
         groupManager.leaveGroup(group);
     }
 
-    public void viewChanged(String groupName, ArrayList<Host> members) throws RemoteException {
+    public void viewChanged(String groupName, ArrayList<Host> members) throws RemoteException, MalformedURLException, NotBoundException {
         groupManager.processViewChange(groupName, members);
     }
 
