@@ -6,6 +6,7 @@ import gcom.utils.Message;
 import gcom.utils.VectorClock;
 
 import java.util.*;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.PriorityBlockingQueue;
 
@@ -14,15 +15,14 @@ import java.util.concurrent.PriorityBlockingQueue;
  */
 public class MessageSorter implements Runnable {
 
-    private GCom gCom;
+    private BlockingQueue<Message> deliverQueue;
+    private VectorClock localVectorClock;
     private Map<Host,PriorityBlockingQueue<Message>> holdBackQueues;
-    private String group;
 
-    public MessageSorter(GCom gCom, String group) {
-        this.gCom = gCom;
-        this.group = group;
+    public MessageSorter(BlockingQueue<Message> deliverQueue, VectorClock localVectorClock) {
+        this.deliverQueue = deliverQueue;
+        this.localVectorClock = localVectorClock;
         holdBackQueues = new ConcurrentHashMap<>();
-
     }
 
     public void receive(Message message) {
@@ -40,30 +40,8 @@ public class MessageSorter implements Runnable {
         thread.start();
     }
 
-    private VectorClock getLocalVectorClock() {
-        return gCom.getVectorClock(group);
-    }
-
     private void incrementLocalVectorClock(Host host) {
-        gCom.incrementVectorClock(group, host);
-    }
-
-    private class MessageComparator implements Comparator<Message>
-    {
-
-        @Override
-        public int compare(Message first, Message second)
-        {
-            if (first.getVectorClock().isBefore(second.getVectorClock(), first.getSender()))
-            {
-                return -1;
-            }
-            if (second.getVectorClock().isBefore(first.getVectorClock(), first.getSender()))
-            {
-                return 1;
-            }
-            return 0;
-        }
+        localVectorClock.increment(host);
     }
 
     @Override
@@ -81,17 +59,36 @@ public class MessageSorter implements Runnable {
 
                 Message firstMessage = holdBackQueue.peek();
 
-                if((firstMessage.getVectorClock().getValue(key) == (getLocalVectorClock().getValue(key) + 1)) &&
-                        firstMessage.getVectorClock().isBeforeOrEqualOnAllValuesExcept(getLocalVectorClock(), key)){
+                if(firstMessage == null) {}
+                else if((firstMessage.getVectorClock().getValue(key) == (localVectorClock.getValue(key) + 1)) &&
+                        firstMessage.getVectorClock().isBeforeOrEqualOnAllValuesExcept(localVectorClock, key)){
 
                     // Deliver
-                    gCom.deliverMessage(firstMessage.getText());
+                    deliverQueue.add(firstMessage);
                     incrementLocalVectorClock(key);
                     holdBackQueue.remove();
                     running = true;
                 }
 
             }
+        }
+    }
+
+    private class MessageComparator implements Comparator<Message>
+    {
+
+        @Override
+        public int compare(Message first, Message second)
+        {
+            if (first.getVectorClock().isBefore(second.getVectorClock(), first.getSender()))
+            {
+                return -1;
+            }
+            if (second.getVectorClock().isBefore(first.getVectorClock(), first.getSender()))
+            {
+                return 1;
+            }
+            return 0;
         }
     }
 }

@@ -48,4 +48,21 @@ public class Message implements Serializable {
         return sender;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Message message = (Message) o;
+
+        if (deliverCausally != message.deliverCausally) return false;
+        if (isReliable != message.isReliable) return false;
+        if (groupName != null ? !groupName.equals(message.groupName) : message.groupName != null) return false;
+        if (sender != null ? !sender.equals(message.sender) : message.sender != null) return false;
+        if (text != null ? !text.equals(message.text) : message.text != null) return false;
+        if (vectorClock != null ? !vectorClock.equals(message.vectorClock) : message.vectorClock != null) return false;
+
+        return true;
+    }
+
 }

@@ -23,7 +23,6 @@ public class GCom {
 
     private boolean reliableMulticast;
     private RmiServer rmiServer;
-    private VectorClock vectorClock;
     private GroupManager groupManager;
     private Communicator communicator;
     private MessageSorter messageSorter;
@@ -37,7 +36,6 @@ public class GCom {
         this.gcomClient = gcomClient;
         groupManager = new GroupManager(nameService, rmiServer.getHost(), this);
         communicator = new Communicator(this);
-        vectorClock = new VectorClock(rmiServer.getHost());
         PeerCommunication stub = (PeerCommunication) UnicastRemoteObject.exportObject(communicator, rmiPort);
         rmiServer.bind(PeerCommunication.class.getSimpleName(), stub);
         NameServiceClient nameServiceClient = (NameServiceClient) UnicastRemoteObject.exportObject(groupManager, rmiPort);
@@ -45,8 +43,8 @@ public class GCom {
     }
 
     public void sendMessage(String text, String group, boolean sendReliably, boolean deliverCausally) throws UnknownHostException, RemoteException, NotBoundException {
-        vectorClock.increment(rmiServer.getHost());
-        Message message = new Message(sendReliably, deliverCausally, text, rmiServer.getHost(), vectorClock, group);
+        groupManager.getVectorClock(group).increment(rmiServer.getHost());
+        Message message = new Message(sendReliably, deliverCausally, text, rmiServer.getHost(), groupManager.getVectorClock(group), group);
 
         communicator.multicast(message, groupManager.getMembers(group));
     }
