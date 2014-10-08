@@ -59,7 +59,7 @@ public class MessageSorter implements Runnable {
 
                 Message firstMessage = holdBackQueue.peek();
 
-                if(firstMessage == null) {}
+                if((firstMessage == null) || (firstMessage.getVectorClock().getValue(key) == null)) {}
                 else if((firstMessage.getVectorClock().getValue(key) == (localVectorClock.getValue(key) + 1)) &&
                         firstMessage.getVectorClock().isBeforeOrEqualOnAllValuesExcept(localVectorClock, key)){
 
