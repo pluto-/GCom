@@ -9,17 +9,23 @@ import java.util.Map;
 public class Message implements Serializable {
 
     private boolean isReliable;
+    private boolean deliverCausally;
     private String text;
     private Host sender;
     private VectorClock vectorClock;
     private String groupName;
 
-    public Message(boolean isReliable, String text, Host sender, VectorClock vectorClock, String groupName) {
+    public Message(boolean isReliable, boolean deliverCausally, String text, Host sender, VectorClock vectorClock, String groupName) {
         this.isReliable = isReliable;
+        this.deliverCausally = deliverCausally;
         this.text = text;
         this.sender = sender;
         this.vectorClock = vectorClock;
         this.groupName = groupName;
+    }
+
+    public boolean deliverCausally() {
+        return deliverCausally;
     }
 
     public String getGroupName() {

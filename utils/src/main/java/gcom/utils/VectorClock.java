@@ -2,16 +2,18 @@ package gcom.utils;
 
 import java.io.Serializable;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 /**
  * Created by Jonas on 2014-10-06.
  */
 public class VectorClock implements Serializable {
-    Map<Host, Integer> clock;
+    private Map<Host, Integer> clock;
 
-    public VectorClock() {
+    public VectorClock(Host self) {
         clock = new HashMap<>();
+        clock.put(self, 0);
     }
 
     public boolean hasReceived(Host host, Integer value) {
@@ -27,6 +29,31 @@ public class VectorClock implements Serializable {
     }
 
     public void increment(Host host) {
+        if(!clock.containsKey(host)) {
+            clock.put(host, 0);
+        }
         clock.put(host, clock.get(host) + 1);
+    }
+
+    public boolean isBefore(VectorClock other, Host host) {
+        if(clock.get(host) < other.getValue(host)) {
+            return true;
+        }
+        return false;
+    }
+
+    public boolean isBeforeOrEqualOnAllValuesExcept(VectorClock other, Host exception) {
+
+        Iterator<Host> keys = clock.keySet().iterator();
+        Host key;
+        while(keys.hasNext()) {
+            key = keys.next();
+            if(key != exception) {
+                if(clock.get(key) > other.getValue(key)) {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 }
