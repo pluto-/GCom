@@ -9,12 +9,7 @@ import java.util.Map;
  * Created by Jonas on 2014-10-06.
  */
 public class VectorClock implements Serializable {
-    private Map<Host, Integer> clock;
-
-    public VectorClock(Host self) {
-        clock = new HashMap<>();
-        clock.put(self, 0);
-    }
+    private Map<Host, Integer> clock = new HashMap<>();
 
     public boolean hasReceived(Host host, Integer value) {
         if(value < clock.get(host)) {

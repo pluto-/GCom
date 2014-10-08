@@ -55,13 +55,8 @@ public class Communicator implements PeerCommunication {
     }
 
     @Override
-    public void viewChanged(String groupName, ArrayList<Host> members) throws RemoteException {
+    public void viewChanged(String groupName, ArrayList<Host> members) throws RemoteException, MalformedURLException, NotBoundException {
         gCom.viewChanged(groupName, members);
-    }
-
-    @Override
-    public void electLeader(String groupName) throws RemoteException {
-        //TODO fix
     }
 
     public void sendViewChange(ArrayList<Host> members, String groupName) throws RemoteException, NotBoundException, MalformedURLException {

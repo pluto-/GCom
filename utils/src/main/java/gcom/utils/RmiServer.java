@@ -20,12 +20,11 @@ public class RmiServer {
     private Registry registry;
     private InetAddress externalIp;
     private int port;
-    private Logger logger2 = LogManager.getLogger(this.getClass());
-    private Logger logger = LogManager.getLogger(SecurityManager.class);
+    private Logger logger = LogManager.getLogger(this.getClass());
 
     public RmiServer(int portNumber) throws IOException {
         this.port = portNumber;
-        logger2.error("before security manager");
+        logger.error("before security manager");
         if(System.getSecurityManager() == null) {
             System.setSecurityManager(new SecurityManager() {
                 public void checkConnect (String host, int port) {/*logger.error("connect");*/}
@@ -35,12 +34,12 @@ public class RmiServer {
                 public void checkAccept(String host, int port) {/*logger.error("connect");*/}
             });
         }
-        logger2.error("after security manager");
+        logger.error("after security manager");
         //System.setProperty("java.rmi.server.hostname", Inet4Address.getLocalHost().getHostAddress());
         System.setProperty("java.rmi.server.hostname", IpChecker.getIp());
         registry = java.rmi.registry.LocateRegistry.createRegistry(portNumber);
         externalIp = InetAddress.getByName(IpChecker.getIp());
-        logger2.error("constructor done");
+        logger.error("constructor done");
     }
 
     public void bind(String name, Remote object) throws RemoteException, AlreadyBoundException {
