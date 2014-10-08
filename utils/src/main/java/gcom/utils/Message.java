@@ -20,7 +20,7 @@ public class Message implements Serializable {
         this.deliverCausally = deliverCausally;
         this.text = text;
         this.sender = sender;
-        this.vectorClock = vectorClock;
+        this.vectorClock = new VectorClock(vectorClock);
         this.groupName = groupName;
     }
 

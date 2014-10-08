@@ -35,11 +35,12 @@ public class MessageSorterTest extends TestCase {
         System.err.println("Sending message1 to MessageSorter.");
         messageSorter.receive(message1);
 
+        System.out.println(deliverQueue.size());
         System.err.println("Taking...");
-        System.err.println("First message delivered from MessageSorter: " + deliverQueue.take());
+        System.err.println("First message delivered from MessageSorter: " + deliverQueue.take().getText());
         System.err.println("Taking...");
-        System.err.println("Second message delivered from MessageSorter: " + deliverQueue.take());
+        System.err.println("Second message delivered from MessageSorter: " + deliverQueue.take().getText());
         System.err.println("Taking...");
-        System.err.println("Third message delivered from MessageSorter: " + deliverQueue.take());
+        System.err.println("Third message delivered from MessageSorter: " + deliverQueue.take().getText());
     }
 }

@@ -18,6 +18,8 @@ public class MessageSorter implements Runnable {
     private BlockingQueue<Message> deliverQueue;
     private VectorClock localVectorClock;
     private Map<Host,PriorityBlockingQueue<Message>> holdBackQueues;
+    private Thread thread = new Thread(this);
+    private boolean running;
 
     public MessageSorter(BlockingQueue<Message> deliverQueue, VectorClock localVectorClock) {
         this.deliverQueue = deliverQueue;
@@ -36,8 +38,10 @@ public class MessageSorter implements Runnable {
     }
 
     private void startThread() {
-        Thread thread = new Thread(this);
-        thread.start();
+        running = true;
+        if(!thread.isAlive()) {
+            thread.start();
+        }
     }
 
     private void incrementLocalVectorClock(Host host) {
@@ -46,9 +50,7 @@ public class MessageSorter implements Runnable {
 
     @Override
     public void run() {
-        boolean running = true;
         while(running) {
-
             running = false;
             Iterator<Host> keys = holdBackQueues.keySet().iterator();
             Host key;
