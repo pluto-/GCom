@@ -18,17 +18,26 @@ public class MessageSorter implements Runnable {
     private BlockingQueue<Message> deliverQueue;
     private VectorClock localVectorClock;
     private Map<Host,PriorityBlockingQueue<Message>> holdBackQueues;
-    private Thread thread = new Thread(this);
+    private Thread thread;
     private boolean running;
+    Host self;
 
-    public MessageSorter(BlockingQueue<Message> deliverQueue, VectorClock localVectorClock) {
+    public MessageSorter(BlockingQueue<Message> deliverQueue, VectorClock localVectorClock, Host self) {
+        this.self = self;
         this.deliverQueue = deliverQueue;
         this.localVectorClock = localVectorClock;
         holdBackQueues = new ConcurrentHashMap<>();
+        thread = new Thread(this);
     }
 
     public void receive(Message message) {
 
+        if((!message.deliverCausally()) || (message.getSender().equals(self))) {
+            deliverQueue.add(message);
+            return;
+        }
+
+        System.err.println("MessageSorter received message.");
         if(!holdBackQueues.containsKey(message.getSender())) {
             holdBackQueues.put(message.getSender(), new PriorityBlockingQueue<>(5, new MessageComparator()));
         }
@@ -40,6 +49,7 @@ public class MessageSorter implements Runnable {
     private void startThread() {
         running = true;
         if(!thread.isAlive()) {
+            thread = new Thread(this);
             thread.start();
         }
     }
@@ -51,6 +61,7 @@ public class MessageSorter implements Runnable {
     @Override
     public void run() {
         while(running) {
+            System.err.println("Running");
             running = false;
             Iterator<Host> keys = holdBackQueues.keySet().iterator();
             Host key;
@@ -60,20 +71,32 @@ public class MessageSorter implements Runnable {
                 PriorityBlockingQueue<Message> holdBackQueue = holdBackQueues.get(key);
 
                 Message firstMessage = holdBackQueue.peek();
+                System.err.println("First Message : " + firstMessage.getText());
+                System.err.println("Sender Vector Clock[Sender] : " + firstMessage.getVectorClock().getValue(firstMessage.getSender()));
+                System.err.println("Local Vector Clock[Sender] : " + localVectorClock.getValue(firstMessage.getSender()));
+                System.err.println("Sender Vector Clock[Local] : " + firstMessage.getVectorClock().getValue(self));
+                System.err.println("Local Vector Clock[Local] : " + localVectorClock.getValue(self));
+
 
                 if((firstMessage == null) || (firstMessage.getVectorClock().getValue(key) == null)) {}
                 else if((firstMessage.getVectorClock().getValue(key) == (localVectorClock.getValue(key) + 1)) &&
                         firstMessage.getVectorClock().isBeforeOrEqualOnAllValuesExcept(localVectorClock, key)){
 
                     // Deliver
+                    System.err.println("Delivering to deliverQueue");
                     deliverQueue.add(firstMessage);
                     incrementLocalVectorClock(key);
                     holdBackQueue.remove();
                     running = true;
+                } else {
+                    System.err.println("First bool: " + (firstMessage.getVectorClock().getValue(key) == (localVectorClock.getValue(key) + 1)));
+                    System.err.println("Second bool: " + firstMessage.getVectorClock().isBeforeOrEqualOnAllValuesExcept(localVectorClock, key));
+
                 }
 
             }
         }
+        System.err.println("Not Running");
     }
 
     private class MessageComparator implements Comparator<Message>

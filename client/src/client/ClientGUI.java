@@ -18,6 +18,7 @@ public class ClientGUI extends JFrame implements ActionListener {
     JButton send;
     JButton sendSlow;
     JCheckBox sendReliably;
+    JCheckBox orderCausally;
     Client client;
     String username;
 
@@ -49,6 +50,7 @@ public class ClientGUI extends JFrame implements ActionListener {
         sendSlow.addActionListener(this);
 
         sendReliably = new JCheckBox("Send Reliably");
+        orderCausally = new JCheckBox("Order Causally");
 
         chat = new JTextArea();
         chat.setEditable(false);
@@ -74,6 +76,7 @@ public class ClientGUI extends JFrame implements ActionListener {
         southPanel.add(send, right);
         southPanel.add(sendSlow, right);
         southPanel.add(sendReliably, right);
+        southPanel.add(orderCausally, right);
 
         mainPanel.add(BorderLayout.SOUTH, southPanel);
 
@@ -99,7 +102,7 @@ public class ClientGUI extends JFrame implements ActionListener {
                 message.setText("");
             } else {
                 try {
-                    client.sendMessage(username + " > " + message.getText(), sendReliably.isSelected());
+                    client.sendMessage(username + " > " + message.getText(), sendReliably.isSelected(), orderCausally.isSelected());
                 } catch (NotBoundException e1) {
                     e1.printStackTrace();
                 } catch (RemoteException e1) {

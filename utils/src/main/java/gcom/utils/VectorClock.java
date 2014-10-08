@@ -72,4 +72,21 @@ public class VectorClock implements Serializable {
     public Map<Host, Integer> getClock() {
         return clock;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        VectorClock that = (VectorClock) o;
+
+        if (clock != null ? !clock.equals(that.clock) : that.clock != null) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        return clock != null ? clock.hashCode() : 0;
+    }
 }

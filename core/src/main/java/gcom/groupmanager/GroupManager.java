@@ -36,6 +36,10 @@ public class GroupManager implements NameServiceClient {
         nameService.joinGroup(groupName, self);
     }
 
+    public Group getGroup(String groupName) {
+        return groups.get(groupName);
+    }
+
     public void leaveGroup(String groupName) throws RemoteException, NotBoundException, MalformedURLException {
         Group group = groups.get(groupName);
         group.removeMember(self);
@@ -59,6 +63,7 @@ public class GroupManager implements NameServiceClient {
             group.setLeader(leader);
         }
         groups.put(groupName, group);
+
     }
 
     public void processViewChange(String groupName, ArrayList<Host> members) throws RemoteException, NotBoundException, MalformedURLException {

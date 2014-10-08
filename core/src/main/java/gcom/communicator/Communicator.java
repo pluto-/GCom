@@ -51,7 +51,7 @@ public class Communicator implements PeerCommunication {
 
         //TODO: Send to message ordering.
 
-        gCom.deliverMessage(message.getText());
+        gCom.sendToMessageSorter(message);
     }
 
     @Override

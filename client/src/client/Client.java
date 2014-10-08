@@ -66,6 +66,8 @@ public class Client implements GComClient {
             e.printStackTrace();
         } catch (NotBoundException e) {
             e.printStackTrace();
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
         }
         System.out.println(" Done!");
 
@@ -76,8 +78,8 @@ public class Client implements GComClient {
         clientGUI.incomingMessage(message);
     }
 
-    public void sendMessage(String message, boolean sendReliably) throws NotBoundException, RemoteException, UnknownHostException {
-        gCom.sendMessage(message, group, sendReliably, true);
+    public void sendMessage(String message, boolean sendReliably, boolean deliverCausally) throws NotBoundException, RemoteException, UnknownHostException {
+        gCom.sendMessage(message, group, sendReliably, deliverCausally);
     }
 
     public void setGroupName(String groupName) {

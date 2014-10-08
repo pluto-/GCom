@@ -11,6 +11,8 @@ import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -23,10 +25,10 @@ public class GCom implements Runnable {
     private RmiServer rmiServer;
     private GroupManager groupManager;
     private Communicator communicator;
-    private MessageSorter messageSorter;
+    private Map<String, MessageSorter> messageSorters;
     private boolean running;
     private Thread thread;
-    private BlockingQueue<String> deliveryQueue;
+    private BlockingQueue<Message> deliveryQueue;
 
     private GComClient gcomClient;
 
@@ -41,6 +43,7 @@ public class GCom implements Runnable {
         rmiServer.bind(PeerCommunication.class.getSimpleName(), stub);
         NameServiceClient nameServiceClient = (NameServiceClient) UnicastRemoteObject.exportObject(groupManager, rmiPort);
         rmiServer.bind(NameServiceClient.class.getSimpleName(), nameServiceClient);
+        messageSorters = new HashMap<>();
 
         deliveryQueue = new LinkedBlockingQueue<>();
 
@@ -76,8 +79,11 @@ public class GCom implements Runnable {
         return (groupManager.getVectorClock(message.getGroupName()).hasReceived(message));
     }
 
-    public void joinGroup(String groupName) throws RemoteException, MalformedURLException, NotBoundException {
+    public void joinGroup(String groupName) throws RemoteException, NotBoundException, MalformedURLException, UnknownHostException {
+
         groupManager.sendJoinGroup(groupName);
+        messageSorters.put(groupName, new MessageSorter(deliveryQueue, groupManager.getGroup(groupName).getVectorClock(), rmiServer.getHost()));
+
     }
 
     public void sendViewChange(Group group) throws RemoteException, NotBoundException, MalformedURLException {
@@ -88,15 +94,15 @@ public class GCom implements Runnable {
         return groupManager.getMembers(groupName);
     }
 
-    public void deliverMessage(String message) {
-        gcomClient.deliverMessage(message);
+    public void sendToMessageSorter(Message message) {
+        messageSorters.get(message.getGroupName()).receive(message);
     }
 
     @Override
     public void run() {
         while (running) {
             try {
-                gcomClient.deliverMessage(deliveryQueue.take());
+                gcomClient.deliverMessage(deliveryQueue.take().getText());
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
