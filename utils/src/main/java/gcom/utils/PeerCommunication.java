@@ -13,5 +13,4 @@ import java.util.Map;
  */
 public interface PeerCommunication extends Remote {
     public void receiveMessage(Message message) throws RemoteException;
-    public void viewChanged(String groupName, ArrayList<Host> members) throws RemoteException, MalformedURLException, NotBoundException;
 }
