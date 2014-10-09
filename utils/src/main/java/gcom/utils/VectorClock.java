@@ -19,20 +19,8 @@ public class VectorClock implements Serializable {
         clock = new HashMap<>(objectToClone.getClock());
     }
 
-    public boolean hasReceived(Host host, Integer value) {
-        if(value < clock.get(host)) {
-            return false;
-        } else {
-            return true;
-        }
-    }
-
-
     public boolean hasReceived(Message message) {
-        if(!clock.containsKey(message.getSender())) {
-            return false;
-        }
-        return !(message.getVectorClock().getValue(message.getSender()) < clock.get(message.getSender()));
+        return !(message.getVectorClock().getValue(message.getSource()) < getValue(message.getSource()));
     }
 
 
@@ -56,14 +44,9 @@ public class VectorClock implements Serializable {
 
     public boolean isBeforeOrEqualOnAllValuesExcept(VectorClock other, Host exception) {
 
-        Iterator<Host> keys = clock.keySet().iterator();
-        Host key;
-        while(keys.hasNext()) {
-            key = keys.next();
-            if(!key.equals(exception)) {
-                if(clock.get(key) > other.getValue(key)) {
-                    return false;
-                }
+        for(Host host : clock.keySet()) {
+            if(!host.equals(exception) && (clock.get(host) > other.getValue(host))) {
+                return false;
             }
         }
         return true;

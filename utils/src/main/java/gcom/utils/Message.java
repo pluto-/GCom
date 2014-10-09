@@ -1,7 +1,6 @@
 package gcom.utils;
 
 import java.io.Serializable;
-import java.util.Map;
 
 /**
  * Created by Jonas on 2014-10-06.
@@ -11,15 +10,15 @@ public class Message implements Serializable {
     private boolean isReliable;
     private boolean deliverCausally;
     private String text;
-    private Host sender;
+    private Host source;
     private VectorClock vectorClock;
     private String groupName;
 
-    public Message(boolean isReliable, boolean deliverCausally, String text, Host sender, VectorClock vectorClock, String groupName) {
+    public Message(boolean isReliable, boolean deliverCausally, String text, Host source, VectorClock vectorClock, String groupName) {
         this.isReliable = isReliable;
         this.deliverCausally = deliverCausally;
         this.text = text;
-        this.sender = sender;
+        this.source = source;
         this.vectorClock = new VectorClock(vectorClock);
         this.groupName = groupName;
     }
@@ -44,8 +43,13 @@ public class Message implements Serializable {
         return text;
     }
 
-    public Host getSender() {
-        return sender;
+    public Host getSource() {
+        return source;
+    }
+
+    public boolean isCausallyConsistent(VectorClock localVectorClock) {
+        return (vectorClock.getValue(source) == (localVectorClock.getValue(source) + 1)) &&
+                getVectorClock().isBeforeOrEqualOnAllValuesExcept(localVectorClock, source);
     }
 
     @Override
@@ -58,7 +62,7 @@ public class Message implements Serializable {
         if (deliverCausally != message.deliverCausally) return false;
         if (isReliable != message.isReliable) return false;
         if (groupName != null ? !groupName.equals(message.groupName) : message.groupName != null) return false;
-        if (sender != null ? !sender.equals(message.sender) : message.sender != null) return false;
+        if (source != null ? !source.equals(message.source) : message.source != null) return false;
         if (text != null ? !text.equals(message.text) : message.text != null) return false;
         if (vectorClock != null ? !vectorClock.equals(message.vectorClock) : message.vectorClock != null) return false;
 

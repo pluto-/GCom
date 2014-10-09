@@ -47,6 +47,10 @@ public class Group {
         return members;
     }
 
+    public boolean hasMember(Host member) {
+        return members.contains(member);
+    }
+
     public void setMembers(ArrayList<Host> members) {
         this.members = members;
     }

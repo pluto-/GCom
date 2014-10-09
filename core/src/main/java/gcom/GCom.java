@@ -89,7 +89,10 @@ public class GCom implements Runnable {
     }
 
     public void sendViewChange(Group group) throws RemoteException, NotBoundException, MalformedURLException {
-        communicator.sendViewChange(group.getMembers(), group.getName());
+        //communicator.sendViewChange(group.getMembers(), group.getName());
+        groupManager.getVectorClock(group.getName()).increment(self);
+        ViewChange viewChange = new ViewChange(true, true, null, self, groupManager.getVectorClock(group.getName()), group.getName(), group.getMembers());
+        communicator.multicast(viewChange, viewChange.getMembers());
     }
 
     public ArrayList<Host> getGroupMembers(String groupName) {
@@ -101,7 +104,7 @@ public class GCom implements Runnable {
     }
 
     public void receive(Message message) {
-        if(message.getSender().equals(self)) {
+        if(message.getSource().equals(self)) {
             deliveryQueue.add(message);
         } else {
             sendToMessageSorter(message);
