@@ -42,7 +42,7 @@ public class Client implements GComClient, HoldBackQueueListener {
         }
         try {
             gCom = new GCom(false, rmiPort, this, nameService);
-            gCom.attachHoldBackQueueListener(this);
+
         } catch (RemoteException e) {
             e.printStackTrace();
         } catch (UnknownHostException e) {
@@ -60,6 +60,7 @@ public class Client implements GComClient, HoldBackQueueListener {
         System.out.print("Trying to join group ...");
         try {
             gCom.joinGroup(group);
+            gCom.attachHoldBackQueueListener(this, group);
         } catch (RemoteException e) {
             e.printStackTrace();
         } catch (MalformedURLException e) {
