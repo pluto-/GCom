@@ -62,9 +62,6 @@ public class MessageSorter implements Runnable {
                 PriorityBlockingQueue<Message> holdBackQueue = holdBackQueues.get(key);
 
                 Message firstMessage = holdBackQueue.peek();
-                /*System.err.println("First Message : " + firstMessage.getText());
-                System.err.println("Sender Vector Clock[Sender] : " + firstMessage.getVectorClock().getValue(firstMessage.getSender()));
-                System.err.println("Local Vector Clock[Sender] : " + localVectorClock.getValue(firstMessage.getSender()));*/
 
                 if((firstMessage == null) || (firstMessage.getVectorClock().getValue(key) == null)) {}
                 else if((firstMessage.getVectorClock().getValue(key) == (localVectorClock.getValue(key) + 1)) &&
@@ -89,7 +86,7 @@ public class MessageSorter implements Runnable {
                         System.err.println("First Message Vector Clock Key: " + key1 + " Value: " + firstMessage.getVectorClock().getValue(key1));
                     }
                     for(Host key1 : localVectorClock.getClock().keySet()) {
-                        System.err.println("Local Vector Clock Key: " + key1 + " Value: " + firstMessage.getVectorClock().getValue(key1));
+                        System.err.println("Local Vector Clock Key: " + key1 + " Value: " + localVectorClock.getValue(key1));
                     }
 
                     System.err.println("First bool: " + (firstMessage.getVectorClock().getValue(key) == (localVectorClock.getValue(key) + 1)));

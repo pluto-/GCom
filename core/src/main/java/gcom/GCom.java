@@ -111,7 +111,11 @@ public class GCom implements Runnable {
     public void run() {
         while (running) {
             try {
-                gcomClient.deliverMessage(deliveryQueue.take().getText());
+
+                Message message = deliveryQueue.take();
+                gcomClient.deliverMessage(message);
+                gcomClient.debugSetVectorClock(groupManager.getGroup(message.getGroupName()).getVectorClock());
+
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }

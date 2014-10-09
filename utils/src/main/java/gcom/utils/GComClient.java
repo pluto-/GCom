@@ -5,6 +5,6 @@ package gcom.utils;
  */
 public interface GComClient {
 
-    public void deliverMessage(String message);
-
+    public void deliverMessage(Message message);
+    public void debugSetVectorClock(VectorClock vectorClock);
 }
