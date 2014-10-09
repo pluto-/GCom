@@ -59,8 +59,7 @@ public class GCom implements Runnable {
     public void sendMessage(String text, String group, boolean sendReliably, boolean deliverCausally) throws UnknownHostException, RemoteException, NotBoundException {
         groupManager.getVectorClock(group).increment(self);
         Message message = new Message(sendReliably, deliverCausally, text, self, groupManager.getVectorClock(group), group);
-        receive(message);
-        communicator.multicast(message, groupManager.getMembers(group));
+        sendMessage(message, groupManager.getGroup(group).getMembers());
     }
 
     public VectorClock getVectorClock(String groupName) {
@@ -89,7 +88,12 @@ public class GCom implements Runnable {
     public void sendViewChange(Group group) throws RemoteException, NotBoundException, MalformedURLException {
         groupManager.getVectorClock(group.getName()).increment(self);
         ViewChange viewChange = new ViewChange(true, true, null, self, groupManager.getVectorClock(group.getName()), group.getName(), group.getMembers());
-        communicator.multicast(viewChange, viewChange.getMembers());
+        sendMessage(viewChange, viewChange.getMembers());
+    }
+
+    private void sendMessage(Message message, ArrayList<Host> members) throws RemoteException, NotBoundException {
+        deliveryQueue.add(message);
+        communicator.multicast(message, members);
     }
 
     public ArrayList<Host> getGroupMembers(String groupName) {
@@ -102,18 +106,14 @@ public class GCom implements Runnable {
 
     public void receive(Message message) throws RemoteException, NotBoundException {
 
-        if(message.getSource().equals(self)) {
-            deliveryQueue.add(message);
-        } else {
-            if(message.isReliable()) {
-                if(debug) {
-                    message.appendToText("\nMessage been at host: " + self);
-                }
-                ArrayList<Host> members = getGroupMembers(message.getGroupName());
-                communicator.multicast(message, members);
+        if(message.isReliable()) {
+            if(debug) {
+                message.appendToText("\nMessage been at host: " + self);
             }
-            sendToMessageSorter(message);
+            ArrayList<Host> members = getGroupMembers(message.getGroupName());
+            communicator.multicast(message, members);
         }
+        sendToMessageSorter(message);
     }
     @Override
     public void run() {
