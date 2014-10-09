@@ -72,4 +72,8 @@ public class VectorClock implements Serializable {
     public int hashCode() {
         return clock != null ? clock.hashCode() : 0;
     }
+
+    public void addValue(Host member, int value) {
+        clock.put(member, value);
+    }
 }

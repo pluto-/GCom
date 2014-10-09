@@ -65,11 +65,18 @@ public class GroupManager implements NameServiceClient {
 
     }
 
-    public void processViewChange(String groupName, ArrayList<Host> members) throws RemoteException, NotBoundException, MalformedURLException {
+    public void processViewChange(ViewChange viewChange) throws RemoteException, NotBoundException, MalformedURLException {
         System.out.println("Members:");
+        ArrayList<Host> members = viewChange.getMembers();
+        ArrayList<Host> newMembers = new ArrayList<>();
+        ArrayList<Host> currentMembers = getMembers(viewChange.getGroupName());
         for(Host member : members) {
+            if(!currentMembers.contains(member)) {
+                groups.get(viewChange.getGroupName()).addVectorValue(member, viewChange.getVectorClock().getValue(member));
+            }
             System.out.println(member.getAddress().getHostAddress());
         }
+        String groupName = viewChange.getGroupName();
         if (!members.contains(groups.get(groupName).getLeader())) {
             sendJoinGroup(groupName);
         }

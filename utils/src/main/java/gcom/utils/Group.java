@@ -62,4 +62,9 @@ public class Group {
     public void setVectorClock(VectorClock vectorClock) {
         this.vectorClock = vectorClock;
     }
+
+    public void addVectorValue(Host member, int value) {
+        vectorClock.addValue(member, value);
+
+    }
 }

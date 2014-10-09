@@ -45,16 +45,4 @@ public class Communicator implements PeerCommunication {
 
     }
 
-    @Override
-    public void viewChanged(String groupName, ArrayList<Host> members) throws RemoteException, MalformedURLException, NotBoundException {
-        gCom.viewChanged(groupName, members);
-    }
-
-    public void sendViewChange(ArrayList<Host> members, String groupName) throws RemoteException, NotBoundException, MalformedURLException {
-        for(Host member : members) {
-            System.out.println("Send view changed to " + member.getAddress().getHostAddress());
-            PeerCommunication stub = (PeerCommunication) Naming.lookup("rmi://" + member + "/" + PeerCommunication.class.getSimpleName());
-            stub.viewChanged(groupName, members);
-        }
-    }
 }
