@@ -59,7 +59,7 @@ public class GCom implements Runnable {
     public void sendMessage(String text, String group, boolean sendReliably, boolean deliverCausally) throws UnknownHostException, RemoteException, NotBoundException {
         groupManager.getVectorClock(group).increment(self);
         Message message = new Message(sendReliably, deliverCausally, text, self, groupManager.getVectorClock(group), group);
-
+        receive(message);
         communicator.multicast(message, groupManager.getMembers(group));
     }
 
