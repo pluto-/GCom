@@ -42,12 +42,12 @@ public class Communicator implements PeerCommunication {
     public void receiveMessage(Message message) throws RemoteException {
 
         // TODO: Send to others if not received before.
-        if(gCom.hasReceived(message)) {
+        if(!gCom.hasReceived(message)) {
 
         }
 
-        //TODO: Send to message ordering.
         gCom.receive(message);
+        //TODO: Send to message ordering.
     }
 
     @Override

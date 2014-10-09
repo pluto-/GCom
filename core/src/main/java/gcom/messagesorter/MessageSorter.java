@@ -1,6 +1,5 @@
 package gcom.messagesorter;
 
-import gcom.GCom;
 import gcom.utils.Host;
 import gcom.utils.Message;
 import gcom.utils.VectorClock;
@@ -29,10 +28,10 @@ public class MessageSorter implements Runnable {
 
     public synchronized void receive(Message message) {
 
-        if(!holdBackQueues.containsKey(message.getSender())) {
-            holdBackQueues.put(message.getSender(), new PriorityBlockingQueue<>(5, new MessageComparator()));
+        if(!holdBackQueues.containsKey(message.getSource())) {
+            holdBackQueues.put(message.getSource(), new PriorityBlockingQueue<>(5, new MessageComparator()));
         }
-        holdBackQueues.get(message.getSender()).put(message);
+        holdBackQueues.get(message.getSource()).put(message);
 
         startThread();
     }
@@ -59,12 +58,8 @@ public class MessageSorter implements Runnable {
                 PriorityBlockingQueue<Message> holdBackQueue = holdBackQueues.get(holdBackQueueHost);
 
                 Message firstMessage = holdBackQueue.peek();
-                /*System.err.println("First Message : " + firstMessage.getText());
-                System.err.println("Sender Vector Clock[Sender] : " + firstMessage.getVectorClock().getValue(firstMessage.getSender()));
-                System.err.println("Local Vector Clock[Sender] : " + localVectorClock.getValue(firstMessage.getSender()));*/
 
-                if((firstMessage != null) && (firstMessage.getVectorClock().getValue(holdBackQueueHost) == (localVectorClock.getValue(holdBackQueueHost) + 1)) &&
-                        firstMessage.getVectorClock().isBeforeOrEqualOnAllValuesExcept(localVectorClock, holdBackQueueHost)){
+                if((firstMessage != null) && firstMessage.isCausallyConsistent(localVectorClock)){
 
                     // Deliver
 
@@ -77,15 +72,15 @@ public class MessageSorter implements Runnable {
                     System.err.println("Delivering to deliverQueue");
                    
                     incrementLocalVectorClock(holdBackQueueHost);
-                    holdBackQueue.remove();
+                    holdBackQueue.remove(firstMessage);
                     running = true;
                 } else {
 
-                    for(Host key1 : firstMessage.getVectorClock().getClock().keySet()) {
-                        System.err.println("First Message Vector Clock Key: " + key1 + " Value: " + firstMessage.getVectorClock().getValue(key1));
+                    for(Host clockKey : firstMessage.getVectorClock().getClock().keySet()) {
+                        System.err.println("First Message Vector Clock Key: " + clockKey + " Value: " + firstMessage.getVectorClock().getValue(clockKey));
                     }
-                    for(Host key1 : localVectorClock.getClock().keySet()) {
-                        System.err.println("Local Vector Clock Key: " + key1 + " Value: " + localVectorClock.getValue(key1));
+                    for(Host clockKey : localVectorClock.getClock().keySet()) {
+                        System.err.println("Local Vector Clock Key: " + clockKey + " Value: " + localVectorClock.getValue(clockKey));
                     }
 
                     System.err.println("First bool: " + (firstMessage.getVectorClock().getValue(holdBackQueueHost) == (localVectorClock.getValue(holdBackQueueHost) + 1)));
@@ -104,11 +99,11 @@ public class MessageSorter implements Runnable {
         @Override
         public int compare(Message first, Message second)
         {
-            if (first.getVectorClock().isBefore(second.getVectorClock(), first.getSender()))
+            if (first.getVectorClock().isBefore(second.getVectorClock(), first.getSource()))
             {
                 return -1;
             }
-            if (second.getVectorClock().isBefore(first.getVectorClock(), first.getSender()))
+            if (second.getVectorClock().isBefore(first.getVectorClock(), first.getSource()))
             {
                 return 1;
             }

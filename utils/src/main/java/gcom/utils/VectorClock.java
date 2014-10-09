@@ -2,7 +2,6 @@ package gcom.utils;
 
 import java.io.Serializable;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
 /**
@@ -20,7 +19,7 @@ public class VectorClock implements Serializable {
     }
 
     public boolean hasReceived(Message message) {
-        return !(message.getVectorClock().getValue(message.getSender()) < getValue(message.getSender()));
+        return !(message.getVectorClock().getValue(message.getSource()) < getValue(message.getSource()));
     }
 
 
@@ -44,14 +43,9 @@ public class VectorClock implements Serializable {
 
     public boolean isBeforeOrEqualOnAllValuesExcept(VectorClock other, Host exception) {
 
-        Iterator<Host> keys = clock.keySet().iterator();
-        Host key;
-        while(keys.hasNext()) {
-            key = keys.next();
-            if(!key.equals(exception)) {
-                if(clock.get(key) > other.getValue(key)) {
-                    return false;
-                }
+        for(Host host : clock.keySet()) {
+            if(!host.equals(exception) && (clock.get(host) > other.getValue(host))) {
+                return false;
             }
         }
         return true;
