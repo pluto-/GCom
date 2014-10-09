@@ -20,15 +20,14 @@ public class VectorClock implements Serializable {
     }
 
     public boolean hasReceived(Message message) {
-        return !(message.getVectorClock().getValue(message.getSource()) < getValue(message.getSource()));
+        int messageVectorValue = message.getVectorClock().getValue(message.getSource());
+        int localVectorValue = getValue(message.getSource());
+        return (message.getVectorClock().getValue(message.getSource()) < getValue(message.getSource()));
     }
 
 
     public Integer getValue(Host host) {
-        if(!clock.containsKey(host)) {
-            clock.put(host,0);
-        }
-        return clock.get(host);
+        return (clock.containsKey(host) ? clock.get(host) : 0);
     }
 
     public void increment(Host host) {

@@ -21,29 +21,31 @@ import java.util.ArrayList;
 public class Communicator implements PeerCommunication {
 
     private GCom gCom;
+    private Host self;
 
-    public Communicator(GCom gCom) throws IOException, AlreadyBoundException {
+    public Communicator(GCom gCom, Host self) throws IOException, AlreadyBoundException {
         this.gCom = gCom;
+        this.self = self;
     }
 
     public void multicast(Message message, ArrayList<Host> groupMembers) throws RemoteException, NotBoundException {
         for(Host member : groupMembers) {
-            Registry memberRegistry = LocateRegistry.getRegistry(member.getAddress().getHostAddress(), member.getPort());
+            if(!member.equals(self)) {
+                Registry memberRegistry = LocateRegistry.getRegistry(member.getAddress().getHostAddress(), member.getPort());
 
-            PeerCommunication stub = (PeerCommunication) memberRegistry.lookup(PeerCommunication.class.getSimpleName());
-            stub.receiveMessage(message);
+                PeerCommunication stub = (PeerCommunication) memberRegistry.lookup(PeerCommunication.class.getSimpleName());
+                stub.receiveMessage(message);
+            }
         }
     }
 
     @Override
     public void receiveMessage(Message message) throws RemoteException, NotBoundException {
-
+        boolean hasReceived = gCom.hasReceived(message);
         if(!gCom.hasReceived(message)) {
             gCom.receive(message);
         } else {
             gCom.alreadyReceived(message);
         }
-
     }
-
 }
