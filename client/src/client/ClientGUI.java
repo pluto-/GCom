@@ -1,5 +1,6 @@
 package client;
 
+import gcom.utils.Message;
 import gcom.utils.VectorClock;
 
 import javax.swing.*;
@@ -21,7 +22,10 @@ public class ClientGUI extends JFrame implements ActionListener, ItemListener {
     JTextPane chat;
     StyleContext context;
     StyledDocument document;
-    Style style;
+
+    Style blackStyle;
+    Style blueStyle;
+    Style redStyle;
 
     JTextField message;
     JButton send;
@@ -35,8 +39,10 @@ public class ClientGUI extends JFrame implements ActionListener, ItemListener {
     JMenuBar menuBar;
     JMenu debug;
     JCheckBoxMenuItem showLocalVectorClock;
+    JCheckBoxMenuItem showHoldBackQueue;
 
     VectorClockGUI vectorClockGUI;
+    HoldBackQueueGUI holdBackQueueGUI;
 
     /**
      * GUI look taken from: http://codereview.stackexchange.com/questions/25461/simple-chat-room-swing-gui
@@ -60,7 +66,10 @@ public class ClientGUI extends JFrame implements ActionListener, ItemListener {
         debug = new JMenu("Debug");
         showLocalVectorClock = new JCheckBoxMenuItem("Show Local Vector Clock");
         showLocalVectorClock.addItemListener(this);
+        showHoldBackQueue = new JCheckBoxMenuItem("Show Hold-Back Queue");
+        showHoldBackQueue.addItemListener(this);
         debug.add(showLocalVectorClock);
+        debug.add(showHoldBackQueue);
         menuBar.add(debug);
         setJMenuBar(menuBar);
 
@@ -82,8 +91,18 @@ public class ClientGUI extends JFrame implements ActionListener, ItemListener {
         chat.setFont(new Font("Times New Roman", Font.PLAIN, 15));
         context = new StyleContext();
         document = new DefaultStyledDocument(context);
-        style = context.getStyle(StyleContext.DEFAULT_STYLE);
-        StyleConstants.setFontSize(style, 14);
+
+        blackStyle = chat.addStyle("BlackStyle", null);
+        StyleConstants.setFontSize(blackStyle, 14);
+        StyleConstants.setForeground(blackStyle, Color.black);
+
+        blueStyle = chat.addStyle("BlueStyle", null);
+        StyleConstants.setFontSize(blueStyle, 14);
+        StyleConstants.setForeground(blueStyle, Color.blue);
+
+        redStyle = chat.addStyle("RedStyle", null);
+        StyleConstants.setFontSize(redStyle, 14);
+        StyleConstants.setForeground(redStyle, Color.red);
 
         mainPanel.add(new JScrollPane(chat), BorderLayout.CENTER);
 
@@ -115,21 +134,28 @@ public class ClientGUI extends JFrame implements ActionListener, ItemListener {
         setVisible(true);
 
         vectorClockGUI = new VectorClockGUI();
+        holdBackQueueGUI = new HoldBackQueueGUI();
     }
 
     public boolean isDebug() {
         return cbDebug.isSelected();
     }
 
+    public void messagePutInHoldBackQueue(Message message) {
+        holdBackQueueGUI.addMessage(message);
+    }
+    public void messageRemovedFromHoldBackQueue(Message message) {
+        holdBackQueueGUI.removeMessage(message);
+    }
+
+
     public void incomingMessage(String messageText, String debugText) {
 
         try {
-            StyleConstants.setForeground(style, Color.black);
             document.insertString(document.getLength(), messageText,
-                    style);
-            StyleConstants.setForeground(style, Color.blue);
+                    blackStyle);
             document.insertString(document.getLength(), debugText,
-                    style);
+                    blueStyle);
 
         } catch (BadLocationException e) {
             e.printStackTrace();
@@ -137,6 +163,21 @@ public class ClientGUI extends JFrame implements ActionListener, ItemListener {
 
         chat.setStyledDocument(document);
 
+
+        chat.setCaretPosition(chat.getDocument().getLength());
+    }
+
+    public void incomingMessageAlreadyReceived(String messageText) {
+
+        try {
+            document.insertString(document.getLength(), "[Already received message] " + messageText + "\n",
+                    redStyle);
+
+        } catch (BadLocationException e) {
+            e.printStackTrace();
+        }
+
+        chat.setStyledDocument(document);
 
         chat.setCaretPosition(chat.getDocument().getLength());
     }
@@ -196,6 +237,9 @@ public class ClientGUI extends JFrame implements ActionListener, ItemListener {
         if(e.getSource().equals(showLocalVectorClock)) {
             boolean selected = (e.getStateChange() == ItemEvent.SELECTED);
             vectorClockGUI.setVisible(selected);
+        } else if(e.getSource().equals(showHoldBackQueue)) {
+            boolean selected = (e.getStateChange() == ItemEvent.SELECTED);
+            holdBackQueueGUI.setVisible(selected);
         }
     }
 }

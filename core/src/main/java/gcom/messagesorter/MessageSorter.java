@@ -1,5 +1,6 @@
 package gcom.messagesorter;
 
+import gcom.utils.HoldBackQueueListener;
 import gcom.utils.Host;
 import gcom.utils.Message;
 import gcom.utils.VectorClock;
@@ -19,11 +20,17 @@ public class MessageSorter implements Runnable {
     private volatile Map<Host,PriorityBlockingQueue<Message>> holdBackQueues;
     private Thread thread;
     private volatile boolean running;
+    private HoldBackQueueListener listener;
 
     public MessageSorter(BlockingQueue<Message> deliverQueue, VectorClock localVectorClock) {
         this.deliverQueue = deliverQueue;
         this.localVectorClock = localVectorClock;
         holdBackQueues = new ConcurrentHashMap<>();
+        this.listener = null;
+    }
+
+    public void setListener(HoldBackQueueListener listener) {
+        this.listener = listener;
     }
 
     public synchronized void receive(Message message) {
@@ -32,6 +39,9 @@ public class MessageSorter implements Runnable {
             holdBackQueues.put(message.getSource(), new PriorityBlockingQueue<>(5, new MessageComparator()));
         }
         holdBackQueues.get(message.getSource()).put(message);
+        if(listener != null) {
+            listener.messagePutInHoldBackQueue(message);
+        }
 
         startThread();
     }
@@ -73,6 +83,9 @@ public class MessageSorter implements Runnable {
                    
                     incrementLocalVectorClock(holdBackQueueHost);
                     holdBackQueue.remove(firstMessage);
+                    if(listener != null) {
+                        listener.messageRemovedFromHoldBackQueue(firstMessage);
+                    }
                     running = true;
                 } else {
 

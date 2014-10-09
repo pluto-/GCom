@@ -1,14 +1,9 @@
 package client;
 
 import gcom.GCom;
-import gcom.utils.GComClient;
-import gcom.utils.Host;
-import gcom.utils.Message;
-import gcom.utils.VectorClock;
+import gcom.utils.*;
 
 import javax.swing.*;
-import javax.swing.text.*;
-import java.awt.*;
 import java.net.InetAddress;
 import java.net.MalformedURLException;
 import java.net.UnknownHostException;
@@ -19,7 +14,7 @@ import java.rmi.RemoteException;
 /**
  * Created by Jonas on 2014-10-06.
  */
-public class Client implements GComClient {
+public class Client implements GComClient, HoldBackQueueListener {
 
     private ClientGUI clientGUI;
     private GCom gCom;
@@ -47,6 +42,7 @@ public class Client implements GComClient {
         }
         try {
             gCom = new GCom(false, rmiPort, this, nameService);
+            gCom.attachHoldBackQueueListener(this);
         } catch (RemoteException e) {
             e.printStackTrace();
         } catch (UnknownHostException e) {
@@ -102,8 +98,17 @@ public class Client implements GComClient {
     }
 
     @Override
+    public void deliverAlreadyReceivedMessage(Message message) {
+        if(clientGUI.isDebug()) {
+            clientGUI.incomingMessageAlreadyReceived(message.getText());
+        }
+    }
+
+    @Override
     public void debugSetVectorClock(VectorClock vectorClock) {
-        clientGUI.vectorClockChanged(vectorClock);
+        if(clientGUI.isDebug()) {
+            clientGUI.vectorClockChanged(vectorClock);
+        }
     }
 
     public void sendMessage(String message, boolean sendReliably, boolean deliverCausally) throws NotBoundException, RemoteException, UnknownHostException {
@@ -143,5 +148,19 @@ public class Client implements GComClient {
                 }
             }
         });
+    }
+
+    @Override
+    public void messagePutInHoldBackQueue(Message message) {
+        if(clientGUI.isDebug()) {
+            clientGUI.messagePutInHoldBackQueue(message);
+        }
+    }
+
+    @Override
+    public void messageRemovedFromHoldBackQueue(Message message) {
+        if(clientGUI.isDebug()) {
+            clientGUI.messageRemovedFromHoldBackQueue(message);
+        }
     }
 }

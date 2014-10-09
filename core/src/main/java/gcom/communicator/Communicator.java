@@ -40,6 +40,8 @@ public class Communicator implements PeerCommunication {
 
         if(!gCom.hasReceived(message)) {
             gCom.receive(message);
+        } else {
+            gCom.alreadyReceived(message);
         }
 
     }

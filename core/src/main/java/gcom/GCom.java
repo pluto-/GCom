@@ -54,6 +54,10 @@ public class GCom implements Runnable {
         thread.start();
     }
 
+    public void attachHoldBackQueueListener(HoldBackQueueListener listener) {
+
+    }
+
     public void sendMessage(String text, String group, boolean sendReliably, boolean deliverCausally) throws UnknownHostException, RemoteException, NotBoundException {
         groupManager.getVectorClock(group).increment(self);
         Message message = new Message(sendReliably, deliverCausally, text, self, groupManager.getVectorClock(group), group);
@@ -112,6 +116,11 @@ public class GCom implements Runnable {
         }
         sendToMessageSorter(message);
     }
+
+    public void alreadyReceived(Message message) {
+        gcomClient.deliverAlreadyReceivedMessage(message);
+    }
+
     @Override
     public void run() {
         while (running) {
