@@ -7,6 +7,8 @@ import gcom.utils.Message;
 import gcom.utils.VectorClock;
 
 import javax.swing.*;
+import javax.swing.text.*;
+import java.awt.*;
 import java.net.InetAddress;
 import java.net.MalformedURLException;
 import java.net.UnknownHostException;
@@ -77,13 +79,26 @@ public class Client implements GComClient {
 
     @Override
     public void deliverMessage(Message message) {
-        String messageText = message.getText();
-        messageText = messageText.concat("\nVector Clock");
-        for(Host key : message.getVectorClock().getClock().keySet()) {
-            messageText = messageText.concat("\nHost: " + key + " Clock: " + message.getVectorClock().getValue(key));
+
+        String messageText = message.getText() + "\n";
+        String debugText = "";
+        if(clientGUI.isDebug()) {
+            debugText = debugText.concat("\n------DEBUG-----");
+            debugText = debugText.concat("\n\nSender: " + message.getSource());
+
+            debugText = debugText.concat("\n\nVector Clock");
+            for(Host key : message.getVectorClock().getClock().keySet()) {
+                debugText = debugText.concat("\n" + key + " Clock: " + message.getVectorClock().getValue(key));
+            }
+
+            debugText = debugText.concat("\n\nBeen at (After sender)");
+            for(int i = 0; i < message.getBeenAt().size(); i++) {
+                debugText = debugText.concat("\n" + i + ": " + message.getBeenAt().get(i));
+            }
+            debugText = debugText.concat("\n----------------\n");
         }
 
-        clientGUI.incomingMessage(messageText);
+        clientGUI.incomingMessage(messageText, debugText);
     }
 
     @Override

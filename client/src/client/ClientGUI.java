@@ -3,6 +3,7 @@ package client;
 import gcom.utils.VectorClock;
 
 import javax.swing.*;
+import javax.swing.text.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -17,12 +18,17 @@ import java.rmi.RemoteException;
  */
 public class ClientGUI extends JFrame implements ActionListener, ItemListener {
 
-    JTextArea chat;
+    JTextPane chat;
+    StyleContext context;
+    StyledDocument document;
+    Style style;
+
     JTextField message;
     JButton send;
     JButton sendSlow;
     JCheckBox sendReliably;
     JCheckBox orderCausally;
+    JCheckBox cbDebug;
     Client client;
     String username;
 
@@ -69,11 +75,15 @@ public class ClientGUI extends JFrame implements ActionListener, ItemListener {
 
         sendReliably = new JCheckBox("Send Reliably");
         orderCausally = new JCheckBox("Order Causally");
+        cbDebug = new JCheckBox("Debug");
 
-        chat = new JTextArea();
+        chat = new JTextPane();
         chat.setEditable(false);
         chat.setFont(new Font("Times New Roman", Font.PLAIN, 15));
-        chat.setLineWrap(true);
+        context = new StyleContext();
+        document = new DefaultStyledDocument(context);
+        style = context.getStyle(StyleContext.DEFAULT_STYLE);
+        StyleConstants.setFontSize(style, 14);
 
         mainPanel.add(new JScrollPane(chat), BorderLayout.CENTER);
 
@@ -95,6 +105,7 @@ public class ClientGUI extends JFrame implements ActionListener, ItemListener {
         southPanel.add(sendSlow, right);
         southPanel.add(sendReliably, right);
         southPanel.add(orderCausally, right);
+        southPanel.add(cbDebug, right);
 
         mainPanel.add(BorderLayout.SOUTH, southPanel);
 
@@ -106,8 +117,27 @@ public class ClientGUI extends JFrame implements ActionListener, ItemListener {
         vectorClockGUI = new VectorClockGUI();
     }
 
-    public void incomingMessage(String message) {
-        chat.append(message + "\n");
+    public boolean isDebug() {
+        return cbDebug.isSelected();
+    }
+
+    public void incomingMessage(String messageText, String debugText) {
+
+        try {
+            StyleConstants.setForeground(style, Color.black);
+            document.insertString(document.getLength(), messageText,
+                    style);
+            StyleConstants.setForeground(style, Color.blue);
+            document.insertString(document.getLength(), debugText,
+                    style);
+
+        } catch (BadLocationException e) {
+            e.printStackTrace();
+        }
+
+        chat.setStyledDocument(document);
+
+
         chat.setCaretPosition(chat.getDocument().getLength());
     }
 
