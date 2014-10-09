@@ -96,13 +96,6 @@ public class GCom implements Runnable {
         return groupManager.getMembers(groupName);
     }
 
-    public ArrayList<Host> getGroupMembersExceptSelf(String groupName) {
-        ArrayList<Host> members = groupManager.getMembers(groupName);
-        members.remove(self);
-        return members;
-
-    }
-
     public void sendToMessageSorter(Message message) {
         messageSorters.get(message.getGroupName()).receive(message);
     }
@@ -116,8 +109,8 @@ public class GCom implements Runnable {
                 if(debug) {
                     message.appendToText("\nMessage been at host: " + self);
                 }
-                ArrayList<Host> others = getGroupMembersExceptSelf(message.getGroupName());
-                communicator.multicast(message, others);
+                ArrayList<Host> members = getGroupMembers(message.getGroupName());
+                communicator.multicast(message, members);
             }
             sendToMessageSorter(message);
         }
