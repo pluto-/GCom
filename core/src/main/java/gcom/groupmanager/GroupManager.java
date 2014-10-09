@@ -31,7 +31,6 @@ public class GroupManager implements NameServiceClient {
         this.self = self;
         this.gCom = gCom;
     }
-
     public void sendJoinGroup(String groupName) throws RemoteException, MalformedURLException, NotBoundException {
         nameService.joinGroup(groupName, self);
     }
