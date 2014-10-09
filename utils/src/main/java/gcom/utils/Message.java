@@ -23,6 +23,10 @@ public class Message implements Serializable {
         this.groupName = groupName;
     }
 
+    public void appendToText(String append) {
+        text = text.concat(append);
+    }
+
     public boolean deliverCausally() {
         return deliverCausally;
     }

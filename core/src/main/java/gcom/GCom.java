@@ -30,12 +30,14 @@ public class GCom implements Runnable {
     private Thread thread;
     private BlockingQueue<Message> deliveryQueue;
     private Host self;
+    private boolean debug;
 
     private GComClient gcomClient;
 
-    public GCom(boolean reliableMulticast, int rmiPort, GComClient gcomClient, Host nameService)
+    public GCom(boolean reliableMulticast, int rmiPort, GComClient gcomClient, Host nameService, boolean debug)
             throws Exception {
         this.reliableMulticast = reliableMulticast;
+        this.debug = debug;
         rmiServer = new RmiServer(rmiPort);
         self = rmiServer.getHost();
         this.gcomClient = gcomClient;
@@ -99,14 +101,29 @@ public class GCom implements Runnable {
         return groupManager.getMembers(groupName);
     }
 
+    public ArrayList<Host> getGroupMembersExceptSelf(String groupName) {
+        ArrayList<Host> members = groupManager.getMembers(groupName);
+        members.remove(self);
+        return members;
+
+    }
+
     public void sendToMessageSorter(Message message) {
         messageSorters.get(message.getGroupName()).receive(message);
     }
 
-    public void receive(Message message) {
+    public void receive(Message message) throws RemoteException, NotBoundException {
+
         if(message.getSource().equals(self)) {
             deliveryQueue.add(message);
         } else {
+            if(message.isReliable()) {
+                if(debug) {
+                    message.appendToText("\nMessage been at host: " + self);
+                }
+                ArrayList<Host> others = getGroupMembersExceptSelf(message.getGroupName());
+                communicator.multicast(message, others);
+            }
             sendToMessageSorter(message);
         }
     }

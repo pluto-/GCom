@@ -1,10 +1,7 @@
 package gcom.communicator;
 
 import gcom.GCom;
-import gcom.utils.RmiServer;
-import gcom.utils.Host;
-import gcom.utils.Message;
-import gcom.utils.PeerCommunication;
+import gcom.utils.*;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -39,15 +36,13 @@ public class Communicator implements PeerCommunication {
     }
 
     @Override
-    public void receiveMessage(Message message) throws RemoteException {
+    public void receiveMessage(Message message) throws RemoteException, NotBoundException {
 
-        // TODO: Send to others if not received before.
         if(!gCom.hasReceived(message)) {
 
+            gCom.receive(message);
         }
 
-        gCom.receive(message);
-        //TODO: Send to message ordering.
     }
 
     @Override
