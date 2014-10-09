@@ -56,6 +56,10 @@ public class VectorClock implements Serializable {
         return clock;
     }
 
+    public boolean isEmpty() {
+        return clock.isEmpty();
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
