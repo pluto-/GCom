@@ -1,9 +1,13 @@
 package client;
 
+import gcom.utils.VectorClock;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.net.UnknownHostException;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
@@ -11,7 +15,7 @@ import java.rmi.RemoteException;
 /**
  * Created by Jonas on 2014-10-06.
  */
-public class ClientGUI extends JFrame implements ActionListener {
+public class ClientGUI extends JFrame implements ActionListener, ItemListener {
 
     JTextArea chat;
     JTextField message;
@@ -21,6 +25,12 @@ public class ClientGUI extends JFrame implements ActionListener {
     JCheckBox orderCausally;
     Client client;
     String username;
+
+    JMenuBar menuBar;
+    JMenu debug;
+    JCheckBoxMenuItem showLocalVectorClock;
+
+    VectorClockGUI vectorClockGUI;
 
     /**
      * GUI look taken from: http://codereview.stackexchange.com/questions/25461/simple-chat-room-swing-gui
@@ -39,6 +49,14 @@ public class ClientGUI extends JFrame implements ActionListener {
         JPanel southPanel = new JPanel();
         southPanel.setBackground(Color.BLUE);
         southPanel.setLayout(new GridBagLayout());
+
+        menuBar = new JMenuBar();
+        debug = new JMenu("Debug");
+        showLocalVectorClock = new JCheckBoxMenuItem("Show Local Vector Clock");
+        showLocalVectorClock.addItemListener(this);
+        debug.add(showLocalVectorClock);
+        menuBar.add(debug);
+        setJMenuBar(menuBar);
 
         message = new JTextField(30);
         message.requestFocusInWindow();
@@ -85,11 +103,12 @@ public class ClientGUI extends JFrame implements ActionListener {
         setSize(600, 300);
         setVisible(true);
 
-
+        vectorClockGUI = new VectorClockGUI();
     }
 
     public void incomingMessage(String message) {
         chat.append(message + "\n");
+        chat.setCaretPosition(chat.getDocument().getLength());
     }
 
     @Override
@@ -135,6 +154,18 @@ public class ClientGUI extends JFrame implements ActionListener {
             }
             message.requestFocusInWindow();
 
+        }
+    }
+
+    public void vectorClockChanged(VectorClock newLocalVectorClock) {
+        vectorClockGUI.setVectorClockText(newLocalVectorClock);
+    }
+
+    @Override
+    public void itemStateChanged(ItemEvent e) {
+        if(e.getSource().equals(showLocalVectorClock)) {
+            boolean selected = (e.getStateChange() == ItemEvent.SELECTED);
+            vectorClockGUI.setVisible(selected);
         }
     }
 }

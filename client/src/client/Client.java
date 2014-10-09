@@ -3,6 +3,8 @@ package client;
 import gcom.GCom;
 import gcom.utils.GComClient;
 import gcom.utils.Host;
+import gcom.utils.Message;
+import gcom.utils.VectorClock;
 
 import javax.swing.*;
 import java.net.InetAddress;
@@ -74,8 +76,19 @@ public class Client implements GComClient {
     }
 
     @Override
-    public void deliverMessage(String message) {
-        clientGUI.incomingMessage(message);
+    public void deliverMessage(Message message) {
+        String messageText = message.getText();
+        messageText = messageText.concat("\nVector Clock");
+        for(Host key : message.getVectorClock().getClock().keySet()) {
+            messageText = messageText.concat("\nHost: " + key + " Clock: " + message.getVectorClock().getValue(key));
+        }
+
+        clientGUI.incomingMessage(messageText);
+    }
+
+    @Override
+    public void debugSetVectorClock(VectorClock vectorClock) {
+        clientGUI.vectorClockChanged(vectorClock);
     }
 
     public void sendMessage(String message, boolean sendReliably, boolean deliverCausally) throws NotBoundException, RemoteException, UnknownHostException {
