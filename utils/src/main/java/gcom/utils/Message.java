@@ -26,12 +26,12 @@ public class Message implements Serializable {
         beenAt = new ArrayList<>();
     }
 
-    public void appendToText(String append) {
-        text = text.concat(append);
-    }
-
     public void addToBeenAt(Host host) {
         beenAt.add(host);
+    }
+
+    public ArrayList<Host> getBeenAt() {
+        return beenAt;
     }
 
     public boolean deliverCausally() {
