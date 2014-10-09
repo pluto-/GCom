@@ -40,7 +40,7 @@ public class GCom implements Runnable {
         self = rmiServer.getHost();
         this.gcomClient = gcomClient;
         groupManager = new GroupManager(nameService, self, this);
-        communicator = new Communicator(this);
+        communicator = new Communicator(this, self);
         PeerCommunication stub = (PeerCommunication) UnicastRemoteObject.exportObject(communicator, rmiPort);
         rmiServer.bind(PeerCommunication.class.getSimpleName(), stub);
         NameServiceClient nameServiceClient = (NameServiceClient) UnicastRemoteObject.exportObject(groupManager, rmiPort);
@@ -77,10 +77,9 @@ public class GCom implements Runnable {
     }
 
     public void joinGroup(String groupName) throws RemoteException, NotBoundException, MalformedURLException, UnknownHostException {
-
-        groupManager.sendJoinGroup(groupName);
-        messageSorters.put(groupName, new MessageSorter(deliveryQueue, groupManager.getGroup(groupName).getVectorClock()));
-
+        Group group = new Group(groupName);
+        messageSorters.put(groupName, new MessageSorter(deliveryQueue, group.getVectorClock()));
+        groupManager.sendJoinGroup(group);
     }
 
     public void sendViewChange(Group group) throws RemoteException, NotBoundException, MalformedURLException {

@@ -31,8 +31,9 @@ public class GroupManager implements NameServiceClient {
         this.self = self;
         this.gCom = gCom;
     }
-    public void sendJoinGroup(String groupName) throws RemoteException, MalformedURLException, NotBoundException {
-        nameService.joinGroup(groupName, self);
+    public void sendJoinGroup(Group group) throws RemoteException, MalformedURLException, NotBoundException {
+        groups.put(group.getName(), group);
+        nameService.joinGroup(group.getName(), self);
     }
 
     public Group getGroup(String groupName) {
@@ -56,12 +57,7 @@ public class GroupManager implements NameServiceClient {
     @Override
     public void setLeader(String groupName, Host leader) throws RemoteException {
         Group group = groups.get(groupName);
-        if(group == null ) {
-            group = new Group(groupName, leader);
-        } else {
-            group.setLeader(leader);
-        }
-        groups.put(groupName, group);
+        group.setLeader(leader);
 
     }
 
@@ -70,17 +66,19 @@ public class GroupManager implements NameServiceClient {
         ArrayList<Host> members = viewChange.getMembers();
         ArrayList<Host> newMembers = new ArrayList<>();
         ArrayList<Host> currentMembers = getMembers(viewChange.getGroupName());
+
+        Group group = groups.get(viewChange.getGroupName());
         for(Host member : members) {
+            System.out.println(member);
+
             if(!currentMembers.contains(member)) {
                 groups.get(viewChange.getGroupName()).addVectorValue(member, viewChange.getVectorClock().getValue(member));
             }
-            System.out.println(member.getAddress().getHostAddress());
         }
-        String groupName = viewChange.getGroupName();
-        if (!members.contains(groups.get(groupName).getLeader())) {
-            sendJoinGroup(groupName);
+        if (!members.contains(group.getLeader())) {
+            sendJoinGroup(group);
         }
-        groups.get(groupName).setMembers(members);
+        groups.get(group.getName()).setMembers(members);
     }
 
     public ArrayList<Host> getMembers(String groupName) {

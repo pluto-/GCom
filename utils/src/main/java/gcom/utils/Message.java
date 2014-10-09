@@ -59,7 +59,7 @@ public class Message implements Serializable {
     }
 
     public boolean isCausallyConsistent(VectorClock localVectorClock) {
-        return (vectorClock.isEmpty() || (vectorClock.getValue(source) == (localVectorClock.getValue(source) + 1)) &&
+        return (localVectorClock.isEmpty() || (vectorClock.getValue(source) == (localVectorClock.getValue(source) + 1)) &&
                 getVectorClock().isBeforeOrEqualOnAllValuesExcept(localVectorClock, source));
     }
 

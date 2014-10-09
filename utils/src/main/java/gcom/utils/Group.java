@@ -14,11 +14,15 @@ public class Group {
     private ArrayList<Host> members;
     private VectorClock vectorClock;
 
-    public Group(String name, Host leader) {
-        members = new ArrayList<>();
-        this.leader = leader;
+    public Group(String name) {
         this.name = name;
+        members = new ArrayList<>();
         vectorClock = new VectorClock();
+    }
+
+    public Group(String name, Host leader) {
+        this(name);
+        this.leader = leader;
     }
 
     public String getName() {
