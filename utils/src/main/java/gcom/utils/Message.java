@@ -1,6 +1,7 @@
 package gcom.utils;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 
 /**
  * Created by Jonas on 2014-10-06.
@@ -13,6 +14,7 @@ public class Message implements Serializable {
     private Host source;
     private VectorClock vectorClock;
     private String groupName;
+    private ArrayList<Host> beenAt;
 
     public Message(boolean isReliable, boolean deliverCausally, String text, Host source, VectorClock vectorClock, String groupName) {
         this.isReliable = isReliable;
@@ -21,10 +23,15 @@ public class Message implements Serializable {
         this.source = source;
         this.vectorClock = new VectorClock(vectorClock);
         this.groupName = groupName;
+        beenAt = new ArrayList<>();
     }
 
     public void appendToText(String append) {
         text = text.concat(append);
+    }
+
+    public void addToBeenAt(Host host) {
+        beenAt.add(host);
     }
 
     public boolean deliverCausally() {
