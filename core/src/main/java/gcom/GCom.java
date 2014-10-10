@@ -1,12 +1,10 @@
 package gcom;
 
 import gcom.communicator.Communicator;
-import gcom.communicator.RemoteClientException;
 import gcom.groupmanager.GroupManager;
 import gcom.utils.*;
 import gcom.messagesorter.MessageSorter;
 
-import java.net.ConnectException;
 import java.net.MalformedURLException;
 import java.net.UnknownHostException;
 import java.rmi.NotBoundException;
@@ -82,33 +80,27 @@ public class GCom implements Runnable {
         return (groupManager.getVectorClock(message.getGroupName()).hasReceived(message));
     }
 
-    public void joinGroup(String groupName) throws RemoteException, NotBoundException, MalformedURLException, UnknownHostException {
+    public void joinGroup(String groupName) throws RemoteException, NotBoundException, MalformedURLException {
         Group group = new Group(groupName);
         messageSorters.put(groupName, new MessageSorter(deliveryQueue, group.getVectorClock()));
         groupManager.sendJoinGroup(group);
     }
 
-    public void sendViewChange(Group group) throws RemoteException, NotBoundException, MalformedURLException {
+    public void triggerViewChange(Host deadHost, String groupName) {
+        Group group = groupManager.getGroup(groupName);
+        group.getMembers().remove(deadHost);
+        sendViewChange(group);
+    }
+
+    public void sendViewChange(Group group) {
         groupManager.getVectorClock(group.getName()).increment(self);
         ViewChange viewChange = new ViewChange(true, true, null, self, groupManager.getVectorClock(group.getName()), group.getName(), group.getMembers());
         sendMessage(viewChange, viewChange.getMembers());
     }
 
-    private void sendMessage(Message message, ArrayList<Host> members) throws RemoteException, NotBoundException, MalformedURLException {
+    private void sendMessage(Message message, ArrayList<Host> members){
         deliveryQueue.add(message);
-
-        try {
-            communicator.multicast(message, members);
-        } catch (RemoteClientException e) {
-            // Removing problem client from group.
-            Group group = groupManager.getGroup(message.getGroupName());
-            group.removeMember(e.getProblemClient());
-
-            //Send viewChanged with updated group.
-            sendViewChange(group);
-        }
-
-
+        communicator.multicast(message, members);
     }
 
     public ArrayList<Host> getGroupMembers(String groupName) {
