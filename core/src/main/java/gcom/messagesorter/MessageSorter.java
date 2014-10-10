@@ -61,7 +61,6 @@ public class MessageSorter implements Runnable {
     @Override
     public void run() {
         while(running) {
-            System.err.println("Running");
             running = false;
             for(Host holdBackQueueHost : holdBackQueues.keySet()) {
 
@@ -80,7 +79,6 @@ public class MessageSorter implements Runnable {
                     }
 
                     System.err.println("Delivering to deliverQueue");
-                   
                     incrementLocalVectorClock(holdBackQueueHost);
                     holdBackQueue.remove(firstMessage);
                     if(listener != null) {
@@ -103,7 +101,6 @@ public class MessageSorter implements Runnable {
 
             }
         }
-        System.err.println("Not Running");
     }
 
     private class MessageComparator implements Comparator<Message>
