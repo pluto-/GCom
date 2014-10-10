@@ -1,4 +1,4 @@
-package gcom.messagesorter;
+package gcom;
 
 import gcom.utils.HoldBackQueueListener;
 import gcom.utils.Host;
@@ -42,7 +42,6 @@ public class MessageSorter implements Runnable {
         if(listener != null) {
             listener.messagePutInHoldBackQueue(message);
         }
-
         startThread();
     }
 
@@ -85,20 +84,7 @@ public class MessageSorter implements Runnable {
                         listener.messageRemovedFromHoldBackQueue(firstMessage);
                     }
                     running = true;
-                } /*else {
-
-                    for(Host clockKey : firstMessage.getVectorClock().getClock().keySet()) {
-                        System.err.println("First Message Vector Clock Key: " + clockKey + " Value: " + firstMessage.getVectorClock().getValue(clockKey));
-                    }
-                    for(Host clockKey : localVectorClock.getClock().keySet()) {
-                        System.err.println("Local Vector Clock Key: " + clockKey + " Value: " + localVectorClock.getValue(clockKey));
-                    }
-
-                    System.err.println("First bool: " + (firstMessage.getVectorClock().getValue(holdBackQueueHost) == (localVectorClock.getValue(holdBackQueueHost) + 1)));
-                    System.err.println("Second bool: " + firstMessage.getVectorClock().isBeforeOrEqualOnAllValuesExcept(localVectorClock, holdBackQueueHost));
-
-                } */
-
+                }
             }
         }
     }

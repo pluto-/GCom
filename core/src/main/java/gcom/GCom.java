@@ -1,9 +1,7 @@
 package gcom;
 
 import gcom.communicator.Communicator;
-import gcom.groupmanager.GroupManager;
 import gcom.utils.*;
-import gcom.messagesorter.MessageSorter;
 
 import java.net.MalformedURLException;
 import java.net.UnknownHostException;

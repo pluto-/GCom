@@ -1,4 +1,4 @@
-package gcom.groupmanager;
+package gcom;
 
 import gcom.GCom;
 import gcom.utils.*;
