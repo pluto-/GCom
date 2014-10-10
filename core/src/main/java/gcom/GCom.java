@@ -12,6 +12,7 @@ import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -54,7 +55,7 @@ public class GCom implements Runnable {
         thread.start();
     }
 
-    public void sendMessage(String text, String group, boolean sendReliably, boolean deliverCausally) throws UnknownHostException, RemoteException, NotBoundException {
+    public void sendMessage(String text, String group, boolean sendReliably, boolean deliverCausally) {
         groupManager.getVectorClock(group).increment(self);
         Message message = new Message(sendReliably, deliverCausally, text, self, groupManager.getVectorClock(group), group);
         sendMessage(message, groupManager.getGroup(group).getMembers());
@@ -76,19 +77,25 @@ public class GCom implements Runnable {
         return (groupManager.getVectorClock(message.getGroupName()).hasReceived(message));
     }
 
-    public void joinGroup(String groupName) throws RemoteException, NotBoundException, MalformedURLException, UnknownHostException {
+    public void joinGroup(String groupName) throws RemoteException, NotBoundException, MalformedURLException {
         Group group = new Group(groupName);
         messageSorters.put(groupName, new MessageSorter(deliveryQueue, group.getVectorClock()));
         groupManager.sendJoinGroup(group);
     }
 
-    public void sendViewChange(Group group) throws RemoteException, NotBoundException, MalformedURLException {
+    public void triggerViewChange(Host deadHost, String groupName) {
+        Group group = groupManager.getGroup(groupName);
+        group.getMembers().remove(deadHost);
+        sendViewChange(group);
+    }
+
+    public void sendViewChange(Group group) {
         groupManager.getVectorClock(group.getName()).increment(self);
         ViewChange viewChange = new ViewChange(true, true, null, self, groupManager.getVectorClock(group.getName()), group.getName(), group.getMembers());
         sendMessage(viewChange, viewChange.getMembers());
     }
 
-    private void sendMessage(Message message, ArrayList<Host> members) throws RemoteException, NotBoundException {
+    private void sendMessage(Message message, ArrayList<Host> members){
         deliveryQueue.add(message);
         communicator.multicast(message, members);
     }
@@ -111,6 +118,7 @@ public class GCom implements Runnable {
         }
         sendToMessageSorter(message);
     }
+
     @Override
     public void run() {
         while (running) {
