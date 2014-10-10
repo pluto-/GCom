@@ -1,5 +1,6 @@
 package gcom.messagesorter;
 
+import gcom.MessageSorter;
 import gcom.utils.Host;
 import gcom.utils.Message;
 import gcom.utils.VectorClock;

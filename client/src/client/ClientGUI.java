@@ -65,7 +65,7 @@ public class ClientGUI extends JFrame implements ActionListener, ItemListener {
         southPanel.setLayout(new GridBagLayout());
 
         menuBar = new JMenuBar();
-        debug = new JMenu("Debug");
+        debug = new JMenu("Debug Output");
         showLocalVectorClock = new JCheckBoxMenuItem("Show Local Vector Clock");
         showLocalVectorClock.addItemListener(this);
         showHoldBackQueue = new JCheckBoxMenuItem("Show Hold-Back Queue");
@@ -80,6 +80,13 @@ public class ClientGUI extends JFrame implements ActionListener, ItemListener {
 
         message = new JTextField(30);
         message.requestFocusInWindow();
+        message.addActionListener(new ActionListener(){
+
+            public void actionPerformed(ActionEvent e){
+
+                send();
+
+            }});
 
         send = new JButton("Send");
         send.addActionListener(this);
@@ -183,29 +190,33 @@ public class ClientGUI extends JFrame implements ActionListener, ItemListener {
         chat.setCaretPosition(chat.getDocument().getLength());
     }
 
+    private void send() {
+        if (message.getText().length() < 1) {
+            // do nothing
+        } else if (message.getText().equals(".clear")) {
+            chat.setText("Cleared all messages\n");
+            message.setText("");
+        } else {
+            try {
+                client.sendMessage(username + " > " + message.getText(), sendReliably.isSelected(), orderCausally.isSelected());
+            } catch (NotBoundException e1) {
+                e1.printStackTrace();
+            } catch (RemoteException e1) {
+                e1.printStackTrace();
+            } catch (UnknownHostException e1) {
+                e1.printStackTrace();
+            } catch (InterruptedException e1) {
+                e1.printStackTrace();
+            }
+            message.setText("");
+        }
+        message.requestFocusInWindow();
+    }
+
     @Override
     public void actionPerformed(ActionEvent e) {
         if(e.getSource().equals(send)) {
-            if (message.getText().length() < 1) {
-                // do nothing
-            } else if (message.getText().equals(".clear")) {
-                chat.setText("Cleared all messages\n");
-                message.setText("");
-            } else {
-                try {
-                    client.sendMessage(username + " > " + message.getText(), sendReliably.isSelected(), orderCausally.isSelected());
-                } catch (NotBoundException e1) {
-                    e1.printStackTrace();
-                } catch (RemoteException e1) {
-                    e1.printStackTrace();
-                } catch (UnknownHostException e1) {
-                    e1.printStackTrace();
-                } catch (InterruptedException e1) {
-                    e1.printStackTrace();
-                }
-                message.setText("");
-            }
-            message.requestFocusInWindow();
+            send();
 
         } else if(e.getSource().equals(setMulticastSleep)) {
             int sleepMillis = Integer.valueOf(JOptionPane.showInputDialog("Specify how many milliseconds GCom should sleep between the clients when sending a multicast."));

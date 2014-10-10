@@ -74,7 +74,6 @@ public class Communicator implements PeerCommunication {
 
     @Override
     public void receiveMessage(Message message) throws RemoteException, NotBoundException {
-        boolean hasReceived = gCom.hasReceived(message);
         if(!gCom.hasReceived(message)) {
             gCom.receive(message);
         }

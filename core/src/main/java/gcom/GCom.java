@@ -1,9 +1,7 @@
 package gcom;
 
 import gcom.communicator.Communicator;
-import gcom.groupmanager.GroupManager;
 import gcom.utils.*;
-import gcom.messagesorter.MessageSorter;
 
 import java.net.MalformedURLException;
 import java.net.UnknownHostException;
@@ -58,14 +56,10 @@ public class GCom implements Runnable {
         messageSorters.get(groupName).setListener(listener);
     }
 
-    public void sendMessage(String text, String group, boolean sendReliably, boolean deliverCausally) throws UnknownHostException, RemoteException, NotBoundException, InterruptedException {
+    public void sendMessage(String text, String group, boolean sendReliably, boolean deliverCausally) {
         groupManager.getVectorClock(group).increment(self);
         Message message = new Message(sendReliably, deliverCausally, text, self, groupManager.getVectorClock(group), group);
         sendMessage(message, groupManager.getGroup(group).getMembers());
-    }
-
-    public void setSleepMillisBetweenClients(int millis) {
-        communicator.setSleepMillisBetweenClients(millis);
     }
 
     public VectorClock getVectorClock(String groupName) {
@@ -102,17 +96,13 @@ public class GCom implements Runnable {
         sendMessage(viewChange, viewChange.getMembers());
     }
 
-    private void sendMessage(Message message, ArrayList<Host> members) {
+    private void sendMessage(Message message, ArrayList<Host> members){
         deliveryQueue.add(message);
         communicator.multicast(message, members);
     }
 
     public ArrayList<Host> getGroupMembers(String groupName) {
         return groupManager.getMembers(groupName);
-    }
-
-    public void sendToMessageSorter(Message message) {
-        messageSorters.get(message.getGroupName()).receive(message);
     }
 
     public void receive(Message message) throws RemoteException, NotBoundException {
@@ -123,7 +113,7 @@ public class GCom implements Runnable {
             ArrayList<Host> members = getGroupMembers(message.getGroupName());
             communicator.multicast(message, members);
         }
-        sendToMessageSorter(message);
+        messageSorters.get(message.getGroupName()).receive(message);
     }
 
     public void alreadyReceived(Message message) {
