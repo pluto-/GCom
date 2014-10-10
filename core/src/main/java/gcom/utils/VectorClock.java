@@ -20,8 +20,6 @@ public class VectorClock implements Serializable {
     }
 
     public boolean hasReceived(Message message) {
-        int messageVectorValue = message.getVectorClock().getValue(message.getSource());
-        int localVectorValue = getValue(message.getSource());
         return (message.getVectorClock().getValue(message.getSource()) <= getValue(message.getSource()));
     }
 
@@ -78,5 +76,9 @@ public class VectorClock implements Serializable {
 
     public void addValue(Host member, int value) {
         clock.put(member, value);
+    }
+
+    public void removeValue(Host member) {
+        clock.remove(member);
     }
 }

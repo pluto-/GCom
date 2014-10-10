@@ -35,7 +35,6 @@ public class RmiServer {
             });
         }
         logger.error("after security manager");
-        //System.setProperty("java.rmi.server.hostname", Inet4Address.getLocalHost().getHostAddress());
         System.setProperty("java.rmi.server.hostname", IpChecker.getIp());
         registry = java.rmi.registry.LocateRegistry.createRegistry(portNumber);
         externalIp = InetAddress.getByName(IpChecker.getIp());
@@ -50,7 +49,4 @@ public class RmiServer {
         return new Host(externalIp, port);
     }
 
-    public Registry getRegistry() {
-        return registry;
-    }
 }

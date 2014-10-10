@@ -126,6 +126,7 @@ public class GCom implements Runnable {
             try {
                 Message message = deliveryQueue.take();
                 if(message instanceof ViewChange) {
+                    System.out.println("received view change");
                     groupManager.processViewChange((ViewChange)message);
                 } else {
                     gcomClient.deliverMessage(message);
@@ -147,4 +148,5 @@ public class GCom implements Runnable {
     public void setSleepMillisBetweenClients(int millis) {
         communicator.setSleepMillisBetweenClients(millis);
     }
+
 }

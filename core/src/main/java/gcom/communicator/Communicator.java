@@ -37,6 +37,10 @@ public class Communicator implements PeerCommunication {
         sleepMillisBetweenClients = 0;
     }
 
+    public void communicationError(Host host, Message message) {
+
+    }
+
     public void triggerViewChange(Host deadHost, String groupName) {
         channelMap.remove(deadHost);
         gCom.triggerViewChange(deadHost, groupName);
@@ -52,7 +56,7 @@ public class Communicator implements PeerCommunication {
                 if (!channelMap.containsKey(member)) {
                     try {
                         channelMap.put(member, new CommunicationChannel(member, this));
-                    } catch (RemoteException | NotBoundException e) {
+                    } catch (RemoteException | NotBoundException | MalformedURLException e) {
                         triggerViewChange(member, message.getGroupName());
                     }
                 }
@@ -77,5 +81,10 @@ public class Communicator implements PeerCommunication {
         if(!gCom.hasReceived(message)) {
             gCom.receive(message);
         }
+    }
+
+    public void removeChannel(Host host) {
+        channelMap.get(host).stop();
+        channelMap.remove(host);
     }
 }

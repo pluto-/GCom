@@ -1,7 +1,5 @@
 package gcom.utils;
 
-import gcom.utils.Host;
-
 import java.util.ArrayList;
 
 /**
@@ -18,11 +16,6 @@ public class Group {
         this.name = name;
         members = new ArrayList<>();
         vectorClock = new VectorClock();
-    }
-
-    public Group(String name, Host leader) {
-        this(name);
-        this.leader = leader;
     }
 
     public String getName() {
@@ -47,7 +40,9 @@ public class Group {
     }
 
     public ArrayList<Host> addMember(Host member) {
-        members.add(member);
+        if(!members.contains(member)) {
+            members.add(member);
+        }
         return members;
     }
 
@@ -63,12 +58,12 @@ public class Group {
         return vectorClock;
     }
 
-    public void setVectorClock(VectorClock vectorClock) {
-        this.vectorClock = vectorClock;
-    }
-
     public void addVectorValue(Host member, int value) {
         vectorClock.addValue(member, value);
 
+    }
+
+    public void removeVectorEntry(Host member) {
+        vectorClock.removeValue(member);
     }
 }

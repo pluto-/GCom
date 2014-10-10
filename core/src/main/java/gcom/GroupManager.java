@@ -1,14 +1,11 @@
 package gcom;
 
-import gcom.GCom;
 import gcom.utils.*;
 
 import java.net.MalformedURLException;
 import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
-import java.rmi.registry.LocateRegistry;
-import java.rmi.registry.Registry;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -47,11 +44,13 @@ public class GroupManager implements NameServiceClient {
     }
 
     public void addMember(String groupName, Host member) throws RemoteException, NotBoundException, MalformedURLException {
-        if(!groups.get(groupName).getMembers().contains(member)) {
-            groups.get(groupName).addMember(member);
+        Group group = groups.get(groupName);
+        if(!group.getMembers().contains(member)) {
+            group.addMember(member);
+        } else {
+            group.removeVectorEntry(member);
         }
-        gCom.sendViewChange(groups.get(groupName));
-
+        gCom.sendViewChange(group);
     }
 
     @Override
@@ -64,16 +63,14 @@ public class GroupManager implements NameServiceClient {
     public void processViewChange(ViewChange viewChange) throws RemoteException, NotBoundException, MalformedURLException {
         System.out.println("Members:");
         ArrayList<Host> members = viewChange.getMembers();
-        ArrayList<Host> newMembers = new ArrayList<>();
-        ArrayList<Host> currentMembers = getMembers(viewChange.getGroupName());
-
         Group group = groups.get(viewChange.getGroupName());
         for(Host member : members) {
             System.out.println(member);
-
-            if(!currentMembers.contains(member)) {
-                groups.get(viewChange.getGroupName()).addVectorValue(member, viewChange.getVectorClock().getValue(member));
+            if(groups.get(member) != null && viewChange.getVectorClock().getValue(member) != groups.get(member).getVectorClock().getValue(member)) {
+                System.out.println("vector clocks differ for " + member + " - local: " + groups.get(member).getVectorClock().getValue(member) + " remote: " + viewChange.getVectorClock().getValue(member));
             }
+            groups.get(viewChange.getGroupName()).addVectorValue(member, viewChange.getVectorClock().getValue(member));
+
         }
         if (!members.contains(group.getLeader())) {
             sendJoinGroup(group);

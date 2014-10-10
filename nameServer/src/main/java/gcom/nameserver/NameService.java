@@ -21,8 +21,8 @@ import java.util.Map;
  */
 public class NameService implements NameServiceGroupManagement  {
 
-    private Map<String, Host> groups;
-    private RmiServer rmiServer;
+    private volatile  Map<String, Host> groups;
+    private final RmiServer rmiServer;
     private Logger logger = LogManager.getLogger(this.getClass());
 
     public NameService(int rmiPort) throws IOException, AlreadyBoundException {
@@ -35,8 +35,8 @@ public class NameService implements NameServiceGroupManagement  {
     }
 
     @Override
-    public Host joinGroup(String groupName, Host newMember) throws RemoteException, MalformedURLException, NotBoundException {
-        logger.error("joinGroup from " +  newMember + " " + groupName);
+    public synchronized Host joinGroup(String groupName, Host newMember) throws RemoteException, MalformedURLException, NotBoundException {
+        logger.error("joinGroup from " +  newMember + " for group:" + groupName);
         Host leader;
         if(!groups.containsKey(groupName)) {
             setLeader(groupName, newMember);
@@ -57,6 +57,7 @@ public class NameService implements NameServiceGroupManagement  {
         }
 
         try {
+            logger.error("sending addMember for: " + newMember + " to: " + leader + " for group: " + groupName);
             sendAddMember(groupName, leader,  newMember);
         } catch(ConnectException e) {
             if (nameServiceClient != null) {

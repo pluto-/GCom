@@ -19,7 +19,4 @@ public class ViewChange extends Message {
         return members;
     }
 
-    public void setMembers(ArrayList<Host> members) {
-        this.members = members;
-    }
 }
