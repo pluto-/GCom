@@ -48,6 +48,7 @@ public class CommunicationChannel implements Runnable {
             try {
                 message = queue.take();
             } catch (InterruptedException e) {
+                thread.interrupt();
                 e.printStackTrace();
             }
 
