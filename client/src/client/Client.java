@@ -98,16 +98,14 @@ public class Client implements GComClient, HoldBackQueueListener {
 
     @Override
     public void deliverAlreadyReceivedMessage(Message message) {
-        if(clientGUI.isDebug()) {
-            clientGUI.incomingMessageAlreadyReceived(message.getText());
-        }
+        clientGUI.incomingMessageAlreadyReceived(message.getText());
+
     }
 
     @Override
     public void debugSetVectorClock(VectorClock vectorClock) {
-        if(clientGUI.isDebug()) {
-            clientGUI.vectorClockChanged(vectorClock);
-        }
+        clientGUI.vectorClockChanged(vectorClock);
+
     }
 
     public void sendMessage(String message, boolean sendReliably, boolean deliverCausally) throws NotBoundException, RemoteException, UnknownHostException, InterruptedException {
@@ -155,15 +153,11 @@ public class Client implements GComClient, HoldBackQueueListener {
 
     @Override
     public void messagePutInHoldBackQueue(Message message) {
-        if(clientGUI.isDebug()) {
-            clientGUI.messagePutInHoldBackQueue(message);
-        }
+        clientGUI.messagePutInHoldBackQueue(message);
     }
 
     @Override
     public void messageRemovedFromHoldBackQueue(Message message) {
-        if(clientGUI.isDebug()) {
-            clientGUI.messageRemovedFromHoldBackQueue(message);
-        }
+        clientGUI.messageRemovedFromHoldBackQueue(message);
     }
 }

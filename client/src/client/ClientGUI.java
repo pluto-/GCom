@@ -65,7 +65,7 @@ public class ClientGUI extends JFrame implements ActionListener, ItemListener {
         southPanel.setLayout(new GridBagLayout());
 
         menuBar = new JMenuBar();
-        debug = new JMenu("Debug Output");
+        debug = new JMenu("Debug");
         showLocalVectorClock = new JCheckBoxMenuItem("Show Local Vector Clock");
         showLocalVectorClock.addItemListener(this);
         showHoldBackQueue = new JCheckBoxMenuItem("Show Hold-Back Queue");
@@ -93,7 +93,7 @@ public class ClientGUI extends JFrame implements ActionListener, ItemListener {
 
         sendReliably = new JCheckBox("Send Reliably");
         orderCausally = new JCheckBox("Order Causally");
-        cbDebug = new JCheckBox("Debug");
+        cbDebug = new JCheckBox("Debug Output");
 
         chat = new JTextPane();
         chat.setEditable(false);

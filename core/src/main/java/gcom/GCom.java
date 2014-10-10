@@ -143,4 +143,8 @@ public class GCom implements Runnable {
             }
         }
     }
+
+    public void setSleepMillisBetweenClients(int millis) {
+        communicator.setSleepMillisBetweenClients(millis);
+    }
 }
