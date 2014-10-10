@@ -53,12 +53,7 @@ public class CommunicationChannel implements Runnable {
 
             try{
                 remoteHost.receiveMessage(message);
-            } catch (RemoteException e) {
-                if (message != null) {
-                    logger.error(e.getClass().getSimpleName() + " contacting: " + host + " for group: " + message.getGroupName() + " - triggering view change");
-                    communicator.triggerViewChange(host, message.getGroupName());
-                }
-            } catch (NotBoundException e) {
+            } catch (RemoteException | NotBoundException e) {
                 if (message != null) {
                     logger.error(e.getClass().getSimpleName() + " contacting: " + host + " for group: " + message.getGroupName() + " - triggering view change");
                     communicator.triggerViewChange(host, message.getGroupName());
