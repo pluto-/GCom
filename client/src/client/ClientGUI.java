@@ -53,7 +53,9 @@ public class ClientGUI extends JFrame implements ActionListener, ItemListener {
 
         username = JOptionPane.showInputDialog("Username: ");
 
-        client.setGroupName(JOptionPane.showInputDialog("Group name: "));
+        String groupName = JOptionPane.showInputDialog("Group name: ");
+        client.setGroupName(groupName);
+        this.setTitle("Group: " + groupName + " | Username: " + username);
 
         JPanel mainPanel = new JPanel();
         mainPanel.setLayout(new BorderLayout());

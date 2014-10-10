@@ -67,8 +67,6 @@ public class Client implements GComClient, HoldBackQueueListener {
             e.printStackTrace();
         } catch (NotBoundException e) {
             e.printStackTrace();
-        } catch (UnknownHostException e) {
-            e.printStackTrace();
         }
         System.out.println(" Done!");
 

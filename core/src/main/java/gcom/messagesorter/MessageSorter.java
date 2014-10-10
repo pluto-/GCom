@@ -99,7 +99,7 @@ public class MessageSorter implements Runnable {
                     System.err.println("First bool: " + (firstMessage.getVectorClock().getValue(holdBackQueueHost) == (localVectorClock.getValue(holdBackQueueHost) + 1)));
                     System.err.println("Second bool: " + firstMessage.getVectorClock().isBeforeOrEqualOnAllValuesExcept(localVectorClock, holdBackQueueHost));
 
-                }
+                } */
 
             }
         }
