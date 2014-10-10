@@ -33,6 +33,7 @@ public class Communicator implements PeerCommunication {
     }
 
     public void triggerViewChange(Host deadHost, String groupName) {
+        channelMap.remove(deadHost);
         gCom.triggerViewChange(deadHost, groupName);
     }
 
@@ -42,9 +43,7 @@ public class Communicator implements PeerCommunication {
                 if (!channelMap.containsKey(member)) {
                     try {
                         channelMap.put(member, new CommunicationChannel(member, this));
-                    } catch (RemoteException e) {
-                        triggerViewChange(member, message.getGroupName());
-                    } catch (NotBoundException e) {
+                    } catch (RemoteException | NotBoundException e) {
                         triggerViewChange(member, message.getGroupName());
                     }
                 }
