@@ -50,9 +50,7 @@ public class NameService implements NameServiceGroupManagement  {
         try {
             nameServiceClient = (NameServiceClient)Naming.lookup("rmi://" + newMember + "/" + NameServiceClient.class.getSimpleName());
             nameServiceClient.setLeader(groupName, leader);
-        } catch (NotBoundException e) {
-            e.printStackTrace();
-        } catch (MalformedURLException e) {
+        } catch (NotBoundException | MalformedURLException e) {
             e.printStackTrace();
         } catch (Exception e) {
             e.printStackTrace();
@@ -61,8 +59,10 @@ public class NameService implements NameServiceGroupManagement  {
         try {
             sendAddMember(groupName, leader,  newMember);
         } catch(ConnectException e) {
-            nameServiceClient.setLeader(groupName, newMember);
-            logger.error("Leader not reachable, new leader - " + newMember);
+            if (nameServiceClient != null) {
+                nameServiceClient.setLeader(groupName, newMember);
+                logger.error("Leader not reachable, new leader - " + newMember);
+            }
         }
 
         logger.error("after addMember");
