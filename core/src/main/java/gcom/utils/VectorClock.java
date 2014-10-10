@@ -2,7 +2,6 @@ package gcom.utils;
 
 import java.io.Serializable;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
 /**
@@ -33,10 +32,7 @@ public class VectorClock implements Serializable {
     }
 
     public boolean isBefore(VectorClock other, Host host) {
-        if(clock.get(host) < other.getValue(host)) {
-            return true;
-        }
-        return false;
+        return clock.get(host) < other.getValue(host);
     }
 
     public boolean isBeforeOrEqualOnAllValuesExcept(VectorClock other, Host exception) {

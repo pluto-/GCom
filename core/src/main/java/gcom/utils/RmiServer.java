@@ -5,8 +5,6 @@ import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 
 import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.rmi.AlreadyBoundException;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.rmi.registry.Registry;
@@ -41,11 +39,11 @@ public class RmiServer {
         logger.error("constructor done");
     }
 
-    public void bind(String name, Remote object) throws RemoteException, AlreadyBoundException {
+    public void bind(String name, Remote object) throws RemoteException {
         registry.rebind(name, object);
     }
 
-    public Host getHost() throws UnknownHostException {
+    public Host getHost() {
         return new Host(externalIp, port);
     }
 

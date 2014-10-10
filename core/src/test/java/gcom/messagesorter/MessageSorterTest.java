@@ -16,7 +16,7 @@ public class MessageSorterTest extends TestCase {
     public void testReceive_ordered() throws Exception {
         System.err.println("\n\nALREADY ORDERED TEST");
         System.err.println("------------------------------------------------");
-        BlockingQueue<Message> deliverQueue = new LinkedBlockingQueue<Message>();
+        BlockingQueue<Message> deliverQueue = new LinkedBlockingQueue<>();
         VectorClock localVectorClock = new VectorClock();
 
         Host localHost = new Host(InetAddress.getByName("localhost"), 2000);
@@ -50,7 +50,7 @@ public class MessageSorterTest extends TestCase {
     public void testReceive_inverseOrdered() throws Exception {
         System.err.println("\n\nINVERSE ORDER TEST");
         System.err.println("------------------------------------------------");
-        BlockingQueue<Message> deliverQueue = new LinkedBlockingQueue<Message>();
+        BlockingQueue<Message> deliverQueue = new LinkedBlockingQueue<>();
         VectorClock localVectorClock = new VectorClock();
 
         Host localHost = new Host(InetAddress.getByName("localhost"), 2000);
@@ -84,7 +84,7 @@ public class MessageSorterTest extends TestCase {
     public void testReceive_delayed() throws Exception {
         System.err.println("\n\n3RD MESSAGE DELAYED TEST");
         System.err.println("------------------------------------------------");
-        BlockingQueue<Message> deliverQueue = new LinkedBlockingQueue<Message>();
+        BlockingQueue<Message> deliverQueue = new LinkedBlockingQueue<>();
         VectorClock localVectorClock = new VectorClock();
 
         Host localHost = new Host(InetAddress.getByName("localhost"), 2000);
@@ -120,12 +120,12 @@ public class MessageSorterTest extends TestCase {
     }
 
     public void testSpamReceive() throws Exception {
-        BlockingQueue<Message> deliverQueue = new LinkedBlockingQueue<Message>();
+        BlockingQueue<Message> deliverQueue = new LinkedBlockingQueue<>();
         VectorClock localVectorClock = new VectorClock();
         MessageSorter messageSorter = new MessageSorter(deliverQueue,  localVectorClock);
 
         for(int i = 1; i < 10; i++) {
-            new Run(100, messageSorter, i%2 == 0, i);
+            new Run(100, messageSorter, i);
         }
 
         int finishedProcesses = 0;
@@ -143,13 +143,11 @@ public class MessageSorterTest extends TestCase {
         int numberOfMessages;
         Thread thread;
         MessageSorter messageSorter;
-        boolean reversed;
         int id;
 
-        public Run(int numberOfMessages, MessageSorter messageSorter, boolean reversed, int id) {
+        public Run(int numberOfMessages, MessageSorter messageSorter, int id) {
             this.messageSorter = messageSorter;
             this.numberOfMessages = numberOfMessages;
-            this.reversed = reversed;
             this.id = id;
             thread = new Thread(this);
             thread.start();

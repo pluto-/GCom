@@ -1,10 +1,6 @@
 import java.net.UnknownHostException;
 import java.rmi.AlreadyBoundException;
 import java.rmi.RemoteException;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.ListIterator;
-import java.util.Map;
 
 import gcom.nameserver.NameService;
 
@@ -24,11 +20,7 @@ public class Main {
 
         try {
             new NameService(Integer.valueOf(args[0]));
-        } catch (RemoteException e) {
-            e.printStackTrace();
-        } catch (AlreadyBoundException e) {
-            e.printStackTrace();
-        } catch (UnknownHostException e) {
+        } catch (RemoteException | AlreadyBoundException | UnknownHostException e) {
             e.printStackTrace();
         } catch (Exception e) {
             e.printStackTrace();

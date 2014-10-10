@@ -11,7 +11,7 @@ import java.awt.*;
  */
 public class VectorClockGUI extends JFrame {
 
-    JTextArea vectorClockText;
+    private JTextArea vectorClockText;
 
     public VectorClockGUI() {
         super("Local Vector Clock");

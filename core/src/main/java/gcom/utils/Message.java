@@ -8,13 +8,13 @@ import java.util.ArrayList;
  */
 public class Message implements Serializable {
 
-    private boolean isReliable;
-    private boolean deliverCausally;
-    private String text;
-    private Host source;
-    private VectorClock vectorClock;
-    private String groupName;
-    private ArrayList<Host> beenAt;
+    private final boolean isReliable;
+    private final boolean deliverCausally;
+    private final String text;
+    private final Host source;
+    private final VectorClock vectorClock;
+    private final String groupName;
+    private final ArrayList<Host> beenAt;
 
     public Message(boolean isReliable, boolean deliverCausally, String text, Host source, VectorClock vectorClock, String groupName) {
         this.isReliable = isReliable;

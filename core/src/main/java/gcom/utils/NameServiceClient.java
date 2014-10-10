@@ -1,7 +1,5 @@
 package gcom.utils;
 
-import java.net.MalformedURLException;
-import java.rmi.NotBoundException;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 
@@ -10,7 +8,7 @@ import java.rmi.RemoteException;
  */
 public interface NameServiceClient extends Remote {
 
-    public void addMember(String groupName, Host newMember) throws RemoteException, NotBoundException, MalformedURLException;
+    public void addMember(String groupName, Host newMember) throws RemoteException;
     public void setLeader(String groupName, Host leader) throws RemoteException;
 
 }

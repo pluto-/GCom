@@ -11,8 +11,6 @@ import java.rmi.Naming;
 import java.rmi.NoSuchObjectException;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
-import java.rmi.registry.LocateRegistry;
-import java.rmi.registry.Registry;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -21,11 +19,11 @@ import java.util.concurrent.LinkedBlockingQueue;
  */
 public class CommunicationChannel implements Runnable {
 
-    private Host host;
+    private final Host host;
     private Thread thread;
-    private BlockingQueue<Message> queue;
+    private final BlockingQueue<Message> queue;
     private PeerCommunication remoteHost;
-    private Communicator communicator;
+    private final Communicator communicator;
     private final Logger logger = LogManager.getLogger(CommunicationChannel.class);
 
     public CommunicationChannel(Host host, Communicator communicator) throws RemoteException, NotBoundException, MalformedURLException {

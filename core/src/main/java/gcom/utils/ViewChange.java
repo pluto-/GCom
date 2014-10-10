@@ -7,7 +7,7 @@ import java.util.ArrayList;
  */
 public class ViewChange extends Message {
 
-    private ArrayList<Host> members;
+    private final ArrayList<Host> members;
 
     public ViewChange(boolean isReliable, boolean deliverCausally, String text, Host source, VectorClock vectorClock, String groupName, ArrayList<Host> members) {
         super(isReliable, deliverCausally, text, source, vectorClock, groupName);

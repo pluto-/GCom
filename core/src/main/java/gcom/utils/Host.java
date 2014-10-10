@@ -8,17 +8,12 @@ import java.net.InetAddress;
  */
 public class Host implements Serializable {
 
-    private InetAddress address;
-    private int port;
+    private final InetAddress address;
+    private final int port;
 
     public Host(InetAddress address, int port) {
         this.address = address;
         this.port = port;
-    }
-
-    public Host(Host host) {
-        this.address = host.getAddress();
-        this.port = host.getPort();
     }
 
     public int getPort() {

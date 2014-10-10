@@ -37,13 +37,13 @@ public class GroupManager implements NameServiceClient {
         return groups.get(groupName);
     }
 
-    public void leaveGroup(String groupName) throws RemoteException, NotBoundException, MalformedURLException {
+    public void leaveGroup(String groupName) throws RemoteException {
         Group group = groups.get(groupName);
         group.removeMember(self);
         gCom.sendViewChange(group);
     }
 
-    public void addMember(String groupName, Host member) throws RemoteException, NotBoundException, MalformedURLException {
+    public void addMember(String groupName, Host member) throws RemoteException {
         Group group = groups.get(groupName);
         if(!group.getMembers().contains(member)) {
             group.addMember(member);
@@ -66,9 +66,6 @@ public class GroupManager implements NameServiceClient {
         Group group = groups.get(viewChange.getGroupName());
         for(Host member : members) {
             System.out.println(member);
-            if(groups.get(member) != null && viewChange.getVectorClock().getValue(member) != groups.get(member).getVectorClock().getValue(member)) {
-                System.out.println("vector clocks differ for " + member + " - local: " + groups.get(member).getVectorClock().getValue(member) + " remote: " + viewChange.getVectorClock().getValue(member));
-            }
             groups.get(viewChange.getGroupName()).addVectorValue(member, viewChange.getVectorClock().getValue(member));
 
         }

@@ -4,7 +4,6 @@ import gcom.communicator.Communicator;
 import gcom.utils.*;
 
 import java.net.MalformedURLException;
-import java.net.UnknownHostException;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
@@ -20,7 +19,6 @@ import java.util.concurrent.LinkedBlockingQueue;
 public class GCom implements Runnable {
 
     private boolean reliableMulticast;
-    private RmiServer rmiServer;
     private GroupManager groupManager;
     private Communicator communicator;
     private Map<String, MessageSorter> messageSorters;
@@ -34,7 +32,7 @@ public class GCom implements Runnable {
     public GCom(boolean reliableMulticast, int rmiPort, GComClient gcomClient, Host nameService)
             throws Exception {
         this.reliableMulticast = reliableMulticast;
-        rmiServer = new RmiServer(rmiPort);
+        RmiServer rmiServer = new RmiServer(rmiPort);
         self = rmiServer.getHost();
         this.gcomClient = gcomClient;
         groupManager = new GroupManager(nameService, self, this);
@@ -70,7 +68,7 @@ public class GCom implements Runnable {
         groupManager.getVectorClock(groupName).increment(host);
     }
 
-    public void leaveGroup(String group) throws RemoteException, NotBoundException, MalformedURLException {
+    public void leaveGroup(String group) throws RemoteException {
         groupManager.leaveGroup(group);
     }
 
@@ -105,7 +103,7 @@ public class GCom implements Runnable {
         return groupManager.getMembers(groupName);
     }
 
-    public void receive(Message message) throws RemoteException, NotBoundException {
+    public void receive(Message message) {
 
         if(message.isReliable()) {
             message.addToBeenAt(self);
@@ -133,13 +131,7 @@ public class GCom implements Runnable {
                     gcomClient.debugSetVectorClock(groupManager.getGroup(message.getGroupName()).getVectorClock());
                 }
 
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            } catch (RemoteException e) {
-                e.printStackTrace();
-            } catch (MalformedURLException e) {
-                e.printStackTrace();
-            } catch (NotBoundException e) {
+            } catch (InterruptedException | RemoteException | MalformedURLException | NotBoundException e) {
                 e.printStackTrace();
             }
         }

@@ -2,7 +2,6 @@ package client;
 
 import gcom.utils.Host;
 import gcom.utils.Message;
-import gcom.utils.VectorClock;
 
 import javax.swing.*;
 import java.awt.*;
@@ -13,8 +12,8 @@ import java.util.ArrayList;
  */
 public class HoldBackQueueGUI extends JFrame {
 
-    JTextArea holdBackQueueText;
-    ArrayList<Message> messages;
+    private JTextArea holdBackQueueText;
+    private ArrayList<Message> messages;
 
     public HoldBackQueueGUI() {
         super("Hold-Back Queue");

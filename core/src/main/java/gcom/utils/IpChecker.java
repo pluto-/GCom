@@ -2,7 +2,6 @@ package gcom.utils;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.net.MalformedURLException;
 import java.net.URL;
 
 public class IpChecker {
@@ -13,8 +12,7 @@ public class IpChecker {
         try {
             in = new BufferedReader(new InputStreamReader(
                     whatismyip.openStream()));
-            String ip = in.readLine();
-            return ip;
+            return in.readLine();
         } finally {
             if (in != null) {
                 try {

@@ -6,12 +6,8 @@ import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 
 import java.io.IOException;
-import java.net.InetAddress;
 import java.net.MalformedURLException;
-import java.net.UnknownHostException;
 import java.rmi.*;
-import java.rmi.registry.LocateRegistry;
-import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.HashMap;
 import java.util.Map;
@@ -22,12 +18,12 @@ import java.util.Map;
 public class NameService implements NameServiceGroupManagement  {
 
     private volatile  Map<String, Host> groups;
-    private final RmiServer rmiServer;
-    private Logger logger = LogManager.getLogger(this.getClass());
+    private final Logger logger = LogManager.getLogger(this.getClass());
 
-    public NameService(int rmiPort) throws IOException, AlreadyBoundException {
+    public NameService(int rmiPort) throws IOException {
         groups = new HashMap<>();
-        rmiServer = new RmiServer(rmiPort);
+
+        RmiServer rmiServer = new RmiServer(rmiPort);
 
         NameServiceGroupManagement stub = (NameServiceGroupManagement) UnicastRemoteObject.exportObject(this, rmiPort);
         rmiServer.bind(NameServiceGroupManagement.class.getSimpleName(), stub);
@@ -58,7 +54,7 @@ public class NameService implements NameServiceGroupManagement  {
 
         try {
             logger.error("sending addMember for: " + newMember + " to: " + leader + " for group: " + groupName);
-            sendAddMember(groupName, leader,  newMember);
+            sendAddMember(groupName, leader, newMember);
         } catch(ConnectException e) {
             if (nameServiceClient != null) {
                 nameServiceClient.setLeader(groupName, newMember);

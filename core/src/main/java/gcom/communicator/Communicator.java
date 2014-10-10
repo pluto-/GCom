@@ -5,16 +5,9 @@ import gcom.utils.*;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 
-import java.io.IOException;
 import java.net.MalformedURLException;
-import java.net.UnknownHostException;
-import java.rmi.AlreadyBoundException;
-import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
-import java.rmi.registry.LocateRegistry;
-import java.rmi.registry.Registry;
-import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -24,21 +17,17 @@ import java.util.Map;
  */
 public class Communicator implements PeerCommunication {
 
-    private GCom gCom;
-    private Host self;
-    private Map<Host, CommunicationChannel> channelMap;
+    private final GCom gCom;
+    private final Host self;
+    private final Map<Host, CommunicationChannel> channelMap;
     private int sleepMillisBetweenClients;
-    private Logger logger = LogManager.getLogger(this.getClass());
+    private final Logger logger = LogManager.getLogger(this.getClass());
 
-    public Communicator(GCom gCom, Host self) throws IOException, AlreadyBoundException {
+    public Communicator(GCom gCom, Host self) {
         this.gCom = gCom;
         this.self = self;
         channelMap = new HashMap<>();
         sleepMillisBetweenClients = 0;
-    }
-
-    public void communicationError(Host host, Message message) {
-
     }
 
     public void triggerViewChange(Host deadHost, String groupName) {
@@ -77,7 +66,7 @@ public class Communicator implements PeerCommunication {
     }
 
     @Override
-    public void receiveMessage(Message message) throws RemoteException, NotBoundException {
+    public void receiveMessage(Message message) throws RemoteException {
         if(!gCom.hasReceived(message)) {
             gCom.receive(message);
         }

@@ -108,7 +108,7 @@ public class Client implements GComClient, HoldBackQueueListener {
 
     }
 
-    public void sendMessage(String message, boolean sendReliably, boolean deliverCausally) throws NotBoundException, RemoteException, UnknownHostException, InterruptedException {
+    public void sendMessage(String message, boolean sendReliably, boolean deliverCausally) {
         gCom.sendMessage(message, group, sendReliably, deliverCausally);
     }
 

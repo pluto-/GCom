@@ -10,39 +10,36 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
-import java.net.UnknownHostException;
-import java.rmi.NotBoundException;
-import java.rmi.RemoteException;
 
 /**
  * Created by Jonas on 2014-10-06.
  */
 public class ClientGUI extends JFrame implements ActionListener, ItemListener {
 
-    JTextPane chat;
-    StyleContext context;
-    StyledDocument document;
+    private JTextPane chat;
+    private StyleContext context;
+    private StyledDocument document;
 
-    Style blackStyle;
-    Style blueStyle;
-    Style redStyle;
+    private Style blackStyle;
+    private Style blueStyle;
+    private Style redStyle;
 
-    JTextField message;
-    JButton send;
-    JCheckBox sendReliably;
-    JCheckBox orderCausally;
-    JCheckBox cbDebug;
-    Client client;
-    String username;
+    private JTextField message;
+    private JButton send;
+    private JCheckBox sendReliably;
+    private JCheckBox orderCausally;
+    private JCheckBox cbDebug;
+    private Client client;
+    private String username;
 
-    JMenuBar menuBar;
-    JMenu debug;
-    JCheckBoxMenuItem showLocalVectorClock;
-    JCheckBoxMenuItem showHoldBackQueue;
-    JMenuItem setMulticastSleep;
+    private JMenuBar menuBar;
+    private JMenu debug;
+    private JCheckBoxMenuItem showLocalVectorClock;
+    private JCheckBoxMenuItem showHoldBackQueue;
+    private JMenuItem setMulticastSleep;
 
-    VectorClockGUI vectorClockGUI;
-    HoldBackQueueGUI holdBackQueueGUI;
+    private VectorClockGUI vectorClockGUI;
+    private HoldBackQueueGUI holdBackQueueGUI;
 
     /**
      * GUI look taken from: http://codereview.stackexchange.com/questions/25461/simple-chat-room-swing-gui
@@ -191,24 +188,14 @@ public class ClientGUI extends JFrame implements ActionListener, ItemListener {
     }
 
     private void send() {
-        if (message.getText().length() < 1) {
-            // do nothing
-        } else if (message.getText().equals(".clear")) {
-            chat.setText("Cleared all messages\n");
-            message.setText("");
-        } else {
-            try {
+        if(message.getText().length() > 0) {
+            if (message.getText().equals(".clear")) {
+                chat.setText("Cleared all messages\n");
+                message.setText("");
+            } else {
                 client.sendMessage(username + " > " + message.getText(), sendReliably.isSelected(), orderCausally.isSelected());
-            } catch (NotBoundException e1) {
-                e1.printStackTrace();
-            } catch (RemoteException e1) {
-                e1.printStackTrace();
-            } catch (UnknownHostException e1) {
-                e1.printStackTrace();
-            } catch (InterruptedException e1) {
-                e1.printStackTrace();
+                message.setText("");
             }
-            message.setText("");
         }
         message.requestFocusInWindow();
     }

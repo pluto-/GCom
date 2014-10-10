@@ -60,7 +60,6 @@ public class Group {
 
     public void addVectorValue(Host member, int value) {
         vectorClock.addValue(member, value);
-
     }
 
     public void removeVectorEntry(Host member) {
