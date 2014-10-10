@@ -47,6 +47,9 @@ public class HoldBackQueueGUI extends JFrame {
         String text = "";
         for(Message message : messages) {
             text = text.concat("\nHost: " + message.getSource() + " Message: " + message.getText());
+            text = text.concat("\n\tVector Clock");
+            for(Host member: message.getVectorClock().getClock().keySet())
+            text = text.concat("\n\tHost: " + member + " Clock: " + message.getVectorClock().getValue(member));
         }
         holdBackQueueText.setText(text);
     }
