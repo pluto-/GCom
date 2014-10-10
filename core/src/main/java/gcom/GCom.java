@@ -56,7 +56,7 @@ public class GCom implements Runnable {
         messageSorters.get(groupName).setListener(listener);
     }
 
-    public void sendMessage(String text, String group, boolean sendReliably, boolean deliverCausally) throws UnknownHostException, RemoteException, NotBoundException {
+    public void sendMessage(String text, String group, boolean sendReliably, boolean deliverCausally) {
         groupManager.getVectorClock(group).increment(self);
         Message message = new Message(sendReliably, deliverCausally, text, self, groupManager.getVectorClock(group), group);
         sendMessage(message, groupManager.getGroup(group).getMembers());
@@ -105,10 +105,6 @@ public class GCom implements Runnable {
         return groupManager.getMembers(groupName);
     }
 
-    public void sendToMessageSorter(Message message) {
-        messageSorters.get(message.getGroupName()).receive(message);
-    }
-
     public void receive(Message message) throws RemoteException, NotBoundException {
 
         if(message.isReliable()) {
@@ -117,7 +113,7 @@ public class GCom implements Runnable {
             ArrayList<Host> members = getGroupMembers(message.getGroupName());
             communicator.multicast(message, members);
         }
-        sendToMessageSorter(message);
+        messageSorters.get(message.getGroupName()).receive(message);
     }
 
     public void alreadyReceived(Message message) {
