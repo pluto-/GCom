@@ -29,7 +29,6 @@ public class ClientGUI extends JFrame implements ActionListener, ItemListener {
 
     JTextField message;
     JButton send;
-    JButton sendSlow;
     JCheckBox sendReliably;
     JCheckBox orderCausally;
     JCheckBox cbDebug;
@@ -40,6 +39,7 @@ public class ClientGUI extends JFrame implements ActionListener, ItemListener {
     JMenu debug;
     JCheckBoxMenuItem showLocalVectorClock;
     JCheckBoxMenuItem showHoldBackQueue;
+    JMenuItem setMulticastSleep;
 
     VectorClockGUI vectorClockGUI;
     HoldBackQueueGUI holdBackQueueGUI;
@@ -70,8 +70,11 @@ public class ClientGUI extends JFrame implements ActionListener, ItemListener {
         showLocalVectorClock.addItemListener(this);
         showHoldBackQueue = new JCheckBoxMenuItem("Show Hold-Back Queue");
         showHoldBackQueue.addItemListener(this);
+        setMulticastSleep = new JMenuItem("Set Multicast Sleep");
+        setMulticastSleep.addActionListener(this);
         debug.add(showLocalVectorClock);
         debug.add(showHoldBackQueue);
+        debug.add(setMulticastSleep);
         menuBar.add(debug);
         setJMenuBar(menuBar);
 
@@ -80,9 +83,6 @@ public class ClientGUI extends JFrame implements ActionListener, ItemListener {
 
         send = new JButton("Send");
         send.addActionListener(this);
-
-        sendSlow = new JButton("Send Slow");
-        sendSlow.addActionListener(this);
 
         sendReliably = new JCheckBox("Send Reliably");
         orderCausally = new JCheckBox("Order Causally");
@@ -123,7 +123,6 @@ public class ClientGUI extends JFrame implements ActionListener, ItemListener {
 
         southPanel.add(message, left);
         southPanel.add(send, right);
-        southPanel.add(sendSlow, right);
         southPanel.add(sendReliably, right);
         southPanel.add(orderCausally, right);
         southPanel.add(cbDebug, right);
@@ -201,32 +200,16 @@ public class ClientGUI extends JFrame implements ActionListener, ItemListener {
                     e1.printStackTrace();
                 } catch (UnknownHostException e1) {
                     e1.printStackTrace();
+                } catch (InterruptedException e1) {
+                    e1.printStackTrace();
                 }
                 message.setText("");
             }
             message.requestFocusInWindow();
 
-        } else if(e.getSource().equals(sendSlow)) {
-            if (message.getText().length() < 1) {
-                // do nothing
-            } else if (message.getText().equals(".clear")) {
-                chat.setText("Cleared all messages\n");
-                message.setText("");
-            } else {
-                int speed = Integer.valueOf(JOptionPane.showInputDialog("Speed: "));
-                /*try {
-                    client.sendMessage(message.getText());
-                } catch (NotBoundException e1) {
-                    e1.printStackTrace();
-                } catch (RemoteException e1) {
-                    e1.printStackTrace();
-                } catch (UnknownHostException e1) {
-                    e1.printStackTrace();
-                }*/
-                message.setText("");
-            }
-            message.requestFocusInWindow();
-
+        } else if(e.getSource().equals(setMulticastSleep)) {
+            int sleepMillis = Integer.valueOf(JOptionPane.showInputDialog("Specify how many milliseconds GCom should sleep between the clients when sending a multicast."));
+            client.setSleepMillisBetweenClients(sleepMillis);
         }
     }
 

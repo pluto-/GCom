@@ -58,10 +58,14 @@ public class GCom implements Runnable {
         messageSorters.get(groupName).setListener(listener);
     }
 
-    public void sendMessage(String text, String group, boolean sendReliably, boolean deliverCausally) throws UnknownHostException, RemoteException, NotBoundException {
+    public void sendMessage(String text, String group, boolean sendReliably, boolean deliverCausally) throws UnknownHostException, RemoteException, NotBoundException, InterruptedException {
         groupManager.getVectorClock(group).increment(self);
         Message message = new Message(sendReliably, deliverCausally, text, self, groupManager.getVectorClock(group), group);
         sendMessage(message, groupManager.getGroup(group).getMembers());
+    }
+
+    public void setSleepMillisBetweenClients(int millis) {
+        communicator.setSleepMillisBetweenClients(millis);
     }
 
     public VectorClock getVectorClock(String groupName) {
@@ -98,7 +102,7 @@ public class GCom implements Runnable {
         sendMessage(viewChange, viewChange.getMembers());
     }
 
-    private void sendMessage(Message message, ArrayList<Host> members){
+    private void sendMessage(Message message, ArrayList<Host> members) {
         deliveryQueue.add(message);
         communicator.multicast(message, members);
     }

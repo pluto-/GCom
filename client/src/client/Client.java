@@ -110,8 +110,12 @@ public class Client implements GComClient, HoldBackQueueListener {
         }
     }
 
-    public void sendMessage(String message, boolean sendReliably, boolean deliverCausally) throws NotBoundException, RemoteException, UnknownHostException {
+    public void sendMessage(String message, boolean sendReliably, boolean deliverCausally) throws NotBoundException, RemoteException, UnknownHostException, InterruptedException {
         gCom.sendMessage(message, group, sendReliably, deliverCausally);
+    }
+
+    public void setSleepMillisBetweenClients(int millis) {
+        gCom.setSleepMillisBetweenClients(millis);
     }
 
     public void setGroupName(String groupName) {
