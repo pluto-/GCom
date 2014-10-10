@@ -16,6 +16,11 @@ public class Host implements Serializable {
         this.port = port;
     }
 
+    public Host(Host host) {
+        this.address = host.getAddress();
+        this.port = host.getPort();
+    }
+
     public int getPort() {
         return port;
     }

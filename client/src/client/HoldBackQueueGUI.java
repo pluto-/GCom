@@ -32,11 +32,13 @@ public class HoldBackQueueGUI extends JFrame {
     }
 
     public void addMessage(Message message) {
+        System.err.println("Adding " + message.getText() + " in holdback queue GUI.");
         messages.add(message);
         updateText();
     }
 
     public void removeMessage(Message message) {
+        System.err.println("Removing " + message.getText() + " from holdback queue GUI.");
         messages.remove(message);
         updateText();
     }

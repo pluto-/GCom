@@ -4,6 +4,7 @@ import gcom.GCom;
 import gcom.utils.*;
 
 import java.io.IOException;
+import java.net.ConnectException;
 import java.net.MalformedURLException;
 import java.net.UnknownHostException;
 import java.rmi.AlreadyBoundException;
@@ -28,13 +29,19 @@ public class Communicator implements PeerCommunication {
         this.self = self;
     }
 
-    public void multicast(Message message, ArrayList<Host> groupMembers) throws RemoteException, NotBoundException {
+    public void multicast(Message message, ArrayList<Host> groupMembers) throws RemoteClientException {
         for(Host member : groupMembers) {
             if(!member.equals(self)) {
-                Registry memberRegistry = LocateRegistry.getRegistry(member.getAddress().getHostAddress(), member.getPort());
 
-                PeerCommunication stub = (PeerCommunication) memberRegistry.lookup(PeerCommunication.class.getSimpleName());
-                stub.receiveMessage(message);
+                try {
+                    Registry memberRegistry = LocateRegistry.getRegistry(member.getAddress().getHostAddress(), member.getPort());
+                    PeerCommunication stub = (PeerCommunication) memberRegistry.lookup(PeerCommunication.class.getSimpleName());
+                    stub.receiveMessage(message);
+                } catch(RemoteException e) {
+                    throw new RemoteClientException(groupMembers.indexOf(member));
+                } catch(NotBoundException e) {
+                    throw new RemoteClientException(groupMembers.indexOf(member));
+                }
             }
         }
     }

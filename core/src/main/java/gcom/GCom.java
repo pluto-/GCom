@@ -1,10 +1,12 @@
 package gcom;
 
 import gcom.communicator.Communicator;
+import gcom.communicator.RemoteClientException;
 import gcom.groupmanager.GroupManager;
 import gcom.utils.*;
 import gcom.messagesorter.MessageSorter;
 
+import java.net.ConnectException;
 import java.net.MalformedURLException;
 import java.net.UnknownHostException;
 import java.rmi.NotBoundException;
@@ -92,9 +94,21 @@ public class GCom implements Runnable {
         sendMessage(viewChange, viewChange.getMembers());
     }
 
-    private void sendMessage(Message message, ArrayList<Host> members) throws RemoteException, NotBoundException {
+    private void sendMessage(Message message, ArrayList<Host> members) throws RemoteException, NotBoundException, MalformedURLException {
         deliveryQueue.add(message);
-        communicator.multicast(message, members);
+
+        try {
+            communicator.multicast(message, members);
+        } catch (RemoteClientException e) {
+            // Removing problem client from group.
+            Group group = groupManager.getGroup(message.getGroupName());
+            group.removeMember(e.getProblemClient());
+
+            //Send viewChanged with updated group.
+            sendViewChange(group);
+        }
+
+
     }
 
     public ArrayList<Host> getGroupMembers(String groupName) {
