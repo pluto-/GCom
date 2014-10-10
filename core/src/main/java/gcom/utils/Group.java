@@ -11,7 +11,7 @@ public class Group {
 
     private final String name;
     private Host leader;
-    private ArrayList<Host> members;
+    private volatile ArrayList<Host> members;
     private VectorClock vectorClock;
 
     public Group(String name) {
