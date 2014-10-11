@@ -31,7 +31,7 @@ public class Communicator implements PeerCommunication {
     }
 
     public void triggerViewChange(Host deadHost, String groupName) {
-        channelMap.remove(deadHost);
+        removeChannel(deadHost);
         gCom.triggerViewChange(deadHost, groupName);
     }
 
