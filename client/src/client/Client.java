@@ -11,9 +11,6 @@ import java.rmi.AlreadyBoundException;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 
-/**
- * Created by Jonas on 2014-10-06.
- */
 public class Client implements GComClient, HoldBackQueueListener {
 
     private ClientGUI clientGUI;
@@ -98,8 +95,18 @@ public class Client implements GComClient, HoldBackQueueListener {
 
     @Override
     public void deliverAlreadyReceivedMessage(Message message) {
-        clientGUI.incomingMessageAlreadyReceived(message.getText());
-
+        if(clientGUI.isDebug()) {
+            if(message instanceof ViewChange) {
+                ViewChange viewChange = (ViewChange)message;
+                String members = "";
+                for(Host member : viewChange.getMembers()) {
+                    members = members.concat(" " + member.toString());
+                }
+                clientGUI.incomingMessageAlreadyReceived("View change, members:" + members);
+            }else {
+                clientGUI.incomingMessageAlreadyReceived(message.getText());
+            }
+        }
     }
 
     @Override
