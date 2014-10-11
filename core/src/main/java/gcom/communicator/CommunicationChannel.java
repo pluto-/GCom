@@ -66,7 +66,7 @@ public class CommunicationChannel implements Runnable {
                         communicator.triggerViewChange(host, message.getGroupName());
                     }
                 }
-            } catch (RemoteException | NotBoundException e) {
+            } catch (RemoteException e) {
 
                 if (message != null) {
                     logger.error(e.getClass().getSimpleName() + " contacting: " + host + " for group: " + message.getGroupName() + " - triggering view change");

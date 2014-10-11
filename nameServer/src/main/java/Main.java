@@ -20,7 +20,7 @@ public class Main {
 
         try {
             new NameService(Integer.valueOf(args[0]));
-        } catch (RemoteException | AlreadyBoundException | UnknownHostException e) {
+        } catch (RemoteException | UnknownHostException e) {
             e.printStackTrace();
         } catch (Exception e) {
             e.printStackTrace();
