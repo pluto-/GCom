@@ -109,7 +109,7 @@ public class GCom implements Runnable {
         } else {
             if (message.isReliable()) {
                 message.addToBeenAt(self);
-                communicator.multicast(message, getGroupMembers(message.getGroupName());
+                communicator.multicast(message, getGroupMembers(message.getGroupName()));
             }
 
             if (message.deliverCausally()) {
