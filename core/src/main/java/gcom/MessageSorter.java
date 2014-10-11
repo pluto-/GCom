@@ -16,17 +16,19 @@ import java.util.concurrent.PriorityBlockingQueue;
 public class MessageSorter implements Runnable {
 
     private BlockingQueue<Message> deliverQueue;
-    private VectorClock localVectorClock;
+    private volatile VectorClock localVectorClock;
     private volatile Map<Host,PriorityBlockingQueue<Message>> holdBackQueues;
     private Thread thread;
     private volatile boolean running;
     private HoldBackQueueListener listener;
+    private HashMap<VectorClock, Message> causallyInconsistentlyDeliveredMessages;
 
     public MessageSorter(BlockingQueue<Message> deliverQueue, VectorClock localVectorClock) {
         this.deliverQueue = deliverQueue;
         this.localVectorClock = localVectorClock;
         holdBackQueues = new ConcurrentHashMap<>();
         this.listener = null;
+        causallyInconsistentlyDeliveredMessages = new HashMap<>();
     }
 
     public void setListener(HoldBackQueueListener listener) {
@@ -34,13 +36,26 @@ public class MessageSorter implements Runnable {
     }
 
     public synchronized void receive(Message message) {
+        if(message.deliverCausally()) {
 
-        if(!holdBackQueues.containsKey(message.getSource())) {
-            holdBackQueues.put(message.getSource(), new PriorityBlockingQueue<>(5, new MessageComparator()));
-        }
-        holdBackQueues.get(message.getSource()).put(message);
-        if(listener != null) {
-            listener.messagePutInHoldBackQueue(message);
+            if (!holdBackQueues.containsKey(message.getSource())) {
+                holdBackQueues.put(message.getSource(), new PriorityBlockingQueue<>(5, new MessageComparator()));
+            }
+            holdBackQueues.get(message.getSource()).put(message);
+            if (listener != null) {
+                listener.messagePutInHoldBackQueue(message);
+            }
+        } else {
+            if(message.isCausallyConsistent(localVectorClock)) {
+                deliverMessage(message);
+            } else {
+                try {
+                    deliverQueue.put(message);
+                    causallyInconsistentlyDeliveredMessages.put(message.getVectorClock(), message);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
         }
         startThread();
     }
@@ -51,6 +66,34 @@ public class MessageSorter implements Runnable {
             thread = new Thread(this);
             thread.start();
         }
+    }
+
+    private void deliverMessage(Message message) {
+        try {
+            System.err.println("Delivering to deliverQueue");
+            deliverQueue.put(message);
+            incrementLocalVectorClock(message.getSource());
+            updateVectorClockCausality();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        startThread();
+    }
+
+    private synchronized void updateVectorClockCausality() {
+        boolean delivered = false;
+        for(VectorClock vectorClock : causallyInconsistentlyDeliveredMessages.keySet()) {
+            Message message = causallyInconsistentlyDeliveredMessages.get(vectorClock);
+            if(message.isCausallyConsistent(localVectorClock)) {
+                causallyInconsistentlyDeliveredMessages.remove(message);
+                incrementLocalVectorClock(message.getSource());
+                delivered = true;
+            }
+        }
+        if(delivered) {
+            updateVectorClockCausality();
+        }
+
     }
 
     private void incrementLocalVectorClock(Host host) {
@@ -71,19 +114,11 @@ public class MessageSorter implements Runnable {
 
                     // Deliver
 
-                    try {
-                        deliverQueue.put(firstMessage);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-
-                    System.err.println("Delivering to deliverQueue");
-                    incrementLocalVectorClock(holdBackQueueHost);
+                    deliverMessage(firstMessage);
                     holdBackQueue.remove(firstMessage);
                     if(listener != null) {
                         listener.messageRemovedFromHoldBackQueue(firstMessage);
                     }
-                    running = true;
                 }
             }
         }
