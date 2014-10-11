@@ -98,8 +98,9 @@ public class Client implements GComClient, HoldBackQueueListener {
 
     @Override
     public void deliverAlreadyReceivedMessage(Message message) {
-        clientGUI.incomingMessageAlreadyReceived(message.getText());
-
+        if(clientGUI.isDebug()) {
+            clientGUI.incomingMessageAlreadyReceived(message.getText());
+        }
     }
 
     @Override
