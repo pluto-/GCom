@@ -66,7 +66,7 @@ public class Communicator implements PeerCommunication {
     }
 
     @Override
-    public void receiveMessage(Message message) throws RemoteException {
+    public synchronized void receiveMessage(Message message) throws RemoteException {
         if(!gCom.hasReceived(message)) {
             gCom.receive(message);
         }
