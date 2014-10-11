@@ -90,7 +90,8 @@ public class MessageSorter implements Runnable {
     }
 
     public boolean hasMessageInHoldbackQueue(Message message) {
-        return holdBackQueues.get(message.getGroupName()).contains(message);
+        PriorityBlockingQueue<Message> holdBackQueue = holdBackQueues.get(message.getSource());
+        return (holdBackQueue!= null && holdBackQueue.contains(message));
     }
 
     private class MessageComparator implements Comparator<Message>
