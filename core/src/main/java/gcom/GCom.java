@@ -104,6 +104,10 @@ public class GCom implements Runnable {
     }
 
     public void receive(Message message) {
+        if(hasReceived(message)) {
+            alreadyReceived(message);
+            return;
+        }
 
         if(message.isReliable()) {
             message.addToBeenAt(self);
@@ -111,7 +115,12 @@ public class GCom implements Runnable {
             ArrayList<Host> members = getGroupMembers(message.getGroupName());
             communicator.multicast(message, members);
         }
-        messageSorters.get(message.getGroupName()).receive(message);
+        if(message.deliverCausally()) {
+            messageSorters.get(message.getGroupName()).receive(message);
+
+        } else {
+            deliveryQueue.add(message);
+        }
     }
 
     public void alreadyReceived(Message message) {

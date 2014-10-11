@@ -67,9 +67,9 @@ public class Communicator implements PeerCommunication {
 
     @Override
     public synchronized void receiveMessage(Message message) throws RemoteException {
-        if(!gCom.hasReceived(message)) {
-            gCom.receive(message);
-        }
+
+        gCom.receive(message);
+
     }
 
     public void removeChannel(Host host) {
