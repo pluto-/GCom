@@ -106,20 +106,18 @@ public class GCom implements Runnable {
     public void receive(Message message) {
         if(hasReceived(message)) {
             alreadyReceived(message);
-            return;
-        }
-
-        if(message.isReliable()) {
-            message.addToBeenAt(self);
-
-            ArrayList<Host> members = getGroupMembers(message.getGroupName());
-            communicator.multicast(message, members);
-        }
-        if(message.deliverCausally()) {
-            messageSorters.get(message.getGroupName()).receive(message);
-
         } else {
-            deliveryQueue.add(message);
+            if (message.isReliable()) {
+                message.addToBeenAt(self);
+                communicator.multicast(message, getGroupMembers(message.getGroupName());
+            }
+
+            if (message.deliverCausally()) {
+                messageSorters.get(message.getGroupName()).receive(message);
+
+            } else {
+                deliveryQueue.add(message);
+            }
         }
     }
 
