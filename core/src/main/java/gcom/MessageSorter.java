@@ -89,6 +89,10 @@ public class MessageSorter implements Runnable {
         }
     }
 
+    public boolean hasMessageInHoldbackQueue(Message message) {
+        return holdBackQueues.get(message.getGroupName()).contains(message);
+    }
+
     private class MessageComparator implements Comparator<Message>
     {
 

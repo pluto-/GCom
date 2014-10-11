@@ -30,8 +30,6 @@ public class CommunicationChannel implements Runnable {
         this.host = host;
         this.communicator = communicator;
         queue = new LinkedBlockingQueue<>();
-//        Registry memberRegistry = LocateRegistry.getRegistry(host.getAddress().getHostAddress(), host.getPort());
-//        remoteHost = (PeerCommunication) memberRegistry.lookup(PeerCommunication.class.getSimpleName());
         remoteHost = (PeerCommunication) Naming.lookup("rmi://" + host.getAddress().getHostAddress() + ":" + host.getPort() + "/" + PeerCommunication.class.getSimpleName());
         thread = new Thread(this);
         thread.start();

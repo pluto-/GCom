@@ -73,7 +73,7 @@ public class GCom implements Runnable {
     }
 
     public boolean hasReceived(Message message) {
-        return (groupManager.getVectorClock(message.getGroupName()).hasReceived(message));
+        return (messageSorters.get(message.getGroupName()).hasMessageInHoldbackQueue(message) || groupManager.getVectorClock(message.getGroupName()).hasReceived(message));
     }
 
     public void joinGroup(String groupName) throws RemoteException, NotBoundException, MalformedURLException {

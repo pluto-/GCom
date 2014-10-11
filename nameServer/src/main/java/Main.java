@@ -14,10 +14,6 @@ public class Main {
             System.exit(1);
         }
 
-        /*System.out.print("Setting policy...");
-        System.setProperty("java.security.policy", "server.policy");
-        System.out.println("Done!");*/
-
         try {
             new NameService(Integer.valueOf(args[0]));
         } catch (RemoteException | UnknownHostException e) {
