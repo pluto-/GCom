@@ -114,13 +114,7 @@ public class GCom implements Runnable {
                 message.addToBeenAt(self);
                 communicator.multicast(message, getGroupMembers(message.getGroupName()));
             }
-
-            if (message.deliverCausally()) {
-                messageSorters.get(message.getGroupName()).receive(message);
-
-            } else {
-                deliveryQueue.add(message);
-            }
+            messageSorters.get(message.getGroupName()).receive(message);
         }
     }
 
