@@ -55,7 +55,10 @@ public class GCom implements Runnable {
     }
 
     public void sendMessage(String text, String group, boolean sendReliably, boolean deliverCausally) {
-        groupManager.getVectorClock(group).increment(self);
+        if(deliverCausally) {
+            groupManager.getVectorClock(group).increment(self);
+
+        }
         Message message = new Message(sendReliably, deliverCausally, text, self, groupManager.getVectorClock(group), group);
         sendMessage(message, groupManager.getGroup(group).getMembers());
     }
