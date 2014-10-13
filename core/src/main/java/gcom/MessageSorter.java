@@ -23,6 +23,11 @@ public class MessageSorter implements Runnable {
     private HoldBackQueueListener listener;
     private HashMap<VectorClock, Message> causallyInconsistentlyDeliveredMessages;
 
+    /**
+     * Constructor
+     * @param deliverQueue The delivery queue of the gcom client.
+     * @param localVectorClock the local vector clock for the group.
+     */
     public MessageSorter(BlockingQueue<Message> deliverQueue, VectorClock localVectorClock) {
         this.deliverQueue = deliverQueue;
         this.localVectorClock = localVectorClock;
@@ -35,6 +40,18 @@ public class MessageSorter implements Runnable {
         this.listener = listener;
     }
 
+    /**
+     * Handles incoming messages.
+     * If message is to be delivered causally, it is put in the holdback queue associated with the source host and
+     * processed by the holdback queue thread. If no holdback queue exists for the source host, one is created.
+     * If the message is to be delivered unordered, the message is put in the delivery queue to the gcom client and
+     * the the message and incoming vectorclock is put in a temporary map containing messages delivered out of order
+     * (unless the unordered message happens to be causally consistent, in which case the local vector clock is
+     * increased).
+     * The holdback queue processing thread is also started.
+     *
+     * @param message - the message to be received.
+     */
     public synchronized void receive(Message message) {
         if(message.deliverCausally()) {
 
@@ -60,6 +77,10 @@ public class MessageSorter implements Runnable {
         startThread();
     }
 
+    /**
+     * Starts a new holdback queue processing thread if one is not currently started. If one is already running, it will
+     * do another iteration through the holdback queues.
+     */
     private synchronized void startThread() {
         running = true;
         if(thread == null || !thread.isAlive()) {
@@ -68,6 +89,12 @@ public class MessageSorter implements Runnable {
         }
     }
 
+    /**
+     * Delivers a message into the delivery queue of the gcom client. Increments the entry for the source host in the
+     * local vector clock and updates the local vector clock in case previously delivered unordered messages have now
+     * been delivered in a causal way.
+     * @param message
+     */
     private synchronized void deliverMessage(Message message) {
         try {
             System.err.println("Delivering to deliverQueue");
@@ -80,6 +107,9 @@ public class MessageSorter implements Runnable {
         startThread();
     }
 
+    /**
+     * Updates the local vector clock if possible with previously delivered unordered message according to causality.
+     */
     private synchronized void updateVectorClockCausality() {
         boolean delivered = false;
         for(VectorClock vectorClock : causallyInconsistentlyDeliveredMessages.keySet()) {
@@ -100,6 +130,9 @@ public class MessageSorter implements Runnable {
         localVectorClock.increment(host);
     }
 
+    /**
+     * Holdback queues processing thread
+     */
     @Override
     public void run() {
         while(running) {
