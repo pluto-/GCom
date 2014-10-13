@@ -56,9 +56,11 @@ public class CommunicationChannel implements Runnable {
     }
 
     /**
-     * Thi thread will attempt to take messages from the queue and call the remote hosts receiveMessage to
-     * deliver the messages. If the host cannot be reached, it is declared dead and a viewChange will be sent
-     * to all other clients in group.
+     * This thread will attempt to take messages from the queue and call the remote hosts receiveMessage to
+     * deliver the messages. In case of a NoSuchObjectException, which happens if the host process has restarted since
+     * the remoteHost was bound, one attempt at rebinding the remoteHost and resending the message will be done. If this
+     * fails, or the host cannot be reached, the host is considered dead and removed from the group and a viewChange
+     * will be sent to all other clients in group.
      */
     @Override
     public void run() {
