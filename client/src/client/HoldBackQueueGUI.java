@@ -7,7 +7,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
 
-/**
+/** If enabled, shows a new window containing information about the hold-back queue.
  * Created by Jonas on 2014-10-09.
  */
 public class HoldBackQueueGUI extends JFrame {

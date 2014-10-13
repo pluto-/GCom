@@ -3,7 +3,10 @@ package gcom.utils;
 import java.io.Serializable;
 import java.util.ArrayList;
 
-/**
+/** Objects of this class is sent between clients when communicating. Contains the following information: If the
+ * message is to be sent reliably, if the message is to be delivered causally, the text, the sender, the vector clock
+ * of the message, the name of the group which is to be sent to and a list containing all the addresses of the clients
+ * which the message has passed through.
  * Created by Jonas on 2014-10-06.
  */
 public class Message implements Serializable {

@@ -4,7 +4,8 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
+/** Contains a map with clock values for added hosts. The clocks can be incremented, compared, added etc. If the
+ * user tries to increment a clock for a host which isn't in the vector clock, the host is added to the vector clock.
  * Created by Jonas on 2014-10-06.
  */
 public class VectorClock implements Serializable {
@@ -35,6 +36,13 @@ public class VectorClock implements Serializable {
         return clock.get(host) < other.getValue(host);
     }
 
+    /**
+     * Checks if the clock values are lower than or equal to the corresponding values of the other vector clock. If
+     * one or more isn't false is returned, otherwise true.
+     * @param other the other victor clock.
+     * @param exception
+     * @return true if this statement holds for all clock values, otherwise false.
+     */
     public boolean isBeforeOrEqualOnAllValuesExcept(VectorClock other, Host exception) {
 
         for(Host host : clock.keySet()) {

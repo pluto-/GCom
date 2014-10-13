@@ -11,7 +11,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 
-/**
+/** Shows the test/debug graphical user interface. Acts as View in MVC design pattern.
  * Created by Jonas on 2014-10-06.
  */
 public class ClientGUI extends JFrame implements ActionListener, ItemListener {

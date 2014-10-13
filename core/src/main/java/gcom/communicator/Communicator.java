@@ -12,7 +12,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
+/** This class is the communication module. It multicasts messages through Communication channels (see class
+ * CommunicationChannel). The interface PeerCommunication is implemented and therefore this class receives messages
+ * from other clients as well.
  * Created by Jonas on 2014-10-03.
  */
 public class Communicator implements PeerCommunication {
@@ -23,6 +25,11 @@ public class Communicator implements PeerCommunication {
     private int sleepMillisBetweenClients;
     private final Logger logger = LogManager.getLogger(this.getClass());
 
+    /**
+     * Initializes the object.
+     * @param gCom the GCom creating this object.
+     * @param self the local host.
+     */
     public Communicator(GCom gCom, Host self) {
         this.gCom = gCom;
         this.self = self;
@@ -30,6 +37,11 @@ public class Communicator implements PeerCommunication {
         sleepMillisBetweenClients = 0;
     }
 
+    /**
+     * this is called when a dead remote client has been detected.
+     * @param deadHost the dead remote client.
+     * @param groupName the group.
+     */
     public void triggerViewChange(Host deadHost, String groupName) {
         removeChannel(deadHost);
         gCom.triggerViewChange(deadHost, groupName);
@@ -39,6 +51,12 @@ public class Communicator implements PeerCommunication {
         sleepMillisBetweenClients = millis;
     }
 
+    /**
+     * Multicasts a message to the whole group (except localhost). Puts the messages in their corresponding
+     * CommunicationChannels.
+     * @param message the message.
+     * @param groupMembers the group members.
+     */
     public void multicast(Message message, ArrayList<Host> groupMembers) {
         for(Host member : groupMembers) {
             if(!member.equals(self)) {
