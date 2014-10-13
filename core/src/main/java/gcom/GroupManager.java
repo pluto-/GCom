@@ -99,11 +99,11 @@ public class GroupManager implements NameServiceClient {
      * @throws MalformedURLException
      */
     public void processViewChange(ViewChange viewChange) throws RemoteException, NotBoundException, MalformedURLException {
-        System.out.println("Members:");
+        System.out.println("View change vector clock:");
         ArrayList<Host> members = viewChange.getMembers();
         Group group = groups.get(viewChange.getGroupName());
         for(Host member : members) {
-            System.out.println(member);
+            System.out.println(member + " clock value: " + viewChange.getVectorClock().getValue(member));
             groups.get(viewChange.getGroupName()).addVectorValue(member, viewChange.getVectorClock().getValue(member));
 
         }
