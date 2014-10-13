@@ -1,4 +1,4 @@
-package client;
+package gcom.client;
 
 import gcom.utils.Message;
 import gcom.utils.VectorClock;

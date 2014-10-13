@@ -1,4 +1,4 @@
-package client;
+package gcom.client;
 
 import gcom.GCom;
 import gcom.utils.*;

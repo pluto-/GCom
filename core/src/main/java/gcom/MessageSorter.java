@@ -115,7 +115,7 @@ public class MessageSorter implements Runnable {
         for(VectorClock vectorClock : causallyInconsistentlyDeliveredMessages.keySet()) {
             Message message = causallyInconsistentlyDeliveredMessages.get(vectorClock);
             if(message.isCausallyConsistent(localVectorClock)) {
-                causallyInconsistentlyDeliveredMessages.remove(message);
+                causallyInconsistentlyDeliveredMessages.remove(message.getVectorClock());
                 incrementLocalVectorClock(message.getSource());
                 delivered = true;
             }
