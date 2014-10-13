@@ -67,13 +67,14 @@ public class Communicator implements PeerCommunication {
 
     @Override
     public synchronized void receiveMessage(Message message) throws RemoteException {
-
         gCom.receive(message);
-
     }
 
     public void removeChannel(Host host) {
-        channelMap.get(host).stop();
+        CommunicationChannel communicationChannel = channelMap.get(host);
+        if(communicationChannel != null) {
+            communicationChannel.stop();
+        }
         channelMap.remove(host);
     }
 }
