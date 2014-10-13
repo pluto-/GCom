@@ -60,7 +60,7 @@ public class MessageSorter implements Runnable {
         startThread();
     }
 
-    private void startThread() {
+    private synchronized void startThread() {
         running = true;
         if(thread == null || !thread.isAlive()) {
             thread = new Thread(this);
@@ -68,7 +68,7 @@ public class MessageSorter implements Runnable {
         }
     }
 
-    private void deliverMessage(Message message) {
+    private synchronized void deliverMessage(Message message) {
         try {
             System.err.println("Delivering to deliverQueue");
             deliverQueue.put(message);
@@ -96,7 +96,7 @@ public class MessageSorter implements Runnable {
 
     }
 
-    private void incrementLocalVectorClock(Host host) {
+    private synchronized void incrementLocalVectorClock(Host host) {
         localVectorClock.increment(host);
     }
 

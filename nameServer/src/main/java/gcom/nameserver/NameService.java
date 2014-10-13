@@ -83,13 +83,7 @@ public class NameService implements NameServiceGroupManagement  {
         return leader;
     }
 
-    @Override
-    public void removeGroup(String groupName) throws RemoteException {
-        groups.remove(groupName);
-    }
-
-    @Override
-    public void setLeader(String groupName, Host leader) throws RemoteException {
+    private void setLeader(String groupName, Host leader) throws RemoteException {
         groups.put(groupName, leader);
     }
 

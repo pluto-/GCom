@@ -76,10 +76,7 @@ public class GCom implements Runnable {
      * @param deliverCausally if the message should be ordered causally.
      */
     public void sendMessage(String text, String group, boolean sendReliably, boolean deliverCausally) {
-        if(deliverCausally) {
-            groupManager.getVectorClock(group).increment(self);
-
-        }
+        groupManager.getVectorClock(group).increment(self);
         Message message = new Message(sendReliably, deliverCausally, text, self, groupManager.getVectorClock(group), group);
         sendMessage(message, groupManager.getGroup(group).getMembers());
     }
