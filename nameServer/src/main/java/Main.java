@@ -1,10 +1,12 @@
+import java.io.IOException;
 import java.net.UnknownHostException;
 import java.rmi.AlreadyBoundException;
 import java.rmi.RemoteException;
 
 import gcom.nameserver.NameService;
 
-/**
+/** Contains the main method which takes one argument (local RMI port number). Creates the NameService
+ *  object and sends the local RMI port number as parameter.
  * Created by Jonas on 2014-10-03.
  */
 public class Main {
@@ -18,7 +20,7 @@ public class Main {
             new NameService(Integer.valueOf(args[0]));
         } catch (RemoteException | UnknownHostException e) {
             e.printStackTrace();
-        } catch (Exception e) {
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }

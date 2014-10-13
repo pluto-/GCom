@@ -11,12 +11,24 @@ import java.rmi.AlreadyBoundException;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 
+/**
+ * Creates the GCom and the ClientGUI. Implements GComClient and receives the messages GCom delivers which are
+ * later sent to the ClientGUI. This class also connects itself as a listener to the hold-back queue of GCom and
+ * when the hold-back queue is changed this class tells the ClientGUI to update it's window containing information
+ * about the hold-back queue. This class acts as model and controller in the MVC design pattern.
+ */
 public class Client implements GComClient, HoldBackQueueListener {
 
     private ClientGUI clientGUI;
     private GCom gCom;
     private String group;
 
+    /**
+     * Creates the GUI object and the GCom object.
+     * @param rmiPort the local RMI port.
+     * @param nameServiceAddress address to the name service.
+     * @param nameServicePort port of the name service.
+     */
     public Client(int rmiPort, String nameServiceAddress, int nameServicePort) {
 
         System.out.println("Local RMI port to be used: " + rmiPort);
@@ -38,7 +50,7 @@ public class Client implements GComClient, HoldBackQueueListener {
             System.exit(1);
         }
         try {
-            gCom = new GCom(false, rmiPort, this, nameService);
+            gCom = new GCom(rmiPort, this, nameService);
 
         } catch (RemoteException e) {
             e.printStackTrace();
@@ -69,6 +81,10 @@ public class Client implements GComClient, HoldBackQueueListener {
 
     }
 
+    /**
+     * When GCom delivers a message to this client, it calls this method.
+     * @param message the message.
+     */
     @Override
     public void deliverMessage(Message message) {
 
@@ -93,6 +109,10 @@ public class Client implements GComClient, HoldBackQueueListener {
         clientGUI.incomingMessage(messageText, debugText);
     }
 
+    /**
+     * When GCom delivers a message which has already been delivered.
+     * @param message the already delivered message.
+     */
     @Override
     public void deliverAlreadyReceivedMessage(Message message) {
         if(clientGUI.isDebug()) {
@@ -115,6 +135,12 @@ public class Client implements GComClient, HoldBackQueueListener {
 
     }
 
+    /**
+     * Sends a message to GCom.
+     * @param message the message text
+     * @param sendReliably if the message should be sent reliably.
+     * @param deliverCausally if the message should be ordered causally.
+     */
     public void sendMessage(String message, boolean sendReliably, boolean deliverCausally) {
         gCom.sendMessage(message, group, sendReliably, deliverCausally);
     }
@@ -147,12 +173,12 @@ public class Client implements GComClient, HoldBackQueueListener {
                 }
                 if(nameServiceAddress.equalsIgnoreCase("localhost")) {
                     try {
-                        Client client = new Client(rmiPort, InetAddress.getLocalHost().getHostAddress(), nameServicePort);
+                        new Client(rmiPort, InetAddress.getLocalHost().getHostAddress(), nameServicePort);
                     } catch (UnknownHostException e) {
                         e.printStackTrace();
                     }
                 } else {
-                    Client client = new Client(rmiPort, nameServiceAddress, nameServicePort);
+                    new Client(rmiPort, nameServiceAddress, nameServicePort);
                 }
             }
         });

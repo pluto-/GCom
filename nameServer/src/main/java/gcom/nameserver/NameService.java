@@ -12,7 +12,9 @@ import java.rmi.server.UnicastRemoteObject;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
+/**When creating an object of this class, it needs an RMI port number to use when creating the local registry.
+ * This local registry will contain the remote method joinGroup
+ * which is implemented from the interface NameServiceGroupManagement
  * Created by Jonas on 2014-10-03.
  */
 public class NameService implements NameServiceGroupManagement  {
@@ -20,6 +22,11 @@ public class NameService implements NameServiceGroupManagement  {
     private volatile  Map<String, Host> groups;
     private final Logger logger = LogManager.getLogger(this.getClass());
 
+    /**
+     * Creates a local RMI registry on specified port and puts it's own joinGroup in the registry.
+     * @param rmiPort the port to use.
+     * @throws IOException
+     */
     public NameService(int rmiPort) throws IOException {
         groups = new HashMap<>();
 
@@ -30,6 +37,15 @@ public class NameService implements NameServiceGroupManagement  {
 
     }
 
+    /**
+     * The method which will be called by remote hosts to join a group and get the leader.
+     * @param groupName the group to join.
+     * @param newMember the remote host which calls the method.
+     * @return the leader of the group.
+     * @throws RemoteException
+     * @throws MalformedURLException
+     * @throws NotBoundException
+     */
     @Override
     public synchronized Host joinGroup(String groupName, Host newMember) throws RemoteException, MalformedURLException, NotBoundException {
         logger.error("joinGroup from " +  newMember + " for group:" + groupName);
@@ -77,6 +93,15 @@ public class NameService implements NameServiceGroupManagement  {
         groups.put(groupName, leader);
     }
 
+    /**
+     * Sends an add member to the leader.
+     * @param groupName the group which has the new member.
+     * @param leader the leader.
+     * @param newMember the new member.
+     * @throws RemoteException
+     * @throws NotBoundException
+     * @throws MalformedURLException
+     */
     private void sendAddMember(String groupName, Host leader, Host newMember) throws RemoteException, NotBoundException, MalformedURLException {
 
         NameServiceClient stub = (NameServiceClient) Naming.lookup("rmi://" + leader + "/" + NameServiceClient.class.getSimpleName());

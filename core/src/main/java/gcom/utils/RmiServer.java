@@ -10,7 +10,8 @@ import java.rmi.RemoteException;
 import java.rmi.registry.Registry;
 import java.security.Permission;
 
-/**
+/** When an object of this class i created, it creates a local RMI registry on a specified port. It also has a
+ * method for binding objects to the registry.
  * Created by Patrik on 2014-10-03.
  */
 public class RmiServer {
@@ -20,6 +21,11 @@ public class RmiServer {
     private int port;
     private Logger logger = LogManager.getLogger(this.getClass());
 
+    /**
+     * Initializes and creates the local registry.
+     * @param portNumber the port to use for the registry.
+     * @throws IOException
+     */
     public RmiServer(int portNumber) throws IOException {
         this.port = portNumber;
         logger.error("before security manager");
@@ -39,6 +45,12 @@ public class RmiServer {
         logger.error("constructor done");
     }
 
+    /**
+     * Rebind the object to the registry with specified name.
+     * @param name the name.
+     * @param object the object.
+     * @throws RemoteException
+     */
     public void bind(String name, Remote object) throws RemoteException {
         registry.rebind(name, object);
     }

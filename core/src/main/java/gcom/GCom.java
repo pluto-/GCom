@@ -13,12 +13,15 @@ import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
-/**
+/** The most essential class of the GCom. The GCom class acts as the spider in a web. It handles the three modules
+ * of GCom (group management, communication and message ordering) by sending and receiving information to/from the
+ * modules. It takes, among other arguments, a GComClient which is used to deliver received and ordered messages
+ * to. This class has a delivery queue which is attached to the message sorters and it's messages are delivered
+ * to the GComClient using a thread.
  * Created by Jonas on 2014-10-03.
  */
 public class GCom implements Runnable {
 
-    private boolean reliableMulticast;
     private GroupManager groupManager;
     private Communicator communicator;
     private Map<String, MessageSorter> messageSorters;
@@ -29,9 +32,15 @@ public class GCom implements Runnable {
 
     private GComClient gcomClient;
 
-    public GCom(boolean reliableMulticast, int rmiPort, GComClient gcomClient, Host nameService)
+    /**
+     * Creates a RMI server on the specified port. Creates the thread which delivers the messages to the GComClient.
+     * @param rmiPort the port number for the local RMI registry.
+     * @param gcomClient The GComClient which uses GCom.
+     * @param nameService the name service.
+     * @throws Exception
+     */
+    public GCom(int rmiPort, GComClient gcomClient, Host nameService)
             throws Exception {
-        this.reliableMulticast = reliableMulticast;
         RmiServer rmiServer = new RmiServer(rmiPort);
         self = rmiServer.getHost();
         this.gcomClient = gcomClient;
@@ -50,10 +59,22 @@ public class GCom implements Runnable {
         thread.start();
     }
 
+    /**
+     * Attaches a Hold-back queue listener to the specified message sorter.
+     * @param listener the listener.
+     * @param groupName the group to attach to.
+     */
     public void attachHoldBackQueueListener(HoldBackQueueListener listener, String groupName) {
         messageSorters.get(groupName).setListener(listener);
     }
 
+    /**
+     * The method used by the client to send messages to the other remote clients in the group.
+     * @param text the text to send.
+     * @param group the group to multicast to.
+     * @param sendReliably if the message should be sent reliably.
+     * @param deliverCausally if the message should be ordered causally.
+     */
     public void sendMessage(String text, String group, boolean sendReliably, boolean deliverCausally) {
         if(deliverCausally) {
             groupManager.getVectorClock(group).increment(self);
@@ -63,34 +84,43 @@ public class GCom implements Runnable {
         sendMessage(message, groupManager.getGroup(group).getMembers());
     }
 
-    public VectorClock getVectorClock(String groupName) {
-        return groupManager.getVectorClock(groupName);
-    }
-
-    public void incrementVectorClock(String groupName, Host host) {
-        groupManager.getVectorClock(groupName).increment(host);
-    }
-
-    public void leaveGroup(String group) throws RemoteException {
-        groupManager.leaveGroup(group);
-    }
-
+    /**
+     * returns true if the message has been received before, otherwise false.
+     * @param message the message.
+     * @return true if received before, else false.
+     */
     public boolean hasReceived(Message message) {
         return (messageSorters.get(message.getGroupName()).hasMessageInHoldbackQueue(message) || groupManager.getVectorClock(message.getGroupName()).hasReceived(message));
     }
 
+    /**
+     * Joins the specified group.
+     * @param groupName the group to join.
+     * @throws RemoteException
+     * @throws NotBoundException
+     * @throws MalformedURLException
+     */
     public void joinGroup(String groupName) throws RemoteException, NotBoundException, MalformedURLException {
         Group group = new Group(groupName);
         messageSorters.put(groupName, new MessageSorter(deliveryQueue, group.getVectorClock()));
         groupManager.sendJoinGroup(group);
     }
 
+    /**
+     * This method is called if a dead host has been detected. Sends a viewChange to all other clients.
+     * @param deadHost
+     * @param groupName
+     */
     public void triggerViewChange(Host deadHost, String groupName) {
         Group group = groupManager.getGroup(groupName);
         group.getMembers().remove(deadHost);
         sendViewChange(group);
     }
 
+    /**
+     * Creates the viewChange object and uses sendMessage to send it.
+     * @param group the new view.
+     */
     public void sendViewChange(Group group) {
         groupManager.getVectorClock(group.getName()).increment(self);
         ViewChange viewChange = new ViewChange(true, true, null, self, groupManager.getVectorClock(group.getName()), group.getName(), group.getMembers());
@@ -106,6 +136,12 @@ public class GCom implements Runnable {
         return groupManager.getMembers(groupName);
     }
 
+    /**
+     * Is called when Communicator delivers a message. Checks if the message has already been received, if it has it is
+     * delivered as an already received message. Otherwise, it is multicasted to all other clients if it is a reliable
+     * message, then it is given to the message sorter.
+     * @param message the received message from Communicator.
+     */
     public void receive(Message message) {
         if(hasReceived(message)) {
             alreadyReceived(message);
@@ -122,6 +158,10 @@ public class GCom implements Runnable {
         gcomClient.deliverAlreadyReceivedMessage(message);
     }
 
+    /**
+     * Thread which takes from the deliveryQueue and delivers to the GComClient. If it is a viewChange,
+     * it is processed.
+     */
     @Override
     public void run() {
         while (running) {

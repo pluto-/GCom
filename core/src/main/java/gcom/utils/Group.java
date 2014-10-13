@@ -2,7 +2,8 @@ package gcom.utils;
 
 import java.util.ArrayList;
 
-/**
+/** Information about a group is stored in this class: The members addresses, the leaders address and the group
+ * name etc. The local vector clock for the group is located here as well.
  * Created by Patrik on 2014-10-06.
  */
 public class Group {

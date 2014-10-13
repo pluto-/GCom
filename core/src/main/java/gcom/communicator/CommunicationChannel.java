@@ -14,7 +14,9 @@ import java.rmi.RemoteException;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
-/**
+/** An internal queue in this class is holding the messages which are to be sent to a remote host. These are
+ * sent by a thread through the PeerCommunication interface (which the remote host implements in it's
+ * Communicator class).
  * Created by Patrik on 2014-10-10.
  */
 public class CommunicationChannel implements Runnable {
@@ -26,6 +28,14 @@ public class CommunicationChannel implements Runnable {
     private final Communicator communicator;
     private final Logger logger = LogManager.getLogger(CommunicationChannel.class);
 
+    /**
+     * Initializes, connects to the remote client and starts the thread.
+     * @param host the remote client.
+     * @param communicator The communicator which created this channel.
+     * @throws RemoteException
+     * @throws NotBoundException
+     * @throws MalformedURLException
+     */
     public CommunicationChannel(Host host, Communicator communicator) throws RemoteException, NotBoundException, MalformedURLException {
         this.host = host;
         this.communicator = communicator;
@@ -36,10 +46,20 @@ public class CommunicationChannel implements Runnable {
     }
 
 
+    /**
+     * Puts the message in the queue and will later be sent.
+     * @param message the message.
+     * @throws InterruptedException
+     */
     public void send(Message message) throws InterruptedException {
         queue.put(message);
     }
 
+    /**
+     * Thi thread will attempt to take messages from the queue and call the remote hosts receiveMessage to
+     * deliver the messages. If the host cannot be reached, it is declared dead and a viewChange will be sent
+     * to all other clients in group.
+     */
     @Override
     public void run() {
         Message message;

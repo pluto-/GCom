@@ -6,7 +6,7 @@ import gcom.utils.VectorClock;
 import javax.swing.*;
 import java.awt.*;
 
-/**
+/** If enabled, shows a new window containing information about the local vector clock.
  * Created by Jonas on 2014-10-09.
  */
 public class VectorClockGUI extends JFrame {
