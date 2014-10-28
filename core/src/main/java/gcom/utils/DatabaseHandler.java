@@ -2,6 +2,7 @@ package gcom.utils;
 
 
 import org.apache.cassandra.service.ConsistencyLevel;
+import org.apache.commons.math3.ml.clustering.*;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
