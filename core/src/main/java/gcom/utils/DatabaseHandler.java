@@ -2,6 +2,7 @@ package gcom.utils;
 
 
 import com.datastax.driver.core.*;
+import com.datastax.driver.core.exceptions.InvalidQueryException;
 import com.datastax.driver.core.exceptions.NoHostAvailableException;
 
 public class DatabaseHandler {
@@ -16,29 +17,16 @@ public class DatabaseHandler {
 
         // Connect to the "mykeyspace" keyspace
         Session session = cluster.connect();
-        try{
-            SimpleStatement toPrepare = new SimpleStatement("USE mykeyspace;");
-            PreparedStatement prepared = session.prepare(toPrepare);
-            ResultSet resultSet = session.execute(prepared.bind(1));
 
-        }catch(NoHostAvailableException e) {
+        session.execute("CREATE KEYSPACE IF NOT EXISTS mykeyspace WITH REPLICATION = {'class' : 'SimpleStrategy', 'replication_factor' : 3};");
+        session.execute("USE mykeyspace");
+        session.execute("CREATE TABLE IF NOT EXISTS users (user_id int PRIMARY KEY, firstName text, lastName text);");
 
+        ResultSet resultSet = session.execute("SELECT * FROM users WHERE user_id=1");
+        if(!resultSet.iterator().hasNext()) {
+            System.out.println("Inserting John.");
+            session.execute("INSERT INTO users (user_id, firstName, lastName) VALUES (1, 'John', 'Smith');");
         }
-
-        // Prepare a statement
-        SimpleStatement toPrepare = new SimpleStatement("SELECT * FROM users WHERE user_id=?");
-        toPrepare.setConsistencyLevel(ConsistencyLevel.ONE);
-
-        // Execute the statement
-        PreparedStatement prepared = session.prepare(toPrepare);
-        ResultSet resultSet = session.execute(prepared.bind(1));
-
-        // Print results
-        Row result = resultSet.one();
-        System.out.println(String.format(
-                "Users with ID 1: %s %s",
-                result.getString("firstName"),
-                result.getString("lastName")));
 
         // Execute another statement
         resultSet = session.execute("SELECT * FROM users");
@@ -52,6 +40,10 @@ public class DatabaseHandler {
                     row.getString("lastName")));
         }
     }
+
+    /*private static void startContactPoint(int nr) {
+        SimpleClient client = new SimpleClient();
+    }*/
 }
 
 
