@@ -2,19 +2,28 @@ package gcom.utils;
 
 
 import com.datastax.driver.core.*;
+import com.datastax.driver.core.exceptions.NoHostAvailableException;
 
 public class DatabaseHandler {
 
     public static void main(String[] args) {
         // Connect to the Cassandra cluster
         Cluster cluster = Cluster.builder()
-                .addContactPoint("127.0.1.1")
-                .addContactPoint("127.0.1.2")
-                .addContactPoint("127.0.1.3")
+                .addContactPoint("127.0.0.1")
+                .addContactPoint("127.0.0.2")
+                .addContactPoint("127.0.0.3")
                 .build();
 
         // Connect to the "mykeyspace" keyspace
-        Session session = cluster.connect("mykeyspace");
+        Session session = cluster.connect();
+        try{
+            SimpleStatement toPrepare = new SimpleStatement("USE mykeyspace;");
+            PreparedStatement prepared = session.prepare(toPrepare);
+            ResultSet resultSet = session.execute(prepared.bind(1));
+
+        }catch(NoHostAvailableException e) {
+
+        }
 
         // Prepare a statement
         SimpleStatement toPrepare = new SimpleStatement("SELECT * FROM users WHERE user_id=?");
