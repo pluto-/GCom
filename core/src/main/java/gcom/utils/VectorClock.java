@@ -85,4 +85,13 @@ public class VectorClock implements Serializable {
     public void removeValue(Host member) {
         clock.remove(member);
     }
+
+    @Override
+    public String toString() {
+        String str = "";
+        for(Host host: clock.keySet()) {
+            str = str.concat("[" + host + "]" + clock.get(host));
+        }
+        return str;
+    }
 }
