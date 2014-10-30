@@ -149,7 +149,7 @@ public class DatabaseHandler {
             Row row = rows.next();
             boolean isReliable = row.getBool("isReliable");
             boolean deliverCausally = row.getBool("deliverCausally");
-            String text = row.getString("text");
+            String text = row.getString("message");
             String hostAddress = row.getString("hostAddress");
             int hostPort = row.getInt("hostPort");
             Host sender = new Host(InetAddress.getByName(hostAddress), hostPort);
