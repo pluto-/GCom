@@ -20,13 +20,14 @@ public class DatabaseHandler {
         String text = message.getText();
         String beenAt = message.getBeenAt().toString();
 
-        session.execute("INSERT INTO messages (vectorClock, message, senderAddress, senderPort, isReliable, group, beenAt) VALUES" +
+        session.execute("INSERT INTO messages (vectorClock, message, senderAddress, senderPort, isReliable, deliverCausally, group, beenAt) VALUES" +
                 "('" +
                 vectorClock + "','" +
                 text + "','" +
                 message.getSource().getAddress().getHostAddress() + "'," +
                 message.getSource().getPort() + "," +
                 message.isReliable() + ",'" +
+                message.deliverCausally() + ",'" +
                 message.getGroupName() + "','" +
                 beenAt + "')");
     }
@@ -87,7 +88,7 @@ public class DatabaseHandler {
 
         session.execute("CREATE KEYSPACE IF NOT EXISTS gcom WITH REPLICATION = {'class' : 'SimpleStrategy', 'replication_factor' : 3};");
         session.execute("USE gcom");
-        session.execute("CREATE TABLE IF NOT EXISTS messages (vectorClock text PRIMARY KEY, message text, senderAddress text, senderPort int, isReliable boolean, group text, beenAt text);");
+        session.execute("CREATE TABLE IF NOT EXISTS messages (vectorClock text PRIMARY KEY, message text, senderAddress text, senderPort int, isReliable boolean, deliverCausally boolean, group text, beenAt text);");
         session.execute("CREATE TABLE IF NOT EXISTS members (group text, hostAddress text, hostPort int, vectorClock text, connected boolean, PRIMARY KEY(group, hostAddress, hostPort));");
         session.execute("CREATE TABLE IF NOT EXISTS groups (groupName text PRIMARY KEY, leaderAddress text, leaderPort int);");
 
@@ -115,12 +116,43 @@ public class DatabaseHandler {
         return members;
     }
 
-    public VectorClock getVectorClock(String groupName, Host host) {
-        return null;
+    public VectorClock getVectorClock(String groupName, Host host) throws UnknownHostException {
+        ResultSet resultSet = session.execute("SELECT vectorClock FROM members WHERE " +
+                "group='" + groupName + "' AND " +
+                "hostAddress='"+ host.getAddress().getHostAddress() +"' AND " +
+                "hostPort="+ host.getPort() +";");
+        if(resultSet.iterator().hasNext()) {
+            return VectorClock.fromString(resultSet.iterator().next().getString("vectorClock"));
+        }
+        return new VectorClock();
     }
 
-    public ArrayList<Message> getNewMessages(Group group, VectorClock clock) {
-        return null;
+    public ArrayList<Message> getNewMessages(String groupName, VectorClock clock) throws UnknownHostException {
+        ArrayList<Message> newMessages = new ArrayList<>();
+        ArrayList<Message> messages = new ArrayList<>();
+        ResultSet resultSet = session.execute("SELECT * FROM messages WHERE group='" +
+                groupName + "';");
+        Iterator<Row> rows = resultSet.iterator();
+        while(rows.hasNext()) {
+            Row row = rows.next();
+            boolean isReliable = row.getBool("isReliable");
+            boolean deliverCausally = row.getBool("deliverCausally");
+            String text = row.getString("text");
+            String hostAddress = row.getString("hostAddress");
+            int hostPort = row.getInt("hostPort");
+            Host sender = new Host(InetAddress.getByName(hostAddress), hostPort);
+            VectorClock vectorClock = VectorClock.fromString(row.getString("vectorClock"));
+            String group = row.getString("groupName");
+
+            Message message = new Message(isReliable, deliverCausally, text, sender, vectorClock, group);
+            messages.add(message);
+        }
+        for(Message message : messages) {
+            if(clock.isBeforeOrEqualOnAllValuesExcept(message.getVectorClock(), message.getSource())) {
+                newMessages.add(message);
+            }
+        }
+        return newMessages;
     }
 }
 

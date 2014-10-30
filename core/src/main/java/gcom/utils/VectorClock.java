@@ -1,6 +1,8 @@
 package gcom.utils;
 
 import java.io.Serializable;
+import java.net.UnknownHostException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -93,5 +95,26 @@ public class VectorClock implements Serializable {
             str = str.concat("[" + host + "]" + clock.get(host));
         }
         return str;
+    }
+
+    public static VectorClock fromString(String vectorClockString) throws UnknownHostException {
+        VectorClock clock = new VectorClock();
+        while(vectorClockString.length() > 0) {
+            if(vectorClockString.indexOf('[') == -1) {
+                break;
+            }
+            vectorClockString = vectorClockString.substring(vectorClockString.indexOf('[') + 1);
+            String ipAndPort = vectorClockString.substring(0, vectorClockString.indexOf(']'));
+            vectorClockString = vectorClockString.substring(vectorClockString.indexOf(']') + 1);
+            String value;
+            if(vectorClockString.indexOf('[') == -1) {
+                value = vectorClockString;
+            } else {
+                value = vectorClockString.substring(0, vectorClockString.indexOf('['));
+            }
+            System.out.println(ipAndPort+ " " +value);
+            clock.addValue(Host.fromString(ipAndPort), Integer.valueOf(value));
+        }
+        return clock;
     }
 }
