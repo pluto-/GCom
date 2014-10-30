@@ -154,7 +154,7 @@ public class DatabaseHandler {
             int hostPort = row.getInt("senderPort");
             Host sender = new Host(InetAddress.getByName(hostAddress), hostPort);
             VectorClock vectorClock = VectorClock.fromString(row.getString("vectorClock"));
-            String group = row.getString("groupName");
+            String group = row.getString("group");
 
             Message message = new Message(isReliable, deliverCausally, text, sender, vectorClock, group);
             messages.add(message);
