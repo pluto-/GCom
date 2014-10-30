@@ -53,7 +53,7 @@ public class GroupManager implements NameServiceClient {
         nameService.joinGroup(group.getName(), self);
         VectorClock clock = databaseHandler.getVectorClock(group.getName(), self);
         if(!clock.isEmpty()) {
-            gCom.receive(databaseHandler.getNewMessages(group, clock));
+            //gCom.receive(databaseHandler.getNewMessages(group, clock));
         }
     }
 

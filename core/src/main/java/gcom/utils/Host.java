@@ -2,6 +2,7 @@ package gcom.utils;
 
 import java.io.Serializable;
 import java.net.InetAddress;
+import java.net.UnknownHostException;
 
 /** Contains a hosts address and port number.
  * Created by Jonas on 2014-10-03.
@@ -39,6 +40,13 @@ public class Host implements Serializable {
         if (address != null ? !address.equals(host.address) : host.address != null) return false;
 
         return true;
+    }
+
+    public static Host fromString(String addressAndPort) throws UnknownHostException {
+        String address = addressAndPort.substring(0, addressAndPort.indexOf(':'));
+        String port = addressAndPort.substring(addressAndPort.indexOf(':') + 1, addressAndPort.length());
+
+        return new Host(InetAddress.getByName(address), Integer.valueOf(port));
     }
 
     @Override
