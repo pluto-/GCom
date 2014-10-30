@@ -17,25 +17,24 @@ public class DatabaseHandler {
         String text = message.getText();
         String beenAt = message.getBeenAt().toString();
 
-
         session.execute("INSERT INTO messages (vectorClock, message, senderAddress, senderPort, isReliable, group, beenAt) VALUES" +
-                "(" +
-                vectorClock + "," +
-                text + "," +
-                message.getSource().getAddress().getHostAddress() + "," +
+                "('" +
+                vectorClock + "','" +
+                text + "','" +
+                message.getSource().getAddress().getHostAddress() + "'," +
                 message.getSource().getPort() + "," +
-                message.isReliable() + "," +
-                message.getGroupName() + "," +
-                beenAt + ")");
+                message.isReliable() + ",'" +
+                message.getGroupName() + "','" +
+                beenAt + "')");
     }
 
     public void addMember(String groupName, Host member, VectorClock vectorClock, boolean isConnected) {
         session.execute("INSERT INTO members (group, hostAddress, hostPort, vectorClock, connected) VALUES" +
-                "(" +
-                groupName + "," +
-                member.getAddress().getHostAddress() + "," +
-                member.getPort() + "," +
-                vectorClock.toString() + "," +
+                "('" +
+                groupName + "','" +
+                member.getAddress().getHostAddress() + "'," +
+                member.getPort() + ",'" +
+                vectorClock.toString() + "'," +
                 isConnected +
                 ")");
     }
