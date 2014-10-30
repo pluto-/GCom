@@ -98,9 +98,14 @@ public class DatabaseHandler {
         //new DatabaseHandler();
     }
 
-    public ArrayList<Host> getMembers(String groupName) throws UnknownHostException {
+    public ArrayList<Host> getMembers(String groupName, boolean onlyConnectedMembers) throws UnknownHostException {
         ArrayList<Host> members = new ArrayList<>();
-        ResultSet resultSet = session.execute("SELECT * FROM members WHERE group='" + groupName + "';");
+        ResultSet resultSet = null;
+        if(onlyConnectedMembers) {
+            resultSet = session.execute("SELECT * FROM members WHERE connected=true AND group='" + groupName + "';");
+        } else {
+            resultSet = session.execute("SELECT * FROM members WHERE group='" + groupName + "';");
+        }
         Iterator<Row> rows = resultSet.iterator();
         while(rows.hasNext()) {
             Row row = rows.next();
