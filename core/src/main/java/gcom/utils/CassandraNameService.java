@@ -5,6 +5,7 @@ import org.apache.log4j.Logger;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.net.UnknownHostException;
 import java.rmi.ConnectException;
 import java.rmi.Naming;
 import java.rmi.NotBoundException;
@@ -72,7 +73,7 @@ public class CassandraNameService implements NameServiceGroupManagement  {
         try {
             logger.error("sending addMember for: " + newMember + " to: " + leader + " for group: " + groupName);
             sendAddMember(groupName, leader, newMember);
-        } catch(ConnectException e) {
+        } catch(ConnectException | UnknownHostException e) {
             if (nameServiceClient != null) {
                 nameServiceClient.setLeader(groupName, newMember);
                 logger.error("Leader not reachable, new leader - " + newMember);
@@ -97,7 +98,7 @@ public class CassandraNameService implements NameServiceGroupManagement  {
      * @throws java.rmi.NotBoundException
      * @throws java.net.MalformedURLException
      */
-    private void sendAddMember(String groupName, Host leader, Host newMember) throws RemoteException, NotBoundException, MalformedURLException {
+    private void sendAddMember(String groupName, Host leader, Host newMember) throws RemoteException, NotBoundException, MalformedURLException, UnknownHostException {
 
         NameServiceClient stub = (NameServiceClient) Naming.lookup("rmi://" + leader + "/" + NameServiceClient.class.getSimpleName());
         stub.addMember(groupName, newMember);

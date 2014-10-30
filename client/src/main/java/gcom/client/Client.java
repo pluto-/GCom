@@ -50,7 +50,7 @@ public class Client implements GComClient, HoldBackQueueListener {
             System.exit(1);
         }
         try {
-            gCom = new GCom(rmiPort, this, nameService);
+            gCom = new GCom(rmiPort, this, nameService, nameServiceAddress);
 
         } catch (RemoteException e) {
             e.printStackTrace();
@@ -75,6 +75,8 @@ public class Client implements GComClient, HoldBackQueueListener {
         } catch (MalformedURLException e) {
             e.printStackTrace();
         } catch (NotBoundException e) {
+            e.printStackTrace();
+        } catch (UnknownHostException e) {
             e.printStackTrace();
         }
         System.out.println(" Done!");

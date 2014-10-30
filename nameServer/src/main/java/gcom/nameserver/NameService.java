@@ -7,6 +7,7 @@ import org.apache.log4j.Logger;
 
 import java.io.IOException;
 import java.net.*;
+import java.net.UnknownHostException;
 import java.rmi.*;
 import java.rmi.ConnectException;
 import java.rmi.server.UnicastRemoteObject;
@@ -93,7 +94,7 @@ public class NameService implements NameServiceGroupManagement  {
      * @throws NotBoundException
      * @throws MalformedURLException
      */
-    private void sendAddMember(String groupName, Host leader, Host newMember) throws RemoteException, NotBoundException, MalformedURLException {
+    private void sendAddMember(String groupName, Host leader, Host newMember) throws RemoteException, NotBoundException, MalformedURLException, UnknownHostException {
         NameServiceClient stub = (NameServiceClient) Naming.lookup("rmi://" + leader + "/" + NameServiceClient.class.getSimpleName());
         stub.addMember(groupName, newMember);
     }
