@@ -7,7 +7,7 @@ import java.net.UnknownHostException;
 /** Contains a hosts address and port number.
  * Created by Jonas on 2014-10-03.
  */
-public class Host implements Serializable {
+public class Host implements Serializable, Comparable {
 
     private final InetAddress address;
     private final int port;
@@ -54,5 +54,11 @@ public class Host implements Serializable {
         int result = address != null ? address.hashCode() : 0;
         result = 31 * result + port;
         return result;
+    }
+
+    @Override
+    public int compareTo(Object o) {
+        Host other = (Host)o;
+        return (other.toString().compareTo(this.toString())) ;
     }
 }

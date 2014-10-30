@@ -2,9 +2,7 @@ package gcom.utils;
 
 import java.io.Serializable;
 import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /** Contains a map with clock values for added hosts. The clocks can be incremented, compared, added etc. If the
  * user tries to increment a clock for a host which isn't in the vector clock, the host is added to the vector clock.
@@ -91,7 +89,13 @@ public class VectorClock implements Serializable {
     @Override
     public String toString() {
         String str = "";
-        for(Host host: clock.keySet()) {
+        Iterator<Host> keys = clock.keySet().iterator();
+        ArrayList<Host> list = new ArrayList<>();
+        while(keys.hasNext()) {
+            list.add(keys.next());
+        }
+        Collections.sort(list);
+        for(Host host : list) {
             str = str.concat("[" + host + "]" + clock.get(host));
         }
         return str;
