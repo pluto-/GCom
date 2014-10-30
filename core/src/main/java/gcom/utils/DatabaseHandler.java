@@ -22,7 +22,7 @@ public class DatabaseHandler {
         String text = message.getText();
         String beenAt = message.getBeenAt().toString();
 
-        session.execute("INSERT INTO messages (vectorClock, message, senderAddress, senderPort, isReliable, deliverCausally, group, beenAt) VALUES" +
+        session.execute("INSERT INTO messages (vectorClock, message, senderAddress, senderPort, isReliable, deliverCausally, group, beenAt, addedBy) VALUES" +
                 "('" +
                 vectorClock + "','" +
                 text + "','" +

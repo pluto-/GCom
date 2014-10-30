@@ -33,7 +33,7 @@ public class NameService implements NameServiceGroupManagement  {
 
         NameServiceGroupManagement stub = (NameServiceGroupManagement) UnicastRemoteObject.exportObject(this, rmiPort);
         rmiServer.bind(NameServiceGroupManagement.class.getSimpleName(), stub);
-        databaseHandler = new DatabaseHandler(rmiServer.getHost().getAddress().getHostAddress());
+        databaseHandler = new DatabaseHandler(rmiServer.getHost().getAddress().getHostAddress(), rmiServer.getHost());
     }
 
     /**
