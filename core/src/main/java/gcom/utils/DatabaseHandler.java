@@ -5,6 +5,7 @@ import com.datastax.driver.core.Cluster;
 import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Row;
 import com.datastax.driver.core.Session;
+import com.datastax.driver.core.exceptions.InvalidQueryException;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -26,10 +27,10 @@ public class DatabaseHandler {
                 text + "','" +
                 message.getSource().getAddress().getHostAddress() + "'," +
                 message.getSource().getPort() + "," +
-                message.isReliable() + ",'" +
+                message.isReliable() + "," +
                 message.deliverCausally() + ",'" +
                 message.getGroupName() + "','" +
-                beenAt + "')");
+                beenAt + "');");
     }
 
     public boolean hasMember(Host host, String groupName) {
@@ -87,12 +88,23 @@ public class DatabaseHandler {
         session = cluster.connect();
 
         session.execute("CREATE KEYSPACE IF NOT EXISTS gcom WITH REPLICATION = {'class' : 'SimpleStrategy', 'replication_factor' : 3};");
-        session.execute("USE gcom");
-        session.execute("CREATE TABLE IF NOT EXISTS messages (vectorClock text PRIMARY KEY, message text, senderAddress text, senderPort int, isReliable boolean, deliverCausally boolean, group text, beenAt text);");
-        session.execute("CREATE TABLE IF NOT EXISTS members (group text, hostAddress text, hostPort int, vectorClock text, connected boolean, PRIMARY KEY(group, hostAddress, hostPort));");
+        session.execute("USE gcom;");
+        session.execute("CREATE TABLE IF NOT EXISTS messages (vectorClock text PRIMARY KEY, message text, " +
+                                "senderAddress text, senderPort int, isReliable boolean, deliverCausally boolean, " +
+                                    "group text, beenAt text);");
+        try {
+            session.execute("CREATE INDEX ON messages(group);");
+        } catch (InvalidQueryException e) {
+
+        }
+        session.execute("CREATE TABLE IF NOT EXISTS members (group text, hostAddress text, hostPort int, " +
+                                "vectorClock text, connected boolean, PRIMARY KEY(group, hostAddress, hostPort));");
+        try {
+            session.execute("CREATE INDEX ON members(connected);");
+        } catch (InvalidQueryException e) {
+
+        }
         session.execute("CREATE TABLE IF NOT EXISTS groups (groupName text PRIMARY KEY, leaderAddress text, leaderPort int);");
-
-
     }
 
     public static void main(String[] args) {
