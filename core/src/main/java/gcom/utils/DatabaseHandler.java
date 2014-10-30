@@ -166,6 +166,7 @@ public class DatabaseHandler {
         for(Message message : messages) {
             if(clock.isBeforeOrEqualOnAllValuesExcept(message.getVectorClock(), message.getSource()) &&
                     clock.getValue(message.getSource()) < message.getVectorClock().getValue(message.getSource())) {
+                message.setText("[FETCHED FROM DATABASE] " + message.getText());
                 newMessages.add(message);
             }
         }

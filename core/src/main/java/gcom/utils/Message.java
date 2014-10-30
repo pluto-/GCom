@@ -13,7 +13,7 @@ public class Message implements Serializable {
 
     private final boolean isReliable;
     private final boolean deliverCausally;
-    private final String text;
+    private String text;
     private final Host source;
     private final VectorClock vectorClock;
     private final String groupName;
@@ -39,6 +39,10 @@ public class Message implements Serializable {
 
     public boolean deliverCausally() {
         return deliverCausally;
+    }
+
+    public void setText(String text) {
+        this.text = text;
     }
 
     public String getGroupName() {
