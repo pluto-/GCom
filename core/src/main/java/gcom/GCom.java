@@ -140,7 +140,7 @@ public class GCom implements Runnable {
         return groupManager.getMembers(groupName);
     }
 
-    public void receive(ArrayList<Message> messages) {
+    public void processOfflineMessages(ArrayList<Message> messages) {
         for(Message message : messages) {
             receive(message);
         }
