@@ -106,10 +106,7 @@ public class GCom implements Runnable {
     public void joinGroup(String groupName) throws RemoteException, NotBoundException, MalformedURLException, UnknownHostException {
         Group group = new Group(groupName);
         messageSorters.put(groupName, new MessageSorter(deliveryQueue, group.getVectorClock()));
-        Host leader = databaseHandler.getLeader(groupName);
-        groupManager.sendJoinGroup(group, leader, databaseHandler);
-
-
+        groupManager.sendJoinGroup(group);
     }
 
     /**

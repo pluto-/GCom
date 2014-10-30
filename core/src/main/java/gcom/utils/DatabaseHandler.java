@@ -31,6 +31,11 @@ public class DatabaseHandler {
                 beenAt + "')");
     }
 
+    public boolean hasMember(Host host, String groupName) {
+        ResultSet resultSet = session.execute("SELECT * FROM members WHERE group = '"+ groupName + "' AND hostAddress = '" + host.getAddress().getHostAddress() + "' AND hostPort =" + host.getPort());
+        return resultSet.iterator().hasNext();
+    }
+
     public void addMember(String groupName, Host member, VectorClock vectorClock, boolean isConnected) {
         session.execute("INSERT INTO members (group, hostAddress, hostPort, vectorClock, connected) VALUES" +
                 "('" +
@@ -62,21 +67,20 @@ public class DatabaseHandler {
 
     public void setLeader(String groupName, Host leader) {
         session.execute("INSERT INTO groups (groupName, leaderAddress, leaderPort) VALUES " +
-                "(" +
-                "'" + groupName + "'," +
-                "'" + leader.getAddress().getHostAddress() + "'," +
-                leader.getPort() +
-                ")");
+            "(" +
+            "'" + groupName + "'," +
+            "'" + leader.getAddress().getHostAddress() + "'," +
+            leader.getPort() +
+            ")");
     }
-
 
     public DatabaseHandler(String address) {
 
         // Connect to the Cassandra cluster
         Cluster cluster = Cluster.builder()
-                .addContactPoint(address)
-                //.addContactPoint("94.254.18.40")
-                .build();
+            .addContactPoint(address)
+            //.addContactPoint("94.254.18.40")
+            .build();
 
         // Connect to the "mykeyspace" keyspace
         session = cluster.connect();
@@ -91,7 +95,11 @@ public class DatabaseHandler {
     }
 
     public static void main(String[] args) {
-        new DatabaseHandler();
+        //new DatabaseHandler();
+    }
+
+    public Group getMembers(String groupName) {
+        return null;
     }
 }
 
