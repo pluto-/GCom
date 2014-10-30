@@ -3,7 +3,10 @@ package gcom;
 import gcom.communicator.Communicator;
 import gcom.utils.*;
 
+import java.net.ConnectException;
 import java.net.MalformedURLException;
+import java.net.UnknownHostException;
+import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
@@ -30,6 +33,8 @@ public class GCom implements Runnable {
     private BlockingQueue<Message> deliveryQueue;
     private Host self;
 
+    private DatabaseHandler databaseHandler;
+
     private GComClient gcomClient;
 
     /**
@@ -39,9 +44,10 @@ public class GCom implements Runnable {
      * @param nameService the name service.
      * @throws Exception
      */
-    public GCom(int rmiPort, GComClient gcomClient, Host nameService)
+    public GCom(int rmiPort, GComClient gcomClient, Host nameService, String cassandraAddress)
             throws Exception {
         RmiServer rmiServer = new RmiServer(rmiPort);
+        databaseHandler = new DatabaseHandler(cassandraAddress);
         self = rmiServer.getHost();
         this.gcomClient = gcomClient;
         groupManager = new GroupManager(nameService, self, this);
@@ -97,10 +103,13 @@ public class GCom implements Runnable {
      * @throws NotBoundException
      * @throws MalformedURLException
      */
-    public void joinGroup(String groupName) throws RemoteException, NotBoundException, MalformedURLException {
+    public void joinGroup(String groupName) throws RemoteException, NotBoundException, MalformedURLException, UnknownHostException {
         Group group = new Group(groupName);
         messageSorters.put(groupName, new MessageSorter(deliveryQueue, group.getVectorClock()));
-        groupManager.sendJoinGroup(group);
+        Host leader = databaseHandler.getLeader(groupName);
+        groupManager.sendJoinGroup(group, leader, databaseHandler);
+
+
     }
 
     /**

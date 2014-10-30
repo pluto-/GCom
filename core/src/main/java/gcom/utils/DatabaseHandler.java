@@ -70,11 +70,11 @@ public class DatabaseHandler {
     }
 
 
-    public DatabaseHandler() {
+    public DatabaseHandler(String address) {
 
         // Connect to the Cassandra cluster
         Cluster cluster = Cluster.builder()
-                .addContactPoint("127.0.0.1")
+                .addContactPoint(address)
                 //.addContactPoint("94.254.18.40")
                 .build();
 

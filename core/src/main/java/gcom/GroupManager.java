@@ -2,6 +2,7 @@ package gcom;
 
 import gcom.utils.*;
 
+import java.net.ConnectException;
 import java.net.MalformedURLException;
 import java.rmi.Naming;
 import java.rmi.NotBoundException;
@@ -17,22 +18,18 @@ import java.util.Map;
 public class GroupManager implements NameServiceClient {
 
     private Map<String, Group> groups;
-    private NameServiceGroupManagement nameService;
     private Host self;
     private GCom gCom;
 
     /**
      * Connects to the remote name service.
-     * @param nameServiceHost the address and port of the name service.
      * @param self the local host.
      * @param gCom the GCom which has this object.
      * @throws RemoteException
      * @throws NotBoundException
      * @throws MalformedURLException
      */
-    public GroupManager (Host nameServiceHost, Host self, GCom gCom) throws RemoteException, NotBoundException, MalformedURLException {
-        nameService = (NameServiceGroupManagement) Naming.lookup("rmi://" + nameServiceHost + "/" + NameServiceGroupManagement.class.getSimpleName());
-        System.out.println("Name Service: " + nameService);
+    public GroupManager (Host self, GCom gCom) throws RemoteException, NotBoundException, MalformedURLException {
 
         groups = new HashMap<>();
         this.self = self;
@@ -46,9 +43,23 @@ public class GroupManager implements NameServiceClient {
      * @throws MalformedURLException
      * @throws NotBoundException
      */
-    public void sendJoinGroup(Group group) throws RemoteException, MalformedURLException, NotBoundException {
+    public void sendJoinGroup(Group group, Host leader, DatabaseHandler databaseHandler) {
         groups.put(group.getName(), group);
-        nameService.joinGroup(group.getName(), self);
+
+        group.setLeader(leader);
+
+        NameServiceClient stub = null;
+        try {
+            stub = (NameServiceClient) Naming.lookup("rmi://" + leader + "/" + NameServiceClient.class.getSimpleName());
+            stub.addMember(group.getName(), self);
+        } catch (RemoteException e) {
+            group.setLeader(self);
+            databaseHandler.setLeader(group.getName(), self);
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        } catch (NotBoundException e) {
+            e.printStackTrace();
+        }
     }
 
     public Group getGroup(String groupName) {
