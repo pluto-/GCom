@@ -185,6 +185,7 @@ public class GCom implements Runnable {
                     databaseHandler.insertMessage(message);
                     gcomClient.debugSetVectorClock(groupManager.getGroup(message.getGroupName()).getVectorClock());
                 }
+                databaseHandler.updateMemberVectorClock(message.getGroupName(),self, groupManager.getGroup(message.getGroupName()).getVectorClock());
 
             } catch (InterruptedException | RemoteException | MalformedURLException | NotBoundException | UnknownHostException e) {
                 e.printStackTrace();
