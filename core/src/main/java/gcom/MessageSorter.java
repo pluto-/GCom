@@ -21,7 +21,7 @@ public class MessageSorter implements Runnable {
     private Thread thread;
     private volatile boolean running;
     private HoldBackQueueListener listener;
-    private HashMap<VectorClock, Message> causallyInconsistentlyDeliveredMessages;
+    private ConcurrentHashMap<VectorClock, Message> causallyInconsistentlyDeliveredMessages;
 
     /**
      * Constructor
@@ -33,7 +33,7 @@ public class MessageSorter implements Runnable {
         this.localVectorClock = localVectorClock;
         holdBackQueues = new ConcurrentHashMap<>();
         this.listener = null;
-        causallyInconsistentlyDeliveredMessages = new HashMap<>();
+        causallyInconsistentlyDeliveredMessages = new ConcurrentHashMap<>();
     }
 
     public void setListener(HoldBackQueueListener listener) {
