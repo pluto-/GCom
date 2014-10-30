@@ -6,10 +6,10 @@ import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
+import java.net.*;
 import java.rmi.*;
+import java.rmi.ConnectException;
 import java.rmi.server.UnicastRemoteObject;
-import java.util.HashMap;
 import java.util.Map;
 
 /**When creating an object of this class, it needs an RMI port number to use when creating the local registry.
@@ -19,8 +19,8 @@ import java.util.Map;
  */
 public class NameService implements NameServiceGroupManagement  {
 
-    private volatile  Map<String, Host> groups;
     private final Logger logger = LogManager.getLogger(this.getClass());
+    DatabaseHandler databaseHandler;
 
     /**
      * Creates a local RMI registry on specified port and puts it's own joinGroup in the registry.
@@ -28,13 +28,11 @@ public class NameService implements NameServiceGroupManagement  {
      * @throws IOException
      */
     public NameService(int rmiPort) throws IOException {
-        groups = new HashMap<>();
-
         RmiServer rmiServer = new RmiServer(rmiPort);
 
         NameServiceGroupManagement stub = (NameServiceGroupManagement) UnicastRemoteObject.exportObject(this, rmiPort);
         rmiServer.bind(NameServiceGroupManagement.class.getSimpleName(), stub);
-
+        databaseHandler = new DatabaseHandler();
     }
 
     /**
@@ -47,14 +45,13 @@ public class NameService implements NameServiceGroupManagement  {
      * @throws NotBoundException
      */
     @Override
-    public synchronized Host joinGroup(String groupName, Host newMember) throws RemoteException, MalformedURLException, NotBoundException {
+    public synchronized Host joinGroup(String groupName, Host newMember) throws RemoteException, MalformedURLException, NotBoundException, java.net.UnknownHostException {
         logger.error("joinGroup from " +  newMember + " for group:" + groupName);
         Host leader;
-        if(!groups.containsKey(groupName)) {
+        if((leader = databaseHandler.getLeader(groupName)) == null) {
             setLeader(groupName, newMember);
+            leader = newMember;
         }
-        leader = groups.get(groupName);
-
 
         // Use leaders addMember method.
         logger.error("before addmember");
@@ -84,7 +81,7 @@ public class NameService implements NameServiceGroupManagement  {
     }
 
     private void setLeader(String groupName, Host leader) throws RemoteException {
-        groups.put(groupName, leader);
+        databaseHandler.setLeader(groupName, leader);
     }
 
     /**
@@ -97,7 +94,6 @@ public class NameService implements NameServiceGroupManagement  {
      * @throws MalformedURLException
      */
     private void sendAddMember(String groupName, Host leader, Host newMember) throws RemoteException, NotBoundException, MalformedURLException {
-
         NameServiceClient stub = (NameServiceClient) Naming.lookup("rmi://" + leader + "/" + NameServiceClient.class.getSimpleName());
         stub.addMember(groupName, newMember);
     }

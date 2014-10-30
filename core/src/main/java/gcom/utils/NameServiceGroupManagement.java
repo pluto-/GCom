@@ -1,6 +1,7 @@
 package gcom.utils;
 
 import java.net.MalformedURLException;
+import java.net.UnknownHostException;
 import java.rmi.NotBoundException;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
@@ -9,5 +10,5 @@ import java.rmi.RemoteException;
  * Created by Jonas on 2014-10-03.
  */
 public interface NameServiceGroupManagement extends Remote {
-    public Host joinGroup(String groupName, Host newMember) throws RemoteException, MalformedURLException, NotBoundException;
+    public Host joinGroup(String groupName, Host newMember) throws RemoteException, MalformedURLException, NotBoundException, UnknownHostException;
 }

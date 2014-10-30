@@ -4,6 +4,7 @@ import gcom.communicator.Communicator;
 import gcom.utils.*;
 
 import java.net.MalformedURLException;
+import java.net.UnknownHostException;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
@@ -97,7 +98,7 @@ public class GCom implements Runnable {
      * @throws NotBoundException
      * @throws MalformedURLException
      */
-    public void joinGroup(String groupName) throws RemoteException, NotBoundException, MalformedURLException {
+    public void joinGroup(String groupName) throws RemoteException, NotBoundException, MalformedURLException, UnknownHostException {
         Group group = new Group(groupName);
         messageSorters.put(groupName, new MessageSorter(deliveryQueue, group.getVectorClock()));
         groupManager.sendJoinGroup(group);
@@ -169,10 +170,11 @@ public class GCom implements Runnable {
                     groupManager.processViewChange((ViewChange)message);
                 } else {
                     gcomClient.deliverMessage(message);
+                    //TODO store in cassandra
                     gcomClient.debugSetVectorClock(groupManager.getGroup(message.getGroupName()).getVectorClock());
                 }
 
-            } catch (InterruptedException | RemoteException | MalformedURLException | NotBoundException e) {
+            } catch (InterruptedException | RemoteException | MalformedURLException | NotBoundException | UnknownHostException e) {
                 e.printStackTrace();
             }
         }

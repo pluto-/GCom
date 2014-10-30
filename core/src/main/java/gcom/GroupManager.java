@@ -3,6 +3,7 @@ package gcom;
 import gcom.utils.*;
 
 import java.net.MalformedURLException;
+import java.net.UnknownHostException;
 import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
@@ -46,7 +47,7 @@ public class GroupManager implements NameServiceClient {
      * @throws MalformedURLException
      * @throws NotBoundException
      */
-    public void sendJoinGroup(Group group) throws RemoteException, MalformedURLException, NotBoundException {
+    public void sendJoinGroup(Group group) throws RemoteException, MalformedURLException, NotBoundException, UnknownHostException {
         groups.put(group.getName(), group);
         nameService.joinGroup(group.getName(), self);
     }
@@ -98,7 +99,7 @@ public class GroupManager implements NameServiceClient {
      * @throws NotBoundException
      * @throws MalformedURLException
      */
-    public void processViewChange(ViewChange viewChange) throws RemoteException, NotBoundException, MalformedURLException {
+    public void processViewChange(ViewChange viewChange) throws RemoteException, NotBoundException, MalformedURLException, UnknownHostException {
         System.out.println("View change vector clock:");
         ArrayList<Host> members = viewChange.getMembers();
         Group group = groups.get(viewChange.getGroupName());
