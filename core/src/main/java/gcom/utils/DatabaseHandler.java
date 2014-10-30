@@ -98,8 +98,16 @@ public class DatabaseHandler {
         //new DatabaseHandler();
     }
 
-    public Group getMembers(String groupName) {
-        return null;
+    public ArrayList<Host> getMembers(String groupName) throws UnknownHostException {
+        ArrayList<Host> members = new ArrayList<>();
+        ResultSet resultSet = session.execute("SELECT * FROM members WHERE group='" + groupName + "';");
+        Iterator<Row> rows = resultSet.iterator();
+        while(rows.hasNext()) {
+            Row row = rows.next();
+            Host host = new Host(InetAddress.getByName(row.getString("hostAddress")), row.getInt("hostPort"));
+            members.add(host);
+        }
+        return members;
     }
 }
 
