@@ -140,6 +140,12 @@ public class GCom implements Runnable {
         return groupManager.getMembers(groupName);
     }
 
+    public void receive(ArrayList<Message> messages) {
+        for(Message message : messages) {
+            receive(message);
+        }
+    }
+
     /**
      * Is called when Communicator delivers a message. Checks if the message has already been received, if it has it is
      * delivered as an already received message. Otherwise, it is multicasted to all other clients if it is a reliable
