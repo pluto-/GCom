@@ -45,8 +45,8 @@ public class GCom implements Runnable {
     public GCom(int rmiPort, GComClient gcomClient, Host nameService, String cassandraAddress)
             throws Exception {
         RmiServer rmiServer = new RmiServer(rmiPort);
-        databaseHandler = new DatabaseHandler(cassandraAddress, self);
         self = rmiServer.getHost();
+        databaseHandler = new DatabaseHandler(cassandraAddress, self);
         this.gcomClient = gcomClient;
         groupManager = new GroupManager(nameService, self, this, databaseHandler);
         communicator = new Communicator(this, self);
