@@ -4,6 +4,7 @@ import gcom.utils.*;
 
 import java.net.ConnectException;
 import java.net.MalformedURLException;
+import java.net.UnknownHostException;
 import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;

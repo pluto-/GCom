@@ -72,7 +72,7 @@ public class CommunicationChannel implements Runnable {
                 message = queue.take();
             } catch (InterruptedException e) {
                 running = false;
-                e.printStackTrace();
+                logger.error("Interrupted exception while taking message from queue");
             }
 
             try{
