@@ -69,9 +69,10 @@ public class NameService implements NameServiceGroupManagement  {
         try {
             logger.error("sending addMember for: " + newMember + " to: " + leader + " for group: " + groupName);
             sendAddMember(groupName, leader, newMember);
-        } catch(ConnectException e) {
+        } catch(NotBoundException | RemoteException | MalformedURLException | UnknownHostException e) {
             if (nameServiceClient != null) {
                 nameServiceClient.setLeader(groupName, newMember);
+                setLeader(groupName, newMember);
                 logger.error("Leader not reachable, new leader - " + newMember);
             }
         }
