@@ -3,10 +3,8 @@ package gcom;
 import gcom.communicator.Communicator;
 import gcom.utils.*;
 
-import java.net.ConnectException;
 import java.net.MalformedURLException;
 import java.net.UnknownHostException;
-import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
@@ -50,7 +48,7 @@ public class GCom implements Runnable {
         databaseHandler = new DatabaseHandler(cassandraAddress);
         self = rmiServer.getHost();
         this.gcomClient = gcomClient;
-        groupManager = new GroupManager(nameService, self, this);
+        groupManager = new GroupManager(nameService, self, this, databaseHandler);
         communicator = new Communicator(this, self);
         PeerCommunication stub = (PeerCommunication) UnicastRemoteObject.exportObject(communicator, rmiPort);
         rmiServer.bind(PeerCommunication.class.getSimpleName(), stub);
@@ -82,7 +80,9 @@ public class GCom implements Runnable {
      * @param deliverCausally if the message should be ordered causally.
      */
     public void sendMessage(String text, String group, boolean sendReliably, boolean deliverCausally) {
-        groupManager.getVectorClock(group).increment(self);
+        VectorClock clock = groupManager.getVectorClock(group);
+        clock.increment(self);
+        databaseHandler.updateMemberVectorClock(group, self, clock);
         Message message = new Message(sendReliably, deliverCausally, text, self, groupManager.getVectorClock(group), group);
         sendMessage(message, groupManager.getGroup(group).getMembers());
     }
@@ -116,6 +116,7 @@ public class GCom implements Runnable {
      */
     public void triggerViewChange(Host deadHost, String groupName) {
         Group group = groupManager.getGroup(groupName);
+        databaseHandler.updateMemberConnected(groupName, deadHost, false);
         group.getMembers().remove(deadHost);
         sendViewChange(group);
     }
@@ -175,6 +176,7 @@ public class GCom implements Runnable {
                     groupManager.processViewChange((ViewChange)message);
                 } else {
                     gcomClient.deliverMessage(message);
+                    databaseHandler.insertMessage(message);
                     gcomClient.debugSetVectorClock(groupManager.getGroup(message.getGroupName()).getVectorClock());
                 }
 

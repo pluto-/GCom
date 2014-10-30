@@ -114,6 +114,14 @@ public class DatabaseHandler {
         }
         return members;
     }
+
+    public VectorClock getVectorClock(String groupName, Host host) {
+        return null;
+    }
+
+    public ArrayList<Message> getNewMessages(Group group, VectorClock clock) {
+        return null;
+    }
 }
 
 

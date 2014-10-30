@@ -1,5 +1,6 @@
 package gcom.utils;
 
+import java.net.UnknownHostException;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 
@@ -8,7 +9,7 @@ import java.rmi.RemoteException;
  */
 public interface NameServiceClient extends Remote {
 
-    public void addMember(String groupName, Host newMember) throws RemoteException;
+    public void addMember(String groupName, Host newMember) throws RemoteException, UnknownHostException;
     public void setLeader(String groupName, Host leader) throws RemoteException;
 
 }

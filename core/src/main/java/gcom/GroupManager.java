@@ -51,6 +51,10 @@ public class GroupManager implements NameServiceClient {
     public void sendJoinGroup(Group group) throws RemoteException, MalformedURLException, NotBoundException, UnknownHostException {
         groups.put(group.getName(), group);
         nameService.joinGroup(group.getName(), self);
+        VectorClock clock = databaseHandler.getVectorClock(group.getName(), self);
+        if(!clock.isEmpty()) {
+            gCom.receive(databaseHandler.getNewMessages(group, clock));
+        }
     }
 
     public Group getGroup(String groupName) {
@@ -69,14 +73,14 @@ public class GroupManager implements NameServiceClient {
      * @param member the new member.
      * @throws RemoteException
      */
-    public void addMember(String groupName, Host member) throws RemoteException {
+    public void addMember(String groupName, Host member) throws RemoteException, UnknownHostException {
         Group group = groups.get(groupName);
         if(!databaseHandler.hasMember(member, groupName)) {
             databaseHandler.addMember(groupName, member, new VectorClock(), true);
         } else {
             databaseHandler.updateMemberConnected(groupName,  member, true);
         }
-        group = databaseHandler.getMembers(groupName);
+        group.setMembers(databaseHandler.getMembers(groupName, true));
         gCom.sendViewChange(group);
     }
 
@@ -90,7 +94,6 @@ public class GroupManager implements NameServiceClient {
     public void setLeader(String groupName, Host leader) throws RemoteException {
         Group group = groups.get(groupName);
         group.setLeader(leader);
-
     }
 
     /**
