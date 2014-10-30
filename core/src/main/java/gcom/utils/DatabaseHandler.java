@@ -6,7 +6,10 @@ import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Row;
 import com.datastax.driver.core.Session;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.Iterator;
 
 public class DatabaseHandler {
 
@@ -47,6 +50,25 @@ public class DatabaseHandler {
         session.execute("UPDATE members SET vectorClock='" + vectorClock.toString() + "' WHERE group='"+ groupName +"' AND hostAddress='" + member.getAddress().getHostAddress() + "' AND hostPort=" + member.getPort() + ";");
     }
 
+    public Host getLeader(String groupName) throws UnknownHostException {
+        ResultSet resultSet = session.execute("SELECT * FROM groups WHERE groupName='"+ groupName +"';");
+        Iterator<Row> iterator = resultSet.iterator();
+        if(iterator.hasNext()) {
+            Row row = iterator.next();
+            return new Host(InetAddress.getByName(row.getString("leaderAddress")), row.getInt("leaderPort"));
+        }
+        return null;
+    }
+
+    public void setLeader(String groupName, Host leader) {
+        session.execute("INSERT INTO groups (groupName, leaderAddress, leaderPort) VALUES " +
+                "(" +
+                "'" + groupName + "'," +
+                "'" + leader.getAddress().getHostAddress() + "'," +
+                leader.getPort() +
+                ")");
+    }
+
 
     public DatabaseHandler() {
 
@@ -63,24 +85,9 @@ public class DatabaseHandler {
         session.execute("USE gcom");
         session.execute("CREATE TABLE IF NOT EXISTS messages (vectorClock text PRIMARY KEY, message text, senderAddress text, senderPort int, isReliable boolean, group text, beenAt text);");
         session.execute("CREATE TABLE IF NOT EXISTS members (group text, hostAddress text, hostPort int, vectorClock text, connected boolean, PRIMARY KEY(group, hostAddress, hostPort));");
+        session.execute("CREATE TABLE IF NOT EXISTS groups (groupName text PRIMARY KEY, leaderAddress text, leaderPort int);");
 
-        /*ResultSet resultSet = session.execute("SELECT * FROM users WHERE user_id=3");
-        if(!resultSet.iterator().hasNext()) {
-            System.out.println("Inserting John.");
-            session.execute("INSERT INTO users (user_id, firstName, lastName) VALUES (3, 'Jonas', 'Mark');");
-        }*/
 
-        // Execute another statement
-       /* resultSet = session.execute("SELECT * FROM users");
-
-        // Print results
-        System.out.println("All users:");
-        for (Row row : resultSet) {
-            System.out.println(String.format("%d %s %s",
-                    row.getInt("user_id"),
-                    row.getString("firstName"),
-                    row.getString("lastName")));
-        }*/
     }
 
     public static void main(String[] args) {
