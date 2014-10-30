@@ -93,7 +93,9 @@ public class GCom implements Runnable {
      * @return true if received before, else false.
      */
     public boolean hasReceived(Message message) {
-        return (messageSorters.get(message.getGroupName()).hasMessageInHoldbackQueue(message) || groupManager.getVectorClock(message.getGroupName()).hasReceived(message));
+        boolean messageInHoldbackQueue = messageSorters.get(message.getGroupName()).hasMessageInHoldbackQueue(message);
+        boolean messageReceived = groupManager.getVectorClock(message.getGroupName()).hasReceived(message);
+        return (messageInHoldbackQueue || messageReceived);
     }
 
     /**
