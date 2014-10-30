@@ -150,8 +150,8 @@ public class DatabaseHandler {
             boolean isReliable = row.getBool("isReliable");
             boolean deliverCausally = row.getBool("deliverCausally");
             String text = row.getString("message");
-            String hostAddress = row.getString("hostAddress");
-            int hostPort = row.getInt("hostPort");
+            String hostAddress = row.getString("senderAddress");
+            int hostPort = row.getInt("senderPort");
             Host sender = new Host(InetAddress.getByName(hostAddress), hostPort);
             VectorClock vectorClock = VectorClock.fromString(row.getString("vectorClock"));
             String group = row.getString("groupName");
