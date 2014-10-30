@@ -14,6 +14,7 @@ import java.util.Iterator;
 
 public class DatabaseHandler {
 
+    private final Host self;
     Session session;
 
     public void insertMessage(Message message) {
@@ -30,7 +31,8 @@ public class DatabaseHandler {
                 message.isReliable() + "," +
                 message.deliverCausally() + ",'" +
                 message.getGroupName() + "','" +
-                beenAt + "');");
+                beenAt + "','" +
+                self + "');");
     }
 
     public boolean hasMember(Host host, String groupName) {
@@ -76,7 +78,9 @@ public class DatabaseHandler {
             ")");
     }
 
-    public DatabaseHandler(String address) {
+    public DatabaseHandler(String address, Host self) {
+
+        this.self = self;
 
         // Connect to the Cassandra cluster
         Cluster cluster = Cluster.builder()
@@ -91,7 +95,7 @@ public class DatabaseHandler {
         session.execute("USE gcom;");
         session.execute("CREATE TABLE IF NOT EXISTS messages (vectorClock text PRIMARY KEY, message text, " +
                                 "senderAddress text, senderPort int, isReliable boolean, deliverCausally boolean, " +
-                                    "group text, beenAt text);");
+                                    "group text, beenAt text, addedBy text);");
         try {
             session.execute("CREATE INDEX ON messages(group);");
         } catch (InvalidQueryException e) {
