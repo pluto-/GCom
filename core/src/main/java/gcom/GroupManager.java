@@ -113,6 +113,7 @@ public class GroupManager implements NameServiceClient {
             System.out.println(member + " clock value: " + viewChange.getVectorClock().getValue(member));
             if (group.getVectorClock().getValue(member) < viewChange.getVectorClock().getValue(member)) {
                 group.addVectorValue(member, viewChange.getVectorClock().getValue(member));
+                System.err.println("Setting vector value for: " + member + " to: " + viewChange.getVectorClock().getValue(member) );
             }
         }
         if (!members.contains(group.getLeader())) {
