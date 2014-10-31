@@ -153,6 +153,10 @@ public class GCom implements Runnable {
     }
 
     public void processOfflineMessages(ArrayList<Message> messages) {
+        System.out.println("Offline message size: " + messages.size());
+        for(Message message : messages) {
+            System.out.println("group: " + message.getGroupName() + " source: " + message.getSource() + " text: " +message.getText());
+        }
         for(Message message : messages) {
             if (message instanceof ViewChange) {
                 groupManager.getVectorClock(message.getGroupName()).increment(message.getSource());
