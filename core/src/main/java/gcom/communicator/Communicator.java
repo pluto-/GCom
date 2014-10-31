@@ -68,6 +68,7 @@ public class Communicator implements PeerCommunication {
                     }
                 }
                 try {
+                    System.out.println("ChannelMap " + member.toString());
                     channelMap.get(member).send(message);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
