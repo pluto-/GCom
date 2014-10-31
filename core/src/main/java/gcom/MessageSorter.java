@@ -1,9 +1,6 @@
 package gcom;
 
-import gcom.utils.HoldBackQueueListener;
-import gcom.utils.Host;
-import gcom.utils.Message;
-import gcom.utils.VectorClock;
+import gcom.utils.*;
 
 import java.util.*;
 import java.util.concurrent.BlockingQueue;
@@ -16,24 +13,24 @@ import java.util.concurrent.PriorityBlockingQueue;
 public class MessageSorter implements Runnable {
 
     private BlockingQueue<Message> deliverQueue;
-    private volatile VectorClock localVectorClock;
     private volatile Map<Host,PriorityBlockingQueue<Message>> holdBackQueues;
     private Thread thread;
     private volatile boolean running;
     private HoldBackQueueListener listener;
     private ConcurrentHashMap<VectorClock, Message> causallyInconsistentlyDeliveredMessages;
+    private final Group group;
 
     /**
      * Constructor
      * @param deliverQueue The delivery queue of the gcom client.
-     * @param localVectorClock the local vector clock for the group.
+     * @param group the group associated with the message sorter.
      */
-    public MessageSorter(BlockingQueue<Message> deliverQueue, VectorClock localVectorClock) {
+    public MessageSorter(BlockingQueue<Message> deliverQueue, Group group) {
         this.deliverQueue = deliverQueue;
-        this.localVectorClock = localVectorClock;
         holdBackQueues = new ConcurrentHashMap<>();
         this.listener = null;
         causallyInconsistentlyDeliveredMessages = new ConcurrentHashMap<>();
+        this.group = group;
     }
 
     public void setListener(HoldBackQueueListener listener) {
@@ -63,7 +60,7 @@ public class MessageSorter implements Runnable {
                 listener.messagePutInHoldBackQueue(message);
             }
         } else {
-            if(message.isCausallyConsistent(localVectorClock)) {
+            if(message.isCausallyConsistent(group.getVectorClock())) {
                 System.err.println("message causally consistent -> delivering");
                 deliverMessage(message);
             } else {
@@ -102,7 +99,7 @@ public class MessageSorter implements Runnable {
             System.err.println("Delivering to deliverQueue");
             deliverQueue.put(message);
             incrementLocalVectorClock(message.getSource());
-            System.out.println("Incrementing vectorclock for : " + message.getSource() + " - vectorClock: " + localVectorClock);
+            System.out.println("Incrementing vectorclock for : " + message.getSource() + " - vectorClock: " + group.getVectorClock());
             updateVectorClockCausality();
         } catch (InterruptedException e) {
             e.printStackTrace();
@@ -117,10 +114,10 @@ public class MessageSorter implements Runnable {
         boolean delivered = false;
         for(VectorClock vectorClock : causallyInconsistentlyDeliveredMessages.keySet()) {
             Message message = causallyInconsistentlyDeliveredMessages.get(vectorClock);
-            if(message.isCausallyConsistent(localVectorClock)) {
+            if(message.isCausallyConsistent(group.getVectorClock())) {
                 causallyInconsistentlyDeliveredMessages.remove(message.getVectorClock());
                 incrementLocalVectorClock(message.getSource());
-                System.out.println("Incremented local vector clock for " + message.getSource() + " - vector clock: " + localVectorClock);
+                System.out.println("Incremented local vector clock for " + message.getSource() + " - vector clock: " + group.getVectorClock());
                 delivered = true;
             }
         }
@@ -131,7 +128,7 @@ public class MessageSorter implements Runnable {
     }
 
     private synchronized void incrementLocalVectorClock(Host host) {
-        localVectorClock.increment(host);
+        group.getVectorClock().increment(host);
     }
 
     /**
@@ -147,7 +144,7 @@ public class MessageSorter implements Runnable {
 
                 Message firstMessage = holdBackQueue.peek();
 
-                if((firstMessage != null) && firstMessage.isCausallyConsistent(localVectorClock)){
+                if((firstMessage != null) && firstMessage.isCausallyConsistent(group.getVectorClock())){
 
                     // Deliver
 
