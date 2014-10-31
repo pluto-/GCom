@@ -154,7 +154,12 @@ public class GCom implements Runnable {
 
     public void processOfflineMessages(ArrayList<Message> messages) {
         for(Message message : messages) {
-            messageSorters.get(message.getGroupName()).receive(message);
+            if (message instanceof ViewChange) {
+                groupManager.getVectorClock(message.getGroupName()).increment(message.getSource());
+                databaseHandler.updateMemberVectorClock(message.getGroupName(), message.getSource(), groupManager.getVectorClock(message.getGroupName()));
+            } else {
+                messageSorters.get(message.getGroupName()).receive(message);
+            }
         }
     }
 
@@ -194,9 +199,9 @@ public class GCom implements Runnable {
                     groupManager.processViewChange((ViewChange)message);
                 } else {
                     gcomClient.deliverMessage(message);
-                    databaseHandler.insertMessage(message);
                     gcomClient.debugSetVectorClock(groupManager.getGroup(message.getGroupName()).getVectorClock());
                 }
+                databaseHandler.insertMessage(message);
                 databaseHandler.updateMemberVectorClock(message.getGroupName(),self, groupManager.getGroup(message.getGroupName()).getVectorClock());
 
             } catch (InterruptedException | RemoteException | MalformedURLException | NotBoundException | UnknownHostException e) {
