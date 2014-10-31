@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingQueue;
 
 /** The most essential class of the GCom. The GCom class acts as the spider in a web. It handles the three modules
@@ -54,7 +55,7 @@ public class GCom implements Runnable {
         rmiServer.bind(PeerCommunication.class.getSimpleName(), stub);
         NameServiceClient nameServiceClient = (NameServiceClient) UnicastRemoteObject.exportObject(groupManager, rmiPort);
         rmiServer.bind(NameServiceClient.class.getSimpleName(), nameServiceClient);
-        messageSorters = new HashMap<>();
+        messageSorters = new ConcurrentHashMap<>();
 
         deliveryQueue = new LinkedBlockingQueue<>();
 
@@ -93,9 +94,18 @@ public class GCom implements Runnable {
      * @return true if received before, else false.
      */
     public boolean hasReceived(Message message) {
-        boolean messageInHoldbackQueue = messageSorters.get(message.getGroupName()).hasMessageInHoldbackQueue(message);
-        boolean messageReceived = groupManager.getVectorClock(message.getGroupName()).hasReceived(message);
-        return (messageInHoldbackQueue || messageReceived);
+        if(message != null) {
+            System.err.println("message getGroupName: " + message.getGroupName());
+            System.err.println("messagesorter for group: " + messageSorters.get(message.getGroupName()));
+            boolean messageInHoldbackQueue = messageSorters.get(message.getGroupName()).hasMessageInHoldbackQueue(message);
+            System.err.println("messageInHoldbackQueue: " + messageInHoldbackQueue);
+            System.err.println("groupManager getVectorClock: " + groupManager.getVectorClock(message.getGroupName()));
+            boolean messageReceived = groupManager.getVectorClock(message.getGroupName()).hasReceived(message);
+            System.err.println("messageReceived: " + messageReceived);
+
+            return (messageInHoldbackQueue || messageReceived);
+        }
+        return false;
     }
 
     /**

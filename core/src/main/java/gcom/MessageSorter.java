@@ -147,8 +147,9 @@ public class MessageSorter implements Runnable {
 
                     // Deliver
 
-                    deliverMessage(firstMessage);
                     holdBackQueue.remove(firstMessage);
+                    deliverMessage(firstMessage);
+                    running = true;
                     if(listener != null) {
                         listener.messageRemovedFromHoldBackQueue(firstMessage);
                     }
