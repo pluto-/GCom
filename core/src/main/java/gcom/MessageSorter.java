@@ -102,6 +102,7 @@ public class MessageSorter implements Runnable {
             System.err.println("Delivering to deliverQueue");
             deliverQueue.put(message);
             incrementLocalVectorClock(message.getSource());
+            System.out.println("Incrementing vectorclock for : " + message.getSource() + " - vectorClock: " + localVectorClock);
             updateVectorClockCausality();
         } catch (InterruptedException e) {
             e.printStackTrace();
