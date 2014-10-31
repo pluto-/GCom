@@ -10,6 +10,7 @@ import com.datastax.driver.core.exceptions.InvalidQueryException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 
 public class DatabaseHandler {
@@ -174,6 +175,7 @@ public class DatabaseHandler {
             Message message = new Message(isReliable, deliverCausally, text, sender, vectorClock, group);
             messages.add(message);
         }
+        Collections.sort(messages);
         for(Message message : messages) {
             if(clock.isBeforeOrEqualOnAllValuesExcept(message.getVectorClock(), message.getSource()) &&
                     clock.getValue(message.getSource()) < message.getVectorClock().getValue(message.getSource())) {

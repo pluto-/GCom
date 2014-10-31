@@ -9,7 +9,7 @@ import java.util.ArrayList;
  * which the message has passed through.
  * Created by Jonas on 2014-10-06.
  */
-public class Message implements Serializable {
+public class Message implements Serializable, Comparable {
 
     private final boolean isReliable;
     private final boolean deliverCausally;
@@ -87,4 +87,16 @@ public class Message implements Serializable {
         return true;
     }
 
+    @Override
+    public int compareTo(Object o) {
+        Message other = (Message)o;
+        if(getVectorClock().isBeforeOrEqualOnAllValues(other.getVectorClock())) {
+            return -1;
+        } else if(other.getVectorClock().isBeforeOrEqualOnAllValues(getVectorClock())) {
+            return 1;
+        } else {
+            return 0;
+        }
+
+    }
 }

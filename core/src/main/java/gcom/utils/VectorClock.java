@@ -54,6 +54,16 @@ public class VectorClock implements Serializable {
         return true;
     }
 
+    public boolean isBeforeOrEqualOnAllValues(VectorClock other) {
+
+        for(Host host : clock.keySet()) {
+            if((clock.get(host) > other.getValue(host))) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     public Map<Host, Integer> getClock() {
         return clock;
     }
