@@ -111,7 +111,9 @@ public class GroupManager implements NameServiceClient {
         Group group = groups.get(viewChange.getGroupName());
         for(Host member : members) {
             System.out.println(member + " clock value: " + viewChange.getVectorClock().getValue(member));
-            groups.get(viewChange.getGroupName()).addVectorValue(member, viewChange.getVectorClock().getValue(member));
+            if (group.getVectorClock().getValue(member) < viewChange.getVectorClock().getValue(member)) {
+                group.addVectorValue(member, viewChange.getVectorClock().getValue(member));
+            }
         }
         if (!members.contains(group.getLeader())) {
             sendJoinGroup(group);
