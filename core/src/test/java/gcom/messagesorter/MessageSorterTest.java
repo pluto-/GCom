@@ -20,7 +20,7 @@ public class MessageSorterTest extends TestCase {
         VectorClock localVectorClock = new VectorClock();
 
         Host localHost = new Host(InetAddress.getByName("localhost"), 2000);
-        MessageSorter messageSorter = new MessageSorter(deliverQueue,  localVectorClock);
+        //MessageSorter messageSorter = new MessageSorter(deliverQueue,  localVectorClock);
 
         Host someone = new Host(InetAddress.getByName("1.1.1.1"), 3000);
         VectorClock someoneVectorClock = new VectorClock();
@@ -32,11 +32,11 @@ public class MessageSorterTest extends TestCase {
         Message message3 = new Message(false, true, "Hej3", someone, someoneVectorClock, null);
 
         System.err.println("Sending message1 to MessageSorter.");
-        messageSorter.receive(message1);
+//        messageSorter.receive(message1);
         System.err.println("Sending message2 to MessageSorter.");
-        messageSorter.receive(message2);
+//        messageSorter.receive(message2);
         System.err.println("Sending message3 to MessageSorter.");
-        messageSorter.receive(message3);
+//        messageSorter.receive(message3);
 
         System.err.println("Taking...");
         System.err.println("First message delivered from MessageSorter: " + deliverQueue.take().getText());
@@ -54,7 +54,7 @@ public class MessageSorterTest extends TestCase {
         VectorClock localVectorClock = new VectorClock();
 
         Host localHost = new Host(InetAddress.getByName("localhost"), 2000);
-        MessageSorter messageSorter = new MessageSorter(deliverQueue,  localVectorClock);
+        //MessageSorter messageSorter = new MessageSorter(deliverQueue,  localVectorClock);
 
         Host someone = new Host(InetAddress.getByName("1.1.1.1"), 3000);
         VectorClock someoneVectorClock = new VectorClock();
@@ -66,11 +66,11 @@ public class MessageSorterTest extends TestCase {
         Message message3 = new Message(false, true, "Hej3", someone, someoneVectorClock, null);
 
         System.err.println("Sending message3 to MessageSorter.");
-        messageSorter.receive(message3);
+//        messageSorter.receive(message3);
         System.err.println("Sending message2 to MessageSorter.");
-        messageSorter.receive(message2);
+//        messageSorter.receive(message2);
         System.err.println("Sending message1 to MessageSorter.");
-        messageSorter.receive(message1);
+//        messageSorter.receive(message1);
 
         System.err.println("Taking...");
         System.err.println("First message delivered from MessageSorter: " + deliverQueue.take().getText());
@@ -88,7 +88,7 @@ public class MessageSorterTest extends TestCase {
         VectorClock localVectorClock = new VectorClock();
 
         Host localHost = new Host(InetAddress.getByName("localhost"), 2000);
-        MessageSorter messageSorter = new MessageSorter(deliverQueue,  localVectorClock);
+        //MessageSorter messageSorter = new MessageSorter(deliverQueue,  localVectorClock);
 
         Host someone = new Host(InetAddress.getByName("1.1.1.1"), 3000);
         VectorClock someoneVectorClock = new VectorClock();
@@ -100,14 +100,14 @@ public class MessageSorterTest extends TestCase {
         Message message3 = new Message(false, true, "Hej3", someone, someoneVectorClock, null);
 
         System.err.println("Sending message3 to MessageSorter.");
-        messageSorter.receive(message3);
+//        messageSorter.receive(message3);
         System.err.println("Sending message2 to MessageSorter.");
-        messageSorter.receive(message2);
+//        messageSorter.receive(message2);
 
         System.err.println("Delay 2 seconds.");
         Thread.sleep(2000);
         System.err.println("Sending message1 to MessageSorter.");
-        messageSorter.receive(message1);
+//        messageSorter.receive(message1);
 
         System.err.println("Taking...");
         System.err.println("First message delivered from MessageSorter: " + deliverQueue.take().getText());
@@ -122,10 +122,10 @@ public class MessageSorterTest extends TestCase {
     public void testSpamReceive() throws Exception {
         BlockingQueue<Message> deliverQueue = new LinkedBlockingQueue<>();
         VectorClock localVectorClock = new VectorClock();
-        MessageSorter messageSorter = new MessageSorter(deliverQueue,  localVectorClock);
+        //MessageSorter messageSorter = new MessageSorter(deliverQueue,  localVectorClock);
 
         for(int i = 1; i < 10; i++) {
-            new Run(100, messageSorter, i);
+//            new Run(100, messageSorter, i);
         }
 
         int finishedProcesses = 0;
