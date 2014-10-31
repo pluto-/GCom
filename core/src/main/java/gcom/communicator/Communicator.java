@@ -11,6 +11,7 @@ import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /** This class is the communication module. It multicasts messages through Communication channels (see class
  * CommunicationChannel). The interface PeerCommunication is implemented and therefore this class receives messages
@@ -21,7 +22,7 @@ public class Communicator implements PeerCommunication {
 
     private final GCom gCom;
     private final Host self;
-    private final Map<Host, CommunicationChannel> channelMap;
+    private volatile Map<Host, CommunicationChannel> channelMap;
     private int sleepMillisBetweenClients;
     private final Logger logger = LogManager.getLogger(this.getClass());
 
@@ -33,7 +34,7 @@ public class Communicator implements PeerCommunication {
     public Communicator(GCom gCom, Host self) {
         this.gCom = gCom;
         this.self = self;
-        channelMap = new HashMap<>();
+        channelMap = new ConcurrentHashMap<>();
         sleepMillisBetweenClients = 0;
     }
 
