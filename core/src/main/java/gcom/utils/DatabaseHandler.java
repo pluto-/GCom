@@ -22,10 +22,14 @@ public class DatabaseHandler {
         String vectorClock = message.getVectorClock().toString();
         String text = message.getText();
         String beenAt = message.getBeenAt().toString();
+        boolean isViewChange = false;
+        if(message instanceof ViewChange) {
+            isViewChange = true;
+        }
 
         ResultSet resultSet = session.execute("SELECT * FROM messages WHERE vectorClock='" + vectorClock + "';");
         if(!resultSet.iterator().hasNext()) {
-            session.execute("INSERT INTO messages (vectorClock, message, senderAddress, senderPort, isReliable, deliverCausally, group, beenAt, addedBy) VALUES" +
+            session.execute("INSERT INTO messages (vectorClock, message, senderAddress, senderPort, isReliable, deliverCausally, group, beenAt, addedBy, isViewChange) VALUES" +
                     "('" +
                     vectorClock + "','" +
                     text + "','" +
@@ -35,7 +39,8 @@ public class DatabaseHandler {
                     message.deliverCausally() + ",'" +
                     message.getGroupName() + "','" +
                     beenAt + "','" +
-                    self + "');");
+                    self + "'," +
+                    isViewChange + ");");
 
         }
 
@@ -101,7 +106,7 @@ public class DatabaseHandler {
         session.execute("USE gcom;");
         session.execute("CREATE TABLE IF NOT EXISTS messages (vectorClock text PRIMARY KEY, message text, " +
                                 "senderAddress text, senderPort int, isReliable boolean, deliverCausally boolean, " +
-                                    "group text, beenAt text, addedBy text);");
+                                    "group text, beenAt text, addedBy text, isViewChange boolean);");
         try {
             session.execute("CREATE INDEX ON messages(group);");
         } catch (InvalidQueryException e) {
@@ -171,8 +176,15 @@ public class DatabaseHandler {
             Host sender = new Host(InetAddress.getByName(hostAddress), hostPort);
             VectorClock vectorClock = VectorClock.fromString(row.getString("vectorClock"));
             String group = row.getString("group");
+            boolean isViewChange = row.getBool("isViewChange");
 
-            Message message = new Message(isReliable, deliverCausally, text, sender, vectorClock, group);
+            Message message = null;
+            if(isViewChange) {
+                message = new ViewChange(isReliable, deliverCausally, text, sender, vectorClock, group, null);
+            } else {
+                message = new Message(isReliable, deliverCausally, text, sender, vectorClock, group);
+
+            }
             messages.add(message);
         }
         Collections.sort(messages);
