@@ -29,6 +29,7 @@ public class VectorClock implements Serializable {
     }
 
     public void increment(Host host) {
+        System.err.print("Incrementing vector value for : " + host + " to: " + (getValue(host) + 1));
         clock.put(host, getValue(host) + 1);
     }
 
