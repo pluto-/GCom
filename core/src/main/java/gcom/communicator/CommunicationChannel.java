@@ -77,20 +77,15 @@ public class CommunicationChannel implements Runnable {
 
             try{
                 remoteHost.receiveMessage(message);
-            } catch (NoSuchObjectException e) {
+            } catch (RemoteException e) {
                 try {
                     remoteHost = (PeerCommunication) Naming.lookup("rmi://" + host.getAddress().getHostAddress() + ":" + host.getPort() + "/" + PeerCommunication.class.getSimpleName());
                     remoteHost.receiveMessage(message);
                 } catch (NotBoundException | MalformedURLException | RemoteException e1) {
                     if(message != null) {
+                        logger.error(e.getClass().getSimpleName() + " contacting: " + host + " for group: " + message.getGroupName() + " - triggering view change");
                         communicator.triggerViewChange(host, message.getGroupName());
                     }
-                }
-            } catch (RemoteException e) {
-
-                if (message != null) {
-                    logger.error(e.getClass().getSimpleName() + " contacting: " + host + " for group: " + message.getGroupName() + " - triggering view change");
-                    communicator.triggerViewChange(host, message.getGroupName());
                 }
             }
         }
