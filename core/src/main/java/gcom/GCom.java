@@ -155,7 +155,7 @@ public class GCom implements Runnable {
     public void processOfflineMessages(ArrayList<Message> messages) {
         System.out.println("Offline message size: " + messages.size());
         for(Message message : messages) {
-            System.out.println("group: " + message.getGroupName() + " source: " + message.getSource() + " text: " +message.getText());
+            System.out.println("group: " + message.getGroupName() + " source: " + message.getSource() + " text: " +message.getText() + " vector clock: " + message.getVectorClock());
         }
         for(Message message : messages) {
             if (message instanceof ViewChange) {
