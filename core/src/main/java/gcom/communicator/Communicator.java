@@ -64,6 +64,7 @@ public class Communicator implements PeerCommunication {
                     try {
                         channelMap.put(member, new CommunicationChannel(member, this));
                     } catch (RemoteException | NotBoundException | MalformedURLException e) {
+                        logger.error("Triggering view change, removing " + member);
                         triggerViewChange(member, message.getGroupName());
                     }
                 }
@@ -71,7 +72,8 @@ public class Communicator implements PeerCommunication {
                     System.out.println("ChannelMap " + member.toString());
                     channelMap.get(member).send(message);
                 } catch (InterruptedException e) {
-                    e.printStackTrace();
+                    logger.error("Triggering view change, removing " + member);
+                    triggerViewChange(member, message.getGroupName());
                 }
             }
             if(sleepMillisBetweenClients > 0) {
