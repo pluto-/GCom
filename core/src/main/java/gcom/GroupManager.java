@@ -52,6 +52,7 @@ public class GroupManager implements NameServiceClient {
         groups.put(group.getName(), group);
         nameService.joinGroup(group.getName(), self);
         VectorClock clock = databaseHandler.getVectorClock(group.getName(), self);
+        group.setVectorClock(clock);
         if(!clock.isEmpty()) {
             gCom.processOfflineMessages(databaseHandler.getNewMessages(group.getName(), clock));
         }
