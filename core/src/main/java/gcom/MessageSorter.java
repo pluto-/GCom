@@ -64,8 +64,10 @@ public class MessageSorter implements Runnable {
             }
         } else {
             if(message.isCausallyConsistent(localVectorClock)) {
+                System.err.println("message causally consistent -> delivering");
                 deliverMessage(message);
             } else {
+                System.err.println("message not causally consistent -> inconsistently delivered");
                 try {
                     deliverQueue.put(message);
                     causallyInconsistentlyDeliveredMessages.put(message.getVectorClock(), message);
@@ -117,6 +119,7 @@ public class MessageSorter implements Runnable {
             if(message.isCausallyConsistent(localVectorClock)) {
                 causallyInconsistentlyDeliveredMessages.remove(message.getVectorClock());
                 incrementLocalVectorClock(message.getSource());
+                System.out.println("Incremented local vector clock for " + message.getSource() + " - vector clock: " + localVectorClock);
                 delivered = true;
             }
         }
