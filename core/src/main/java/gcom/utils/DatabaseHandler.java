@@ -104,14 +104,20 @@ public class DatabaseHandler {
         try {
             session.execute("CREATE INDEX ON messages(group);");
         } catch (InvalidQueryException e) {
-            e.printStackTrace();
+            if(!e.getMessage().equals("Index already exists")) {
+
+                e.printStackTrace();
+            }
         }
         session.execute("CREATE TABLE IF NOT EXISTS members (group text, hostAddress text, hostPort int, " +
                                 "vectorClock text, connected boolean, PRIMARY KEY(group, hostAddress, hostPort));");
         try {
             session.execute("CREATE INDEX ON members(connected);");
         } catch (InvalidQueryException e) {
-            e.printStackTrace();
+            if(!e.getMessage().equals("Index already exists")) {
+
+                e.printStackTrace();
+            }
         }
         session.execute("CREATE TABLE IF NOT EXISTS groups (groupName text PRIMARY KEY, leaderAddress text, leaderPort int);");
     }
