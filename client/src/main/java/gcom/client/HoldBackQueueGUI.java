@@ -2,6 +2,7 @@ package gcom.client;
 
 import gcom.utils.Host;
 import gcom.utils.Message;
+import gcom.utils.ViewChange;
 
 import javax.swing.*;
 import java.awt.*;
@@ -45,10 +46,22 @@ public class HoldBackQueueGUI extends JFrame {
     private void updateText() {
         String text = "";
         for(Message message : messages) {
-            text = text.concat("\nHost: " + message.getSource() + " Message: " + message.getText());
-            text = text.concat("\n\tVector Clock");
-            for(Host member: message.getVectorClock().getClock().keySet())
-            text = text.concat("\n\tHost: " + member + " Clock: " + message.getVectorClock().getValue(member));
+            if(message instanceof ViewChange) {
+                text = text.concat("\nView Change from Host: " + message.getSource());
+                text = text.concat("\n\tVector Clock");
+                for(Host member: message.getVectorClock().getClock().keySet()) {
+                    text = text.concat("\n\tHost: " + member + " Clock: " + message.getVectorClock().getValue(member));
+
+                }
+            } else {
+                text = text.concat("\nHost: " + message.getSource() + " Message: " + message.getText());
+                text = text.concat("\n\tVector Clock");
+                for(Host member: message.getVectorClock().getClock().keySet()) {
+                    text = text.concat("\n\tHost: " + member + " Clock: " + message.getVectorClock().getValue(member));
+
+                }
+
+            }
         }
         holdBackQueueText.setText(text);
     }
