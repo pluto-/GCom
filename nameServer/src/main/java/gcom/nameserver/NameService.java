@@ -72,6 +72,7 @@ public class NameService implements NameServiceGroupManagement  {
         } catch(NotBoundException | RemoteException | MalformedURLException | UnknownHostException e) {
             if (nameServiceClient != null) {
                 nameServiceClient.setLeader(groupName, newMember);
+                databaseHandler.updateMemberConnected(groupName, leader, false);
                 setLeader(groupName, newMember);
                 logger.error("Leader not reachable, new leader - " + newMember);
             }
