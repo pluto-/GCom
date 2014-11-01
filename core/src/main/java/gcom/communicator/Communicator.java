@@ -71,7 +71,10 @@ public class Communicator implements PeerCommunication {
                 }
                 try {
                     System.out.println("ChannelMap " + member.toString());
-                    channelMap.get(member).send(message);
+                    CommunicationChannel communicationChannel;
+                    if((communicationChannel = channelMap.get(member)) != null) {
+                        communicationChannel.send(message);
+                    }
                 } catch (InterruptedException e) {
                     logger.error("Triggering view change, removing " + member);
                     triggerViewChange(member, message.getGroupName());
