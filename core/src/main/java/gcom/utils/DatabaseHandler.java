@@ -34,7 +34,7 @@ public class DatabaseHandler {
                     vectorClock + "','" +
                     text + "','" +
                     message.getSource().getAddress().getHostAddress() + "'," +
-                    message.getSource().getPort() + "," +
+                    message.getSource().getPort() + ",'" +
                     message.getGroupName() + "','" +
                     beenAt + "','" +
                     self + "'," +
@@ -109,7 +109,7 @@ public class DatabaseHandler {
         session.execute("CREATE TABLE IF NOT EXISTS groups (groupName text PRIMARY KEY, leaderAddress text, leaderPort int);");
 
         try {
-            session.execute("CREATE INDEX ON messages(group);");
+            session.execute("CREATE INDEX IF NOT EXISTS ON messages(group);");
         } catch (InvalidQueryException e) {
             if(!e.getMessage().equals("Index already exists")) {
 
@@ -119,7 +119,7 @@ public class DatabaseHandler {
             }
         }
         try {
-            session.execute("CREATE INDEX ON members(connected);");
+            session.execute("CREATE INDEX IF NOT EXISTS sON members(connected);");
         } catch (InvalidQueryException e) {
             if(!e.getMessage().equals("Index already exists")) {
 
