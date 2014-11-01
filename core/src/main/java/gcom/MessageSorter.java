@@ -5,6 +5,7 @@ import gcom.utils.*;
 import java.util.*;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.PriorityBlockingQueue;
 
 /**
@@ -13,7 +14,7 @@ import java.util.concurrent.PriorityBlockingQueue;
 public class MessageSorter implements Runnable {
 
     private BlockingQueue<Message> deliverQueue;
-    private volatile Map<Host,PriorityBlockingQueue<Message>> holdBackQueues;
+    private ConcurrentMap<Host,PriorityBlockingQueue<Message>> holdBackQueues;
     private Thread thread;
     private volatile boolean running;
     private HoldBackQueueListener listener;
@@ -53,7 +54,7 @@ public class MessageSorter implements Runnable {
         if(message.deliverCausally()) {
 
             if (!holdBackQueues.containsKey(message.getSource())) {
-                holdBackQueues.put(message.getSource(), new PriorityBlockingQueue<>(5, new MessageComparator()));
+                holdBackQueues.putIfAbsent(message.getSource(), new PriorityBlockingQueue<>(5, new MessageComparator()));
             }
             holdBackQueues.get(message.getSource()).put(message);
             if (listener != null) {
@@ -67,7 +68,7 @@ public class MessageSorter implements Runnable {
                 System.err.println("message not causally consistent -> inconsistently delivered");
                 try {
                     deliverQueue.put(message);
-                    causallyInconsistentlyDeliveredMessages.put(message.getVectorClock(), message);
+                    causallyInconsistentlyDeliveredMessages.putIfAbsent(message.getVectorClock(), message);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -99,7 +100,6 @@ public class MessageSorter implements Runnable {
             System.err.println("Delivering to deliverQueue");
             deliverQueue.put(message);
             incrementLocalVectorClock(message.getSource());
-            System.out.println("Incrementing vectorclock for : " + message.getSource() + " - vectorClock: " + group.getVectorClock());
             updateVectorClockCausality();
         } catch (InterruptedException e) {
             e.printStackTrace();
@@ -117,7 +117,6 @@ public class MessageSorter implements Runnable {
             if(message.isCausallyConsistent(group.getVectorClock())) {
                 causallyInconsistentlyDeliveredMessages.remove(message.getVectorClock());
                 incrementLocalVectorClock(message.getSource());
-                System.out.println("Incremented local vector clock for " + message.getSource() + " - vector clock: " + group.getVectorClock());
                 delivered = true;
             }
         }
@@ -143,16 +142,21 @@ public class MessageSorter implements Runnable {
                 PriorityBlockingQueue<Message> holdBackQueue = holdBackQueues.get(holdBackQueueHost);
 
                 Message firstMessage = holdBackQueue.peek();
-
+                if(firstMessage != null)
+                    System.out.print("holdback queue processing: " + firstMessage.getSource() + " " + firstMessage.getText() + "... ");
                 if((firstMessage != null) && firstMessage.isCausallyConsistent(group.getVectorClock())){
 
                     // Deliver
 
                     holdBackQueue.remove(firstMessage);
                     deliverMessage(firstMessage);
+                    System.out.println("succeeded!");
                     if(listener != null) {
                         listener.messageRemovedFromHoldBackQueue(firstMessage);
                     }
+                } else if (firstMessage != null) {
+                    System.out.println("failed due to: message not causally consistent");
+                    System.out.println("local vectorClock: " + group.getVectorClock() + " message vectorClock: " + firstMessage.getVectorClock());
                 }
             }
         }
