@@ -29,14 +29,12 @@ public class DatabaseHandler {
 
         ResultSet resultSet = session.execute("SELECT * FROM messages WHERE vectorClock='" + vectorClock + "';");
         if(!resultSet.iterator().hasNext()) {
-            session.execute("INSERT INTO messages (vectorClock, message, senderAddress, senderPort, isReliable, deliverCausally, group, beenAt, addedBy, isViewChange) VALUES" +
+            session.execute("INSERT INTO messages (vectorClock, message, senderAddress, senderPort, group, beenAt, addedBy, isViewChange) VALUES" +
                     "('" +
                     vectorClock + "','" +
                     text + "','" +
                     message.getSource().getAddress().getHostAddress() + "'," +
                     message.getSource().getPort() + "," +
-                    message.isReliable() + "," +
-                    message.deliverCausally() + ",'" +
                     message.getGroupName() + "','" +
                     beenAt + "','" +
                     self + "'," +
@@ -104,28 +102,32 @@ public class DatabaseHandler {
 
         session.execute("CREATE KEYSPACE IF NOT EXISTS gcom WITH REPLICATION = {'class' : 'SimpleStrategy', 'replication_factor' : 3};");
         session.execute("USE gcom;");
-        session.execute("CREATE TABLE IF NOT EXISTS messages (vectorClock text PRIMARY KEY, message text, " +
-                                "senderAddress text, senderPort int, isReliable boolean, deliverCausally boolean, " +
-                                    "group text, beenAt text, addedBy text, isViewChange boolean);");
+        session.execute("CREATE TABLE IF NOT EXISTS messages (vectorClock text PRIMARY KEY, message text, senderAddress text," +
+                            " senderPort int, group text, beenAt text, addedBy text, isViewChange boolean);");
+        session.execute("CREATE TABLE IF NOT EXISTS members (group text, hostAddress text, hostPort int, " +
+                                "vectorClock text, connected boolean, PRIMARY KEY(group, hostAddress, hostPort));");
+        session.execute("CREATE TABLE IF NOT EXISTS groups (groupName text PRIMARY KEY, leaderAddress text, leaderPort int);");
+
         try {
             session.execute("CREATE INDEX ON messages(group);");
         } catch (InvalidQueryException e) {
             if(!e.getMessage().equals("Index already exists")) {
 
                 e.printStackTrace();
+            } else {
+                e.printStackTrace();
             }
         }
-        session.execute("CREATE TABLE IF NOT EXISTS members (group text, hostAddress text, hostPort int, " +
-                                "vectorClock text, connected boolean, PRIMARY KEY(group, hostAddress, hostPort));");
         try {
             session.execute("CREATE INDEX ON members(connected);");
         } catch (InvalidQueryException e) {
             if(!e.getMessage().equals("Index already exists")) {
 
                 e.printStackTrace();
+            } else {
+                e.printStackTrace();
             }
         }
-        session.execute("CREATE TABLE IF NOT EXISTS groups (groupName text PRIMARY KEY, leaderAddress text, leaderPort int);");
     }
 
     public static void main(String[] args) {
