@@ -33,7 +33,6 @@ public class GroupManager implements NameServiceClient {
      */
     public GroupManager (Host nameServiceHost, Host self, GCom gCom, DatabaseHandler databaseHandler) throws RemoteException, NotBoundException, MalformedURLException {
         nameService = (NameServiceGroupManagement) Naming.lookup("rmi://" + nameServiceHost + "/" + NameServiceGroupManagement.class.getSimpleName());
-        System.out.println("Name Service: " + nameService);
 
         groups = new HashMap<>();
         this.self = self;

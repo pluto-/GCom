@@ -194,4 +194,9 @@ public class Client implements GComClient, HoldBackQueueListener, VectorClockLis
     public void vectorClockUpdated(VectorClock newVectorClock) {
         clientGUI.vectorClockChanged(newVectorClock);
     }
+
+    public void exit() {
+        gCom.leaveGroup(group);
+        System.exit(0);
+    }
 }

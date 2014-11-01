@@ -73,6 +73,12 @@ public class GCom implements Runnable {
         messageSorters.get(groupName).setListener(listener);
     }
 
+    public void leaveGroup(String group) {
+        groupManager.getGroup(group).removeMember(self);
+        sendViewChange(groupManager.getGroup(group));
+        databaseHandler.updateMemberConnected(group, self, false);
+    }
+
     /**
      * The method used by the client to send messages to the other remote clients in the group.
      * @param text the text to send.

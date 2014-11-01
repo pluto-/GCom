@@ -6,10 +6,7 @@ import gcom.utils.VectorClock;
 import javax.swing.*;
 import javax.swing.text.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
+import java.awt.event.*;
 
 /** Shows the test/debug graphical user interface. Acts as View in MVC design pattern.
  * Created by Jonas on 2014-10-06.
@@ -29,7 +26,7 @@ public class ClientGUI extends JFrame implements ActionListener, ItemListener {
     private JCheckBox sendReliably;
     private JCheckBox orderCausally;
     private JCheckBox cbDebug;
-    private Client client;
+    private final Client client;
     private String username;
 
     private JMenuBar menuBar;
@@ -135,11 +132,20 @@ public class ClientGUI extends JFrame implements ActionListener, ItemListener {
 
         add(mainPanel);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowClosing(java.awt.event.WindowEvent evt) {
+                exit();
+            }
+        });
         setSize(600, 300);
         setVisible(true);
 
         vectorClockGUI = new VectorClockGUI();
         holdBackQueueGUI = new HoldBackQueueGUI();
+    }
+
+    private void exit() {
+        client.exit();
     }
 
     public boolean isDebug() {
