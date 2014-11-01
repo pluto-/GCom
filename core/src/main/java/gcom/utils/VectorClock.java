@@ -125,7 +125,6 @@ public class VectorClock implements Serializable {
 
     public static VectorClock fromString(String vectorClockString) throws UnknownHostException {
         VectorClock clock = new VectorClock();
-        System.out.println("VectorClock string: " + vectorClockString);
         while(vectorClockString.length() > 0) {
             if(vectorClockString.indexOf('[') == -1) {
                 break;
@@ -139,10 +138,8 @@ public class VectorClock implements Serializable {
             } else {
                 value = vectorClockString.substring(0, vectorClockString.indexOf('['));
             }
-            //System.out.println(ipAndPort+ " " +value);
             clock.addValue(Host.fromString(ipAndPort), Integer.valueOf(value));
         }
-        System.out.println("Resulting vector clock: " + clock);
         return clock;
     }
 }
