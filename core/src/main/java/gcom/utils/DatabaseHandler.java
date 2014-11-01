@@ -119,7 +119,7 @@ public class DatabaseHandler {
             }
         }
         try {
-            session.execute("CREATE INDEX IF NOT EXISTS sON members(connected);");
+            session.execute("CREATE INDEX IF NOT EXISTS ON members(connected);");
         } catch (InvalidQueryException e) {
             if(!e.getMessage().equals("Index already exists")) {
 
