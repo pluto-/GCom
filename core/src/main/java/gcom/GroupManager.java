@@ -49,6 +49,7 @@ public class GroupManager implements NameServiceClient {
      */
     public void sendJoinGroup(Group group) throws RemoteException, MalformedURLException, NotBoundException, UnknownHostException {
         groups.put(group.getName(), group);
+        //TODO kanske skapa vektorklocka från högsta befintliga värdet för varje process i databasen som baseline för att skapa causal consistency för nya processer i fallet då alla gamla processer är disconnectade
         VectorClock clock = databaseHandler.getVectorClock(group.getName(), self);
         group.setVectorClock(clock);
         if(!clock.isEmpty()) {
