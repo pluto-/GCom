@@ -170,8 +170,8 @@ public class DatabaseHandler {
         Iterator<Row> rows = resultSet.iterator();
         while(rows.hasNext()) {
             Row row = rows.next();
-            boolean isReliable = row.getBool("isReliable");
-            boolean deliverCausally = row.getBool("deliverCausally");
+            boolean isReliable = false;
+            boolean deliverCausally = true;
             String text = row.getString("message");
             String hostAddress = row.getString("senderAddress");
             int hostPort = row.getInt("senderPort");
