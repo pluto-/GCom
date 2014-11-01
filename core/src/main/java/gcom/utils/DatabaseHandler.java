@@ -136,9 +136,9 @@ public class DatabaseHandler {
         ArrayList<Host> members = new ArrayList<>();
         ResultSet resultSet = null;
         if(onlyConnectedMembers) {
-            resultSet = session.execute("SELECT * FROM members WHERE connected=true AND group='" + groupName + "';");
+            resultSet = session.execute("SELECT hostAddress, hostPort FROM members WHERE connected=true AND group='" + groupName + "';");
         } else {
-            resultSet = session.execute("SELECT * FROM members WHERE group='" + groupName + "';");
+            resultSet = session.execute("SELECT hostAddress, hostPort FROM members WHERE group='" + groupName + "';");
         }
         Iterator<Row> rows = resultSet.iterator();
         while(rows.hasNext()) {
