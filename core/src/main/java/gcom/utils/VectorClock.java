@@ -10,6 +10,7 @@ import java.util.*;
  */
 public class VectorClock implements Serializable {
     private final Map<Host, Integer> clock;
+    private VectorClockListener vectorClockListener = null;
 
     public VectorClock() {
         clock = new HashMap<>();
@@ -18,6 +19,15 @@ public class VectorClock implements Serializable {
     public VectorClock(VectorClock objectToClone) {
         clock = new HashMap<>(objectToClone.getClock());
     }
+
+    public void setVectorClockListener(VectorClockListener vectorClockListener) {
+        this.vectorClockListener = vectorClockListener;
+    }
+
+    public VectorClockListener getVectorClockListener() {
+        return vectorClockListener;
+    }
+
 
     public boolean hasReceived(Message message) {
         return (message.getVectorClock().getValue(message.getSource()) <= getValue(message.getSource()));
@@ -31,6 +41,7 @@ public class VectorClock implements Serializable {
     public void increment(Host host) {
         System.err.println("Incrementing vector value for : " + host + " to: " + (getValue(host) + 1));
         clock.put(host, getValue(host) + 1);
+        vectorClockListener.vectorClockUpdated(this);
     }
 
     public boolean isBefore(VectorClock other, Host host) {

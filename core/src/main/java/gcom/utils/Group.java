@@ -13,10 +13,11 @@ public class Group {
     private volatile ArrayList<Host> members;
     private volatile VectorClock vectorClock;
 
-    public Group(String name) {
+    public Group(String name, VectorClockListener listener) {
         this.name = name;
         members = new ArrayList<>();
         vectorClock = new VectorClock();
+        vectorClock.setVectorClockListener(listener);
     }
 
     public String getName() {
@@ -60,7 +61,9 @@ public class Group {
     }
 
     public void setVectorClock(VectorClock vectorClock) {
+        VectorClockListener listener = this.vectorClock.getVectorClockListener();
         this.vectorClock = vectorClock;
+        this.vectorClock.setVectorClockListener(listener);
     }
 
     public void addVectorValue(Host member, int value) {

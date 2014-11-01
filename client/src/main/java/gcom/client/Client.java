@@ -17,7 +17,7 @@ import java.rmi.RemoteException;
  * when the hold-back queue is changed this class tells the ClientGUI to update it's window containing information
  * about the hold-back queue. This class acts as model and controller in the MVC design pattern.
  */
-public class Client implements GComClient, HoldBackQueueListener {
+public class Client implements GComClient, HoldBackQueueListener, VectorClockListener {
 
     private ClientGUI clientGUI;
     private GCom gCom;
@@ -68,7 +68,7 @@ public class Client implements GComClient, HoldBackQueueListener {
         System.out.println(" Done!");
         System.out.print("Trying to join group ...");
         try {
-            gCom.joinGroup(group);
+            gCom.joinGroup(group, this);
             gCom.attachHoldBackQueueListener(this, group);
         } catch (RemoteException e) {
             e.printStackTrace();
@@ -131,12 +131,6 @@ public class Client implements GComClient, HoldBackQueueListener {
         }
     }
 
-    @Override
-    public void debugSetVectorClock(VectorClock vectorClock) {
-        clientGUI.vectorClockChanged(vectorClock);
-
-    }
-
     /**
      * Sends a message to GCom.
      * @param message the message text
@@ -194,5 +188,10 @@ public class Client implements GComClient, HoldBackQueueListener {
     @Override
     public void messageRemovedFromHoldBackQueue(Message message) {
         clientGUI.messageRemovedFromHoldBackQueue(message);
+    }
+
+    @Override
+    public void vectorClockUpdated(VectorClock newVectorClock) {
+        clientGUI.vectorClockChanged(newVectorClock);
     }
 }

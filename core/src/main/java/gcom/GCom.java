@@ -115,8 +115,8 @@ public class GCom implements Runnable {
      * @throws NotBoundException
      * @throws MalformedURLException
      */
-    public void joinGroup(String groupName) throws RemoteException, NotBoundException, MalformedURLException, UnknownHostException {
-        Group group = new Group(groupName);
+    public void joinGroup(String groupName, VectorClockListener listener) throws RemoteException, NotBoundException, MalformedURLException, UnknownHostException {
+        Group group = new Group(groupName, listener);
         messageSorters.put(groupName, new MessageSorter(deliveryQueue, group));
         groupManager.sendJoinGroup(group);
     }
@@ -203,7 +203,6 @@ public class GCom implements Runnable {
                     groupManager.processViewChange((ViewChange)message);
                 } else {
                     gcomClient.deliverMessage(message);
-                    gcomClient.debugSetVectorClock(groupManager.getGroup(message.getGroupName()).getVectorClock());
                 }
                 databaseHandler.insertMessage(message);
                 databaseHandler.updateMemberVectorClock(message.getGroupName(),self, groupManager.getGroup(message.getGroupName()).getVectorClock());
