@@ -28,7 +28,6 @@ public class VectorClockGUI extends JFrame {
     }
 
     public void setVectorClockText(VectorClock vectorClock) {
-        System.out.println("New Vector Clock");
         if(vectorClock == null) {
             vectorClockText.setText("");
         } else {
