@@ -6,7 +6,9 @@ import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Row;
 import com.datastax.driver.core.Session;
 import com.datastax.driver.core.exceptions.InvalidQueryException;
+import com.datastax.driver.core.querybuilder.Select;
 
+import javax.xml.transform.Result;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
@@ -198,6 +200,21 @@ public class DatabaseHandler {
             }
         }
         return newMessages;
+    }
+
+    public VectorClock getCurrentVectorClock(String groupName) throws UnknownHostException {
+        ResultSet resultSet = session.execute("SELECT vectorClock FROM messages WHERE group = '" + groupName + "';");
+        Iterator<Row> rows = resultSet.iterator();
+        VectorClock clock = new VectorClock();
+        while(rows.hasNext()) {
+            VectorClock newClock = VectorClock.fromString(rows.next().getString("vectorClock"));
+            for(Host host : newClock.getClock().keySet()) {
+                if(!clock.getClock().containsKey(host) || clock.getValue(host) < newClock.getValue(host)) {
+                    clock.addValue(host, newClock.getValue(host));
+                }
+            }
+        }
+        return clock;
     }
 }
 

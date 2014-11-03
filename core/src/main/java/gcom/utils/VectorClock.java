@@ -125,20 +125,22 @@ public class VectorClock implements Serializable {
 
     public static VectorClock fromString(String vectorClockString) throws UnknownHostException {
         VectorClock clock = new VectorClock();
-        while(vectorClockString.length() > 0) {
-            if(vectorClockString.indexOf('[') == -1) {
-                break;
+        if (vectorClockString != null) {
+            while (vectorClockString.length() > 0) {
+                if (vectorClockString.indexOf('[') == -1) {
+                    break;
+                }
+                vectorClockString = vectorClockString.substring(vectorClockString.indexOf('[') + 1);
+                String ipAndPort = vectorClockString.substring(0, vectorClockString.indexOf(']'));
+                vectorClockString = vectorClockString.substring(vectorClockString.indexOf(']') + 1);
+                String value;
+                if (vectorClockString.indexOf('[') == -1) {
+                    value = vectorClockString;
+                } else {
+                    value = vectorClockString.substring(0, vectorClockString.indexOf('['));
+                }
+                clock.addValue(Host.fromString(ipAndPort), Integer.valueOf(value));
             }
-            vectorClockString = vectorClockString.substring(vectorClockString.indexOf('[') + 1);
-            String ipAndPort = vectorClockString.substring(0, vectorClockString.indexOf(']'));
-            vectorClockString = vectorClockString.substring(vectorClockString.indexOf(']') + 1);
-            String value;
-            if(vectorClockString.indexOf('[') == -1) {
-                value = vectorClockString;
-            } else {
-                value = vectorClockString.substring(0, vectorClockString.indexOf('['));
-            }
-            clock.addValue(Host.fromString(ipAndPort), Integer.valueOf(value));
         }
         return clock;
     }
