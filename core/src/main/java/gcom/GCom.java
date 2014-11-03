@@ -2,6 +2,7 @@ package gcom;
 
 import gcom.communicator.Communicator;
 import gcom.utils.*;
+import org.apache.log4j.Logger;
 
 import java.net.MalformedURLException;
 import java.net.UnknownHostException;
@@ -9,7 +10,6 @@ import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
@@ -35,6 +35,7 @@ public class GCom implements Runnable {
     private DatabaseHandler databaseHandler;
 
     private GComClient gcomClient;
+    Logger logger = org.apache.log4j.LogManager.getLogger(this.getClass());
 
     /**
      * Creates a RMI server on the specified port. Creates the thread which delivers the messages to the GComClient.
@@ -74,9 +75,9 @@ public class GCom implements Runnable {
     }
 
     public void leaveGroup(String group) {
-        groupManager.getGroup(group).removeMember(self);
-        sendViewChange(groupManager.getGroup(group));
-        databaseHandler.updateMemberConnected(group, self, false);
+        //groupManager.getGroup(group).removeMember(self);
+        //sendViewChange(groupManager.getGroup(group));
+        //databaseHandler.updateMemberConnected(group, self, false);
     }
 
     /**
@@ -101,13 +102,11 @@ public class GCom implements Runnable {
      */
     public boolean hasReceived(Message message) {
         if(message != null) {
-            System.err.println("message getGroupName: " + message.getGroupName());
-            System.err.println("messagesorter for group: " + messageSorters.get(message.getGroupName()));
             boolean messageInHoldbackQueue = messageSorters.get(message.getGroupName()).hasMessageInHoldbackQueue(message);
-            System.err.println("messageInHoldbackQueue: " + messageInHoldbackQueue);
-            System.err.println("groupManager getVectorClock: " + groupManager.getVectorClock(message.getGroupName()));
+            logger.error("messageInHoldbackQueue: " + messageInHoldbackQueue);
+            logger.error("groupManager getVectorClock: " + groupManager.getVectorClock(message.getGroupName()) + " message vectorClock" + message.getVectorClock());
             boolean messageReceived = groupManager.getVectorClock(message.getGroupName()).hasReceived(message);
-            System.err.println("messageReceived: " + messageReceived);
+            logger.error("messageReceived: " + messageReceived);
 
             return (messageInHoldbackQueue || messageReceived);
         }
@@ -159,17 +158,16 @@ public class GCom implements Runnable {
     }
 
     public synchronized void processOfflineMessages(ArrayList<Message> messages) {
-        System.out.println("Offline message size: " + messages.size());
+        logger.error("Offline message size: " + messages.size());
         for(Message message : messages) {
-            System.out.println("group: " + message.getGroupName() + " source: " + message.getSource() + " text: "
+            logger.error("group: " + message.getGroupName() + " source: " + message.getSource() + " text: "
                     + message.getText() + " vector clock: " + message.getVectorClock() + " local vector clock: " + groupManager.getVectorClock(message.getGroupName()));
         }
         for(Message message : messages) {
-            if (message instanceof ViewChange) {
-                groupManager.getVectorClock(message.getGroupName()).increment(message.getSource());
-                databaseHandler.updateMemberVectorClock(message.getGroupName(), message.getSource(), groupManager.getVectorClock(message.getGroupName()));
-            } else {
+            if(!hasReceived(message)) {
                 messageSorters.get(message.getGroupName()).receive(message);
+            } else {
+                logger.error("Already received: " + message.getGroupName() + " " + message.getSource() + ": " +message.getText());
             }
         }
     }
@@ -206,7 +204,7 @@ public class GCom implements Runnable {
             try {
                 Message message = deliveryQueue.take();
                 if(message instanceof ViewChange) {
-                    System.out.println("received view change");
+                    logger.error("received view change");
                     groupManager.processViewChange((ViewChange)message);
                 } else {
                     gcomClient.deliverMessage(message);

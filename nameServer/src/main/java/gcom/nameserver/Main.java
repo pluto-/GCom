@@ -2,7 +2,6 @@ package gcom.nameserver;
 
 import java.io.IOException;
 import java.net.UnknownHostException;
-import java.rmi.AlreadyBoundException;
 import java.rmi.RemoteException;
 
 import gcom.nameserver.NameService;

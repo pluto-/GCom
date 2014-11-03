@@ -109,20 +109,22 @@ public class GroupManager implements NameServiceClient {
      * @throws MalformedURLException
      */
     public void processViewChange(ViewChange viewChange) throws RemoteException, NotBoundException, MalformedURLException, UnknownHostException {
-        System.out.println("View change vector clock:");
-        ArrayList<Host> members = viewChange.getMembers();
-        Group group = groups.get(viewChange.getGroupName());
-        for(Host member : members) {
-            System.out.println(member + " clock value: " + viewChange.getVectorClock().getValue(member));
-            if (group.getVectorClock().getValue(member) < viewChange.getVectorClock().getValue(member)) {
-                group.addVectorValue(member, viewChange.getVectorClock().getValue(member));
-                System.err.println("Setting vector value for: " + member + " to: " + viewChange.getVectorClock().getValue(member) );
+        if(!(viewChange instanceof OfflineViewChange)) {
+            System.out.println("View change vector clock:");
+            ArrayList<Host> members = viewChange.getMembers();
+            Group group = groups.get(viewChange.getGroupName());
+            for (Host member : members) {
+                System.out.println(member + " clock value: " + viewChange.getVectorClock().getValue(member));
+                if (group.getVectorClock().getValue(member) < viewChange.getVectorClock().getValue(member)) {
+                    group.addVectorValue(member, viewChange.getVectorClock().getValue(member));
+                    System.err.println("Setting vector value for: " + member + " to: " + viewChange.getVectorClock().getValue(member));
+                }
             }
+            if (!members.contains(group.getLeader())) {
+                sendJoinGroup(group);
+            }
+            groups.get(group.getName()).setMembers(members);
         }
-        if (!members.contains(group.getLeader())) {
-            sendJoinGroup(group);
-        }
-        groups.get(group.getName()).setMembers(members);
     }
 
     public ArrayList<Host> getMembers(String groupName) {

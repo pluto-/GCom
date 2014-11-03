@@ -58,7 +58,7 @@ public class VectorClock implements Serializable {
     public boolean isBeforeOrEqualOnAllValuesExcept(VectorClock other, Host exception) {
 
         for(Host host : clock.keySet()) {
-            if(!host.equals(exception) && (clock.get(host) > other.getValue(host))) {
+            if(!host.equals(exception) && (other.getClock().containsKey(host) && clock.get(host) > other.getValue(host))) {
                 return false;
             }
         }

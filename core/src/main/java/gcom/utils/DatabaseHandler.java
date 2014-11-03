@@ -6,9 +6,7 @@ import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Row;
 import com.datastax.driver.core.Session;
 import com.datastax.driver.core.exceptions.InvalidQueryException;
-import com.datastax.driver.core.querybuilder.Select;
 
-import javax.xml.transform.Result;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
@@ -96,7 +94,6 @@ public class DatabaseHandler {
         // Connect to the Cassandra cluster
         Cluster cluster = Cluster.builder()
             .addContactPoint(address)
-            //.addContactPoint("94.254.18.40")
             .build();
 
         // Connect to the "mykeyspace" keyspace
@@ -138,7 +135,7 @@ public class DatabaseHandler {
 
     public ArrayList<Host> getMembers(String groupName, boolean onlyConnectedMembers) throws UnknownHostException {
         ArrayList<Host> members = new ArrayList<>();
-        ResultSet resultSet = null;
+        ResultSet resultSet;
         if(onlyConnectedMembers) {
             resultSet = session.execute("SELECT hostAddress, hostPort FROM members WHERE connected=true AND group='" + groupName + "';");
         } else {
@@ -182,9 +179,9 @@ public class DatabaseHandler {
             String group = row.getString("group");
             boolean isViewChange = row.getBool("isViewChange");
 
-            Message message = null;
+            Message message;
             if(isViewChange) {
-                message = new ViewChange(isReliable, deliverCausally, text, sender, vectorClock, group, null);
+                message = new OfflineViewChange(isReliable, deliverCausally, text, sender, vectorClock, group, null);
             } else {
                 message = new Message(isReliable, deliverCausally, text, sender, vectorClock, group);
 

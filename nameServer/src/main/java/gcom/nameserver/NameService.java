@@ -9,9 +9,7 @@ import java.io.IOException;
 import java.net.*;
 import java.net.UnknownHostException;
 import java.rmi.*;
-import java.rmi.ConnectException;
 import java.rmi.server.UnicastRemoteObject;
-import java.util.Map;
 
 /**When creating an object of this class, it needs an RMI port number to use when creating the local registry.
  * This local registry will contain the remote method joinGroup

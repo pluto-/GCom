@@ -14,11 +14,11 @@ import java.util.concurrent.PriorityBlockingQueue;
 public class MessageSorter implements Runnable {
 
     private BlockingQueue<Message> deliverQueue;
-    private ConcurrentMap<Host,PriorityBlockingQueue<Message>> holdBackQueues;
+    private volatile ConcurrentMap<Host,PriorityBlockingQueue<Message>> holdBackQueues;
     private Thread thread;
     private volatile boolean running;
     private HoldBackQueueListener listener;
-    private ConcurrentHashMap<VectorClock, Message> causallyInconsistentlyDeliveredMessages;
+    private volatile ConcurrentHashMap<VectorClock, Message> causallyInconsistentlyDeliveredMessages;
     private final Group group;
 
     /**
