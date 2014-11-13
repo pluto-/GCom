@@ -155,7 +155,7 @@ public class DatabaseHandler {
         ArrayList<Message> newMessages = new ArrayList<>();
         ArrayList<Message> messages = new ArrayList<>();
         ResultSet resultSet = session.execute("SELECT * FROM messages WHERE group='" +
-                groupName + "';");
+                groupName + "' ALLOW FILTERING;");
         Iterator<Row> rows = resultSet.iterator();
         while(rows.hasNext()) {
             Row row = rows.next();
@@ -190,7 +190,7 @@ public class DatabaseHandler {
     }
 
     public VectorClock getCurrentVectorClock(String groupName) throws UnknownHostException {
-        ResultSet resultSet = session.execute("SELECT vectorClock FROM messages WHERE group = '" + groupName + "';");
+        ResultSet resultSet = session.execute("SELECT vectorClock FROM messages WHERE group = '" + groupName + "' ALLOW FILTERING;");
         Iterator<Row> rows = resultSet.iterator();
         VectorClock clock = new VectorClock();
         while(rows.hasNext()) {
