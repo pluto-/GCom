@@ -101,8 +101,8 @@ public class DatabaseHandler {
 
         session.execute("CREATE KEYSPACE IF NOT EXISTS gcom WITH REPLICATION = {'class' : 'SimpleStrategy', 'replication_factor' : 3};");
         session.execute("USE gcom;");
-        session.execute("CREATE TABLE IF NOT EXISTS messages (vectorClock text PRIMARY KEY, message text, senderAddress text," +
-                            " senderPort int, group text, beenAt text, addedBy text, isViewChange boolean);");
+        session.execute("CREATE TABLE IF NOT EXISTS messages (vectorClock text, message text, senderAddress text," +
+                            " senderPort int, group text, beenAt text, addedBy text, isViewChange boolean, PRIMARY KEY(vectorClock, group));");
         session.execute("CREATE TABLE IF NOT EXISTS members (group text, hostAddress text, hostPort int, " +
                                 "vectorClock text, connected boolean, PRIMARY KEY(group, hostAddress, hostPort));");
         session.execute("CREATE TABLE IF NOT EXISTS groups (groupName text PRIMARY KEY, leaderAddress text, leaderPort int);");
