@@ -27,7 +27,7 @@ public class DatabaseHandler {
             isViewChange = true;
         }
 
-        ResultSet resultSet = session.execute("SELECT * FROM messages WHERE vectorClock='" + vectorClock + "';");
+        ResultSet resultSet = session.execute("SELECT * FROM messages WHERE vectorClock='" + vectorClock + "' AND group='" + message.getGroupName() + "';");
         if(!resultSet.iterator().hasNext()) {
             session.execute("INSERT INTO messages (vectorClock, message, senderAddress, senderPort, group, beenAt, addedBy, isViewChange) VALUES" +
                     "('" +
