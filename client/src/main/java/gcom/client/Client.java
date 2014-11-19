@@ -136,12 +136,11 @@ public class Client implements GComClient, HoldBackQueueListener, VectorClockLis
     }
 
     public static void main(String[] args) {
-        if(args.length < 2) {
-            System.err.println("Parameters: [Local RMI port to be used] [Cassandra address]");
+        if(args.length < 1) {
+            System.err.println("Parameters: [Local RMI port to be used]");
             System.exit(1);
         }
         final int rmiPort = Integer.valueOf(args[0]);
-        final String cassandraAddress = args[1];
 
         SwingUtilities.invokeLater(new Runnable() {
             @Override

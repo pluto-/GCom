@@ -213,8 +213,7 @@ public class DatabaseHandler {
         }
         Collections.sort(messages);
         for(Message message : messages) {
-            if(!clock.getClock().containsKey(message.getSource()) || clock.isBeforeOrEqualOnAllValuesExcept(message.getVectorClock(), message.getSource()) &&
-                    clock.getValue(message.getSource()) < message.getVectorClock().getValue(message.getSource())) {
+            if(!clock.getClock().containsKey(message.getSource()) || !clock.hasReceived(message)) {
 
                 newMessages.add(message);
             }

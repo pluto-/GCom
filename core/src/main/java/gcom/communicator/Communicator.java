@@ -9,6 +9,8 @@ import java.net.MalformedURLException;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -58,28 +60,33 @@ public class Communicator implements PeerCommunication {
      * @param groupMembers the group members.
      */
     public synchronized void multicast(Message message, ArrayList<Host> groupMembers) {
-        for(Host member : groupMembers) {
-            if(!member.equals(self)) {
+
+        ArrayList<Host> deadHosts = new ArrayList<>();
+
+        for (Host member : groupMembers) {
+            if (!member.equals(self)) {
                 if (!channelMap.containsKey(member)) {
                     try {
                         channelMap.put(member, new CommunicationChannel(member, this));
                     } catch (RemoteException | NotBoundException | MalformedURLException e) {
                         logger.error("Triggering view change, removing " + member);
-                        triggerViewChange(member, message.getGroupName());
+                        //triggerViewChange(member, message.getGroupName());
+                        deadHosts.add(member);
                     }
                 }
                 try {
                     System.out.println("ChannelMap " + member.toString());
                     CommunicationChannel communicationChannel;
-                    if((communicationChannel = channelMap.get(member)) != null) {
+                    if ((communicationChannel = channelMap.get(member)) != null) {
                         communicationChannel.send(message);
                     }
                 } catch (InterruptedException e) {
                     logger.error("Triggering view change, removing " + member);
-                    triggerViewChange(member, message.getGroupName());
+                    //triggerViewChange(member, message.getGroupName());
+                    deadHosts.add(member);
                 }
             }
-            if(sleepMillisBetweenClients > 0) {
+            if (sleepMillisBetweenClients > 0) {
                 try {
                     Thread.sleep(sleepMillisBetweenClients);
                 } catch (InterruptedException e) {
@@ -87,6 +94,11 @@ public class Communicator implements PeerCommunication {
                 }
             }
         }
+
+        for(Host deadHost : deadHosts) {
+            triggerViewChange(deadHost, message.getGroupName());
+        }
+
     }
 
     @Override
