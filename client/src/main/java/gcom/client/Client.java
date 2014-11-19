@@ -26,19 +26,17 @@ public class Client implements GComClient, HoldBackQueueListener, VectorClockLis
     /**
      * Creates the GUI object and the GCom object.
      * @param rmiPort the local RMI port.
-     * @param cassandraAddress address to the name service.
      */
-    public Client(int rmiPort, String cassandraAddress) {
+    public Client(int rmiPort) {
 
         System.out.println("Local RMI port to be used: " + rmiPort);
-        System.out.println("Cassandra address: " + cassandraAddress);
 
         System.out.print("Initializing GUI...");
         clientGUI = new ClientGUI(this);
         System.out.println(" Done!");
         System.out.print("Setting up GCom...");
         try {
-            gCom = new GCom(rmiPort, this, cassandraAddress);
+            gCom = new GCom(rmiPort, this);
 
         } catch (RemoteException e) {
             e.printStackTrace();
@@ -154,15 +152,9 @@ public class Client implements GComClient, HoldBackQueueListener, VectorClockLis
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-                if(cassandraAddress.equalsIgnoreCase("localhost")) {
-                    try {
-                        new Client(rmiPort, InetAddress.getLocalHost().getHostAddress());
-                    } catch (UnknownHostException e) {
-                        e.printStackTrace();
-                    }
-                } else {
-                    new Client(rmiPort, cassandraAddress);
-                }
+
+                new Client(rmiPort);
+
             }
         });
     }

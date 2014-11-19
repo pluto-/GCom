@@ -18,7 +18,7 @@ import java.util.Iterator;
 
 public class DatabaseHandler {
 
-    private static final String configPath = "config.properties";
+    private static final String configPath = "resources/config.properties";
 
     private final Host self;
     Session session;
