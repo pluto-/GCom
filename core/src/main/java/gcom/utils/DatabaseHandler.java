@@ -7,13 +7,18 @@ import com.datastax.driver.core.Row;
 import com.datastax.driver.core.Session;
 import com.datastax.driver.core.exceptions.InvalidQueryException;
 
+import java.io.*;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 
 public class DatabaseHandler {
+
+    private static final String configPath = "config.properties";
 
     private final Host self;
     Session session;
@@ -87,14 +92,42 @@ public class DatabaseHandler {
             ")");
     }
 
-    public DatabaseHandler(String address, Host self) {
+    private ArrayList<String> readContactPoints() throws IOException {
+        ArrayList<String> contactPoints = new ArrayList<>();
+
+        InputStream fis;
+        BufferedReader br;
+        String         line;
+
+        fis = new FileInputStream(configPath);
+        br = new BufferedReader(new InputStreamReader(fis, Charset.forName("UTF-8")));
+        while ((line = br.readLine()) != null) {
+            contactPoints.add(line);
+        }
+
+        // Done with the file
+        br.close();
+        br = null;
+        fis = null;
+
+        return contactPoints;
+    }
+
+    public DatabaseHandler(Host self) throws IOException {
 
         this.self = self;
 
+        Iterator<String> contactPoints = readContactPoints().iterator();
+
         // Connect to the Cassandra cluster
-        Cluster cluster = Cluster.builder()
-            .addContactPoint(address)
-            .build();
+        Cluster.Builder builder = Cluster.builder();
+        while(contactPoints.hasNext()) {
+            String next = contactPoints.next();
+            builder = builder.addContactPoint(next);
+
+        }
+
+        Cluster cluster = builder.build();
 
         // Connect to the "mykeyspace" keyspace
         session = cluster.connect();
