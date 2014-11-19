@@ -42,7 +42,7 @@ public class Communicator implements PeerCommunication {
      * @param deadHost the dead remote client.
      * @param groupName the group.
      */
-    public void triggerViewChange(Host deadHost, String groupName) {
+    public synchronized void triggerViewChange(Host deadHost, String groupName) {
         removeChannel(deadHost);
         gCom.triggerViewChange(deadHost, groupName);
     }
@@ -57,7 +57,7 @@ public class Communicator implements PeerCommunication {
      * @param message the message.
      * @param groupMembers the group members.
      */
-    public void multicast(Message message, ArrayList<Host> groupMembers) {
+    public synchronized void multicast(Message message, ArrayList<Host> groupMembers) {
         for(Host member : groupMembers) {
             if(!member.equals(self)) {
                 if (!channelMap.containsKey(member)) {
