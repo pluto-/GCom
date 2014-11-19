@@ -138,8 +138,8 @@ public class Client implements GComClient, HoldBackQueueListener, VectorClockLis
     }
 
     public static void main(String[] args) {
-        if(args.length < 3) {
-            System.err.println("Parameters: [Local RMI port to be used] [Name service address] [Name service port]");
+        if(args.length < 2) {
+            System.err.println("Parameters: [Local RMI port to be used] [Cassandra address]");
             System.exit(1);
         }
         final int rmiPort = Integer.valueOf(args[0]);
