@@ -10,6 +10,7 @@ import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
@@ -112,6 +113,28 @@ public class GCom implements Runnable {
         return false;
     }
 
+    private void checkForMissedMessages(Message message) throws UnknownHostException {
+        Map<Host, Integer> clock = groupManager.getVectorClock(message.getGroupName()).getClock();
+        boolean outOfDate = false;
+        for(Host host : message.getVectorClock().getClock().keySet()) {
+            int value = message.getVectorClock().getValue(host);
+            if(host.equals(message.getSource())) {
+                value--;
+            }
+            if(!clock.containsKey(host) || clock.get(host) < value) {
+                outOfDate = true;
+                break;
+            }
+        }
+        if(outOfDate) {
+            List<Message> newMessages = databaseHandler.getMissingMessages(groupManager.getGroup(message.getGroupName()));
+            for(Message newMessage: newMessages) {
+                messageSorters.get(newMessage.getGroupName()).receive(newMessage);
+            }
+        }
+
+    }
+
     /**
      * Joins the specified group.
      * @param groupName the group to join.
@@ -186,6 +209,11 @@ public class GCom implements Runnable {
                 communicator.multicast(message, getGroupMembers(message.getGroupName()));
             }
             messageSorters.get(message.getGroupName()).receive(message);
+            try {
+                checkForMissedMessages(message);
+            } catch (UnknownHostException e) {
+                e.printStackTrace();
+            }
         }
     }
 

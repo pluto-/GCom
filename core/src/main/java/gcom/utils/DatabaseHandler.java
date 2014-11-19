@@ -11,10 +11,7 @@ import java.io.*;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Iterator;
+import java.util.*;
 
 public class DatabaseHandler {
 
@@ -50,7 +47,7 @@ public class DatabaseHandler {
     }
 
     public boolean hasMember(Host host, String groupName) {
-        ResultSet resultSet = session.execute("SELECT * FROM members WHERE group = '"+ groupName + "' AND hostAddress = '" + host.getAddress().getHostAddress() + "' AND hostPort =" + host.getPort());
+        ResultSet resultSet = session.execute("SELECT * FROM members WHERE group = '" + groupName + "' AND hostAddress = '" + host.getAddress().getHostAddress() + "' AND hostPort =" + host.getPort());
         return resultSet.iterator().hasNext();
     }
 
@@ -234,6 +231,43 @@ public class DatabaseHandler {
             }
         }
         return clock;
+    }
+
+    public List<Message> getMissingMessages(Group group) throws UnknownHostException {
+        ResultSet resultSet = session.execute("SELECT * FROM messages WHERE group = '" + group.getName() + "' ALLOW FILTERING;");
+        Iterator<Row> rows = resultSet.iterator();
+        ArrayList<Message> messages = new ArrayList<>();
+        ArrayList<Message> newMessages = new ArrayList<>();
+
+        while(rows.hasNext()) {
+            Row row = rows.next();
+            boolean isReliable = false;
+            boolean deliverCausally = true;
+            String text = row.getString("message");
+            String hostAddress = row.getString("senderAddress");
+            int hostPort = row.getInt("senderPort");
+            Host sender = new Host(InetAddress.getByName(hostAddress), hostPort);
+            VectorClock vectorClock = VectorClock.fromString(row.getString("vectorClock"));
+            String groupName = row.getString("group");
+            boolean isViewChange = row.getBool("isViewChange");
+
+            Message message;
+            if(isViewChange) {
+                message = new OfflineViewChange(isReliable, deliverCausally, text, sender, vectorClock, groupName, null);
+            } else {
+                message = new Message(isReliable, deliverCausally, text, sender, vectorClock, groupName);
+
+            }
+            messages.add(message);
+        }
+        Collections.sort(messages);
+        VectorClock clock = group.getVectorClock();
+        for(Message message : messages) {
+            if(!clock.getClock().containsKey(message.getSource()) || !clock.hasReceived(message)) {
+                newMessages.add(message);
+            }
+        }
+        return newMessages;
     }
 }
 
