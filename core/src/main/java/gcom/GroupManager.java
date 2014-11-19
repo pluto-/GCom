@@ -23,7 +23,6 @@ public class GroupManager implements NameServiceClient {
     private DatabaseHandler databaseHandler;
     /**
      * Connects to the remote name service.
-     * @param nameServiceHost the address and port of the name service.
      * @param self the local host.
      * @param gCom the GCom which has this object.
      * @throws RemoteException
@@ -74,6 +73,7 @@ public class GroupManager implements NameServiceClient {
             setLeader(group.getName(), self);
             databaseHandler.updateMemberConnected(group.getName(), leader, false);
             databaseHandler.setLeader(group.getName(), self);
+            addMember(group.getName(), self);
         }
     }
 
