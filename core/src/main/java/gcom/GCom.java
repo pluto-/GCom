@@ -41,16 +41,15 @@ public class GCom implements Runnable {
      * Creates a RMI server on the specified port. Creates the thread which delivers the messages to the GComClient.
      * @param rmiPort the port number for the local RMI registry.
      * @param gcomClient The GComClient which uses GCom.
-     * @param nameService the name service.
      * @throws Exception
      */
-    public GCom(int rmiPort, GComClient gcomClient, Host nameService, String cassandraAddress)
+    public GCom(int rmiPort, GComClient gcomClient, String cassandraAddress)
             throws Exception {
         RmiServer rmiServer = new RmiServer(rmiPort);
         self = rmiServer.getHost();
         databaseHandler = new DatabaseHandler(cassandraAddress, self);
         this.gcomClient = gcomClient;
-        groupManager = new GroupManager(nameService, self, this, databaseHandler);
+        groupManager = new GroupManager(self, this, databaseHandler);
         communicator = new Communicator(this, self);
         PeerCommunication stub = (PeerCommunication) UnicastRemoteObject.exportObject(communicator, rmiPort);
         rmiServer.bind(PeerCommunication.class.getSimpleName(), stub);

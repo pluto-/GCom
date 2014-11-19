@@ -30,7 +30,7 @@ public class GroupManager implements NameServiceClient {
      * @throws NotBoundException
      * @throws MalformedURLException
      */
-    public GroupManager (Host nameServiceHost, Host self, GCom gCom, DatabaseHandler databaseHandler) throws RemoteException, NotBoundException, MalformedURLException {
+    public GroupManager (Host self, GCom gCom, DatabaseHandler databaseHandler) throws RemoteException, NotBoundException, MalformedURLException {
 
         groups = new HashMap<>();
         this.self = self;
