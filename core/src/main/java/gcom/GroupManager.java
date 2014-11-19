@@ -18,7 +18,6 @@ import java.util.Map;
 public class GroupManager implements NameServiceClient {
 
     private Map<String, Group> groups;
-    private NameServiceGroupManagement nameService;
     private Host self;
     private GCom gCom;
     private DatabaseHandler databaseHandler;
@@ -32,7 +31,6 @@ public class GroupManager implements NameServiceClient {
      * @throws MalformedURLException
      */
     public GroupManager (Host nameServiceHost, Host self, GCom gCom, DatabaseHandler databaseHandler) throws RemoteException, NotBoundException, MalformedURLException {
-        nameService = (NameServiceGroupManagement) Naming.lookup("rmi://" + nameServiceHost + "/" + NameServiceGroupManagement.class.getSimpleName());
 
         groups = new HashMap<>();
         this.self = self;
@@ -58,7 +56,25 @@ public class GroupManager implements NameServiceClient {
             clock = databaseHandler.getCurrentVectorClock(group.getName());
             group.setVectorClock(clock);
         }
-        nameService.joinGroup(group.getName(), self);
+
+        //nameService.joinGroup(group.getName(), self);
+
+        Host leader;
+        if((leader = databaseHandler.getLeader(group.getName())) == null) {
+            databaseHandler.setLeader(group.getName(), leader);
+            leader = self;
+        }
+        setLeader(group.getName(), leader);
+
+        try {
+            NameServiceClient stub = (NameServiceClient) Naming.lookup("rmi://" + leader + "/" + NameServiceClient.class.getSimpleName());
+            stub.addMember(group.getName(), self);
+
+        } catch(NotBoundException | RemoteException | MalformedURLException | UnknownHostException e) {
+                setLeader(group.getName(), self);
+                databaseHandler.updateMemberConnected(group.getName(), leader, false);
+                setLeader(group.getName(), self);
+        }
     }
 
     public Group getGroup(String groupName) {
