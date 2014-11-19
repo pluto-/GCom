@@ -61,7 +61,7 @@ public class GroupManager implements NameServiceClient {
 
         Host leader;
         if((leader = databaseHandler.getLeader(group.getName())) == null) {
-            databaseHandler.setLeader(group.getName(), leader);
+            databaseHandler.setLeader(group.getName(), self);
             leader = self;
         }
         setLeader(group.getName(), leader);
@@ -71,9 +71,9 @@ public class GroupManager implements NameServiceClient {
             stub.addMember(group.getName(), self);
 
         } catch(NotBoundException | RemoteException | MalformedURLException | UnknownHostException e) {
-                setLeader(group.getName(), self);
-                databaseHandler.updateMemberConnected(group.getName(), leader, false);
-                setLeader(group.getName(), self);
+            setLeader(group.getName(), self);
+            databaseHandler.updateMemberConnected(group.getName(), leader, false);
+            databaseHandler.setLeader(group.getName(), self);
         }
     }
 
