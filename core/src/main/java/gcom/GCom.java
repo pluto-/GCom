@@ -154,7 +154,7 @@ public class GCom implements Runnable {
      * @param deadHost
      * @param groupName
      */
-    public void triggerViewChange(Host deadHost, String groupName) {
+    public void triggerViewChange(Host deadHost, String groupName) throws UnknownHostException {
         Group group = groupManager.getGroup(groupName);
         databaseHandler.updateMemberConnected(groupName, deadHost, false);
         group.getMembers().remove(deadHost);
@@ -165,9 +165,11 @@ public class GCom implements Runnable {
      * Creates the viewChange object and uses sendMessage to send it.
      * @param group the new view.
      */
-    public void sendViewChange(Group group) {
+    public void sendViewChange(Group group) throws UnknownHostException {
+        VectorClock clock = databaseHandler.getCurrentVectorClock(group.getName());
+        clock.increment(self);
         groupManager.getVectorClock(group.getName()).increment(self);
-        ViewChange viewChange = new ViewChange(true, true, null, self, groupManager.getVectorClock(group.getName()), group.getName(), group.getMembers());
+        ViewChange viewChange = new ViewChange(true, true, null, self, clock, group.getName(), group.getMembers());
         sendMessage(viewChange, viewChange.getMembers());
     }
 
