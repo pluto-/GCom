@@ -123,7 +123,7 @@ public class Client implements GComClient, HoldBackQueueListener, VectorClockLis
      * @param sendReliably if the message should be sent reliably.
      * @param deliverCausally if the message should be ordered causally.
      */
-    public void sendMessage(String message, boolean sendReliably, boolean deliverCausally) {
+    public void sendMessage(String message, boolean sendReliably, boolean deliverCausally) throws UnknownHostException {
         gCom.sendMessage(message, group, sendReliably, deliverCausally);
     }
 

@@ -7,6 +7,7 @@ import javax.swing.*;
 import javax.swing.text.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.net.UnknownHostException;
 
 /** Shows the test/debug graphical user interface. Acts as View in MVC design pattern.
  * Created by Jonas on 2014-10-06.
@@ -78,7 +79,11 @@ public class ClientGUI extends JFrame implements ActionListener, ItemListener {
 
             public void actionPerformed(ActionEvent e){
 
-                send();
+                try {
+                    send();
+                } catch (UnknownHostException e1) {
+                    e1.printStackTrace();
+                }
 
             }});
 
@@ -193,7 +198,7 @@ public class ClientGUI extends JFrame implements ActionListener, ItemListener {
         chat.setCaretPosition(chat.getDocument().getLength());
     }
 
-    private void send() {
+    private void send() throws UnknownHostException {
         if(message.getText().length() > 0) {
             if (message.getText().equals(".clear")) {
                 chat.setText("Cleared all messages\n");
@@ -209,7 +214,11 @@ public class ClientGUI extends JFrame implements ActionListener, ItemListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         if(e.getSource().equals(send)) {
-            send();
+            try {
+                send();
+            } catch (UnknownHostException e1) {
+                e1.printStackTrace();
+            }
 
         } else if(e.getSource().equals(setMulticastSleep)) {
             int sleepMillis = Integer.valueOf(JOptionPane.showInputDialog("Specify how many milliseconds GCom should sleep between the clients when sending a multicast."));

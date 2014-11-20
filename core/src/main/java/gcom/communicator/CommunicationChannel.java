@@ -7,6 +7,7 @@ import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 
 import java.net.MalformedURLException;
+import java.net.UnknownHostException;
 import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
@@ -83,9 +84,17 @@ public class CommunicationChannel implements Runnable {
                 } catch (NotBoundException | MalformedURLException | RemoteException e1) {
                     if(message != null) {
                         logger.error(e.getClass().getSimpleName() + " contacting: " + host + " for group: " + message.getGroupName() + " - triggering view change");
-                        communicator.triggerViewChange(host, message.getGroupName());
+                        try {
+                            communicator.triggerViewChange(host, message.getGroupName());
+                        } catch (UnknownHostException e2) {
+                            e2.printStackTrace();
+                        }
                     }
+                } catch (UnknownHostException e1) {
+                    e1.printStackTrace();
                 }
+            } catch (UnknownHostException e) {
+                e.printStackTrace();
             }
         }
     }

@@ -81,7 +81,7 @@ public class GroupManager implements NameServiceClient {
         return groups.get(groupName);
     }
 
-    public void leaveGroup(String groupName) throws RemoteException {
+    public void leaveGroup(String groupName) throws RemoteException, UnknownHostException {
         Group group = groups.get(groupName);
         group.removeMember(self);
         gCom.sendViewChange(group);

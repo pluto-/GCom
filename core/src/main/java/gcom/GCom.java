@@ -88,7 +88,7 @@ public class GCom implements Runnable {
      * @param sendReliably if the message should be sent reliably.
      * @param deliverCausally if the message should be ordered causally.
      */
-    public void sendMessage(String text, String group, boolean sendReliably, boolean deliverCausally) {
+    public void sendMessage(String text, String group, boolean sendReliably, boolean deliverCausally) throws UnknownHostException {
         VectorClock clock = groupManager.getVectorClock(group);
         clock.increment(self);
         databaseHandler.updateMemberVectorClock(group, self, clock);
@@ -173,7 +173,7 @@ public class GCom implements Runnable {
         sendMessage(viewChange, viewChange.getMembers());
     }
 
-    private void sendMessage(Message message, ArrayList<Host> members){
+    private void sendMessage(Message message, ArrayList<Host> members) throws UnknownHostException {
         deliveryQueue.add(message);
         communicator.multicast(message, members);
     }
@@ -203,7 +203,7 @@ public class GCom implements Runnable {
      * message, then it is given to the message sorter.
      * @param message the received message from Communicator.
      */
-    public void receive(Message message) {
+    public void receive(Message message) throws UnknownHostException {
         if(hasReceived(message)) {
             alreadyReceived(message);
         } else {

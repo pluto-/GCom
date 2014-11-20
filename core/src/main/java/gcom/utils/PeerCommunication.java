@@ -1,6 +1,7 @@
 package gcom.utils;
 
 
+import java.net.UnknownHostException;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 
@@ -9,5 +10,5 @@ import java.rmi.RemoteException;
  * Created by Jonas on 2014-10-03.
  */
 public interface PeerCommunication extends Remote {
-    public void receiveMessage(Message message) throws RemoteException;
+    public void receiveMessage(Message message) throws RemoteException, UnknownHostException;
 }
