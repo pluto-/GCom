@@ -210,20 +210,6 @@ public class GCom implements Runnable {
                 communicator.multicast(message, getGroupMembers(message.getGroupName()));
             }
             messageSorters.get(message.getGroupName()).receive(message);
-            if(message instanceof ViewChange) {
-                ViewChange viewChange = (ViewChange) message;
-                Map<Host, Integer> clock = viewChange.getVectorClock().getClock();
-                boolean update = false;
-                for(Host host : clock.keySet()) {
-                    if(clock.get(host) < groupManager.getVectorClock(viewChange.getGroupName()).getValue(host)) {
-                        update = true;
-                        break;
-                    }
-                }
-                if(update) {
-                    sendViewChange(groupManager.getGroup(message.getGroupName()));
-                }
-            }
             try {
                 checkForMissedMessages(message);
             } catch (UnknownHostException e) {

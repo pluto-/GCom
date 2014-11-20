@@ -140,6 +140,17 @@ public class GroupManager implements NameServiceClient {
                 sendJoinGroup(group);
             }
             groups.get(group.getName()).setMembers(members);
+            Map<Host, Integer> clock = viewChange.getVectorClock().getClock();
+            boolean update = false;
+            for(Host host : clock.keySet()) {
+                if(clock.get(host) < getVectorClock(viewChange.getGroupName()).getValue(host)) {
+                    update = true;
+                    break;
+                }
+            }
+            if(update) {
+                gCom.sendViewChange(group);
+            }
         }
     }
 
