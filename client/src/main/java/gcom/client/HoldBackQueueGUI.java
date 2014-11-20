@@ -17,7 +17,7 @@ import java.util.List;
 public class HoldBackQueueGUI extends JFrame {
 
     private JTextArea holdBackQueueText;
-    private List<Message> messages;
+    private volatile List<Message> messages;
 
     public HoldBackQueueGUI() {
         super("Hold-Back Queue");
