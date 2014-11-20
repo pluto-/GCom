@@ -4,6 +4,7 @@ import gcom.communicator.Communicator;
 import gcom.utils.*;
 import org.apache.log4j.Logger;
 
+import javax.swing.text.View;
 import java.net.MalformedURLException;
 import java.net.UnknownHostException;
 import java.rmi.NotBoundException;
@@ -127,7 +128,7 @@ public class GCom implements Runnable {
             }
         }
         if(outOfDate) {
-            List<Message> newMessages = databaseHandler.getMissingMessages(groupManager.getGroup(message.getGroupName()));
+            List<Message> newMessages = databaseHandler.getNewMessages(message.getGroupName(), groupManager.getVectorClock(message.getGroupName()));
             for(Message newMessage: newMessages) {
                 messageSorters.get(newMessage.getGroupName()).receive(newMessage);
             }
@@ -209,6 +210,20 @@ public class GCom implements Runnable {
                 communicator.multicast(message, getGroupMembers(message.getGroupName()));
             }
             messageSorters.get(message.getGroupName()).receive(message);
+            if(message instanceof ViewChange) {
+                ViewChange viewChange = (ViewChange) message;
+                Map<Host, Integer> clock = viewChange.getVectorClock().getClock();
+                boolean update = false;
+                for(Host host : clock.keySet()) {
+                    if(clock.get(host) < groupManager.getVectorClock(viewChange.getGroupName()).getValue(host)) {
+                        update = true;
+                        break;
+                    }
+                }
+                if(update) {
+                    sendViewChange(groupManager.getGroup(message.getGroupName()));
+                }
+            }
             try {
                 checkForMissedMessages(message);
             } catch (UnknownHostException e) {
