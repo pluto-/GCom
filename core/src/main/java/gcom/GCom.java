@@ -170,6 +170,7 @@ public class GCom implements Runnable {
         clock.increment(self);
         groupManager.getVectorClock(group.getName()).increment(self);
         ViewChange viewChange = new ViewChange(true, true, null, self, clock, group.getName(), group.getMembers());
+        checkForMissedMessages(viewChange);
         sendMessage(viewChange, viewChange.getMembers());
     }
 
