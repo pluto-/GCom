@@ -41,7 +41,10 @@ public class VectorClock implements Serializable {
     public void increment(Host host) {
         System.err.println("Incrementing vector value for : " + host + " to: " + (getValue(host) + 1));
         clock.put(host, getValue(host) + 1);
-        vectorClockListener.vectorClockUpdated(this);
+        if(vectorClockListener != null) {
+            vectorClockListener.vectorClockUpdated(this);
+
+        }
     }
 
     public boolean isBefore(VectorClock other, Host host) {
